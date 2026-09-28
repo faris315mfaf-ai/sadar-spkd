@@ -84,10 +84,18 @@ EXIT;
 
 ## 4. Pasang aplikasi
 
+Repo `faris315mfaf-ai/sadar-spkd` bersifat private, jadi VPS perlu login GitHub sekali. Cara termudah dengan GitHub CLI (pilih *GitHub.com → HTTPS → Login with a web browser*, lalu buka kode yang muncul di browser mana pun):
+
+```bash
+sudo apt install -y gh
+gh auth login
+gh auth setup-git
+```
+
 ```bash
 sudo mkdir -p /var/www && sudo chown $USER:$USER /var/www
 cd /var/www
-git clone https://github.com/<akun-anda>/sadar-spkd.git absensi
+git clone https://github.com/faris315mfaf-ai/sadar-spkd.git absensi
 cd absensi
 composer install --no-dev --optimize-autoloader
 cp .env.example .env
