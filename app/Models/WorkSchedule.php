@@ -21,6 +21,29 @@ class WorkSchedule extends Model
         'is_off' => 'boolean',
     ];
 
+    /**
+     * Default schedule for a division/position: OB, Security and Engineering have their own
+     * shifts; everyone else uses $preferredId when given, otherwise the regular schedule.
+     */
+    public static function defaultIdFor(?string $staff, ?string $position = null, ?int $preferredId = null): ?int
+    {
+        $staff = strtoupper(trim((string) $staff));
+        $position = strtoupper(trim((string) $position));
+
+        $code = match (true) {
+            $staff === 'OB' || $position === 'OB' => 'ob',
+            $staff === 'SECURITY' || $position === 'SECURITY' => 'security',
+            $staff === 'ENGINEERING' || str_contains($position, 'ENGINEERING') => 'engineering',
+            default => null,
+        };
+
+        if ($code === null && $preferredId) {
+            return $preferredId;
+        }
+
+        return static::query()->where('code', $code ?? 'regular')->value('id');
+    }
+
     public function employeeSchedules()
     {
         return $this->hasMany(EmployeeSchedule::class);

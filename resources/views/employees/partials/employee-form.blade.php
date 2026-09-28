@@ -1,5 +1,5 @@
 @php
-    $fieldClass = 'block min-h-11 w-full rounded-2xl border-gray-200 bg-gray-50 text-sm shadow-sm focus:border-red-500 focus:bg-white focus:ring-red-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100';
+    $fieldClass = 'block min-h-11 w-full rounded-2xl border-gray-200 bg-gray-50 text-sm shadow-sm focus:border-brand-500 focus:bg-white focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100';
     $labelClass = 'mb-1.5 block text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400';
 @endphp
 
@@ -26,7 +26,7 @@
                 <input type="file" name="profile_photo"
                     id="{{ $mode === 'edit' ? 'edit_profile_photo' : 'profile_photo' }}"
                     accept="image/png,image/jpeg,image/jpg,image/webp" data-photo-preview="{{ $mode }}"
-                    class="block w-full rounded-2xl border border-gray-200 bg-white text-sm text-gray-700 file:mr-4 file:rounded-xl file:border-0 file:bg-red-600 file:px-4 file:py-2.5 file:text-sm file:font-semibold file:text-white hover:file:bg-red-700 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-300 dark:file:bg-gray-700 dark:file:text-gray-100 dark:hover:file:bg-gray-600">
+                    class="block w-full rounded-2xl border border-gray-200 bg-white text-sm text-gray-700 file:mr-4 file:rounded-xl file:border-0 file:bg-brand-600 file:px-4 file:py-2.5 file:text-sm file:font-semibold file:text-white hover:file:bg-brand-700 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-300 dark:file:bg-gray-700 dark:file:text-gray-100 dark:hover:file:bg-gray-600">
 
                 <p class="mt-2 text-xs leading-relaxed text-gray-500 dark:text-gray-400">
                     Format JPG, JPEG, PNG, atau WEBP. Maksimal 2MB. Wajah harus terlihat jelas (digunakan untuk verifikasi absensi).
@@ -122,7 +122,7 @@
             <input type="text" name="basic_salary"
                 id="{{ $mode === 'edit' ? 'edit_basic_salary' : 'basic_salary' }}" value="1000000" inputmode="numeric"
                 placeholder="Masukkan gaji pokok" oninput="this.value = this.value.replace(/[^0-9]/g, '')"
-                class="block min-h-11 w-full rounded-none rounded-r-2xl border-gray-200 bg-gray-50 text-sm focus:border-red-500 focus:bg-white focus:ring-red-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100">
+                class="block min-h-11 w-full rounded-none rounded-r-2xl border-gray-200 bg-gray-50 text-sm focus:border-brand-500 focus:bg-white focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100">
         </div>
     </div>
 
@@ -165,14 +165,14 @@
         <label class="{{ $labelClass }}">Pengalaman Kerja</label>
         <textarea name="work_experience" id="{{ $mode === 'edit' ? 'edit_work_experience' : 'work_experience' }}"
             rows="2" placeholder="Masukkan pengalaman kerja"
-            class="block w-full rounded-2xl border-gray-200 bg-gray-50 text-sm shadow-sm focus:border-red-500 focus:bg-white focus:ring-red-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100"></textarea>
+            class="block w-full rounded-2xl border-gray-200 bg-gray-50 text-sm shadow-sm focus:border-brand-500 focus:bg-white focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100"></textarea>
     </div>
 
     <div class="md:col-span-2">
         <label class="{{ $labelClass }}">Alamat</label>
         <textarea name="address" id="{{ $mode === 'edit' ? 'edit_address' : 'address' }}" rows="2"
             placeholder="Masukkan alamat lengkap"
-            class="block w-full rounded-2xl border-gray-200 bg-gray-50 text-sm shadow-sm focus:border-red-500 focus:bg-white focus:ring-red-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100"></textarea>
+            class="block w-full rounded-2xl border-gray-200 bg-gray-50 text-sm shadow-sm focus:border-brand-500 focus:bg-white focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100"></textarea>
     </div>
 
     <div class="md:col-span-2 mt-1 rounded-2xl border border-gray-100 bg-gray-50/60 p-4 dark:border-gray-700 dark:bg-gray-900/40">
@@ -181,7 +181,7 @@
             <label class="inline-flex cursor-pointer items-center gap-2">
                 <input type="checkbox" name="roles[]" value="hr"
                     id="{{ $mode === 'edit' ? 'edit_role_hr' : 'role_hr' }}"
-                    class="rounded border-gray-300 text-red-600 shadow-sm focus:ring-red-500 dark:border-gray-600 dark:bg-gray-900">
+                    class="rounded border-gray-300 text-brand-600 shadow-sm focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-900">
                 <span class="text-sm font-medium text-gray-700 dark:text-gray-300">HR / Personalia</span>
                 <span class="rounded-full bg-sky-50 px-2 py-0.5 text-xs font-semibold text-sky-700 ring-1 ring-inset ring-sky-100 dark:bg-sky-950/40 dark:text-sky-300 dark:ring-sky-900/50">
                     Akses Dashboard &amp; Admin
@@ -232,7 +232,7 @@
                             onfocus="if(this.value === '0') this.value = ''"
                             onblur="if(this.value === '') this.value = '0'"
                             oninput="this.value = this.value.replace(/[^0-9]/g, '')"
-                            class="block min-h-11 w-full rounded-none rounded-r-2xl border-gray-200 bg-white text-sm focus:border-red-500 focus:ring-red-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100">
+                            class="block min-h-11 w-full rounded-none rounded-r-2xl border-gray-200 bg-white text-sm focus:border-brand-500 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100">
                     </div>
                 </div>
             @endforeach

@@ -131,12 +131,12 @@
             </div>
         </div>
     @else
-        <div class="relative overflow-hidden bg-gradient-to-br from-white via-white to-red-50/70 dark:from-gray-800 dark:via-gray-800 dark:to-red-950/20">
-            <div class="pointer-events-none absolute -right-14 -top-16 h-40 w-40 rounded-full border-[24px] border-red-100/60 dark:border-red-900/20"></div>
-            <div class="pointer-events-none absolute bottom-0 right-28 h-16 w-16 rounded-full bg-red-100/30 blur-xl dark:bg-red-900/10"></div>
+        <div class="relative overflow-hidden bg-gradient-to-br from-white via-white to-brand-50/70 dark:from-gray-800 dark:via-gray-800 dark:to-brand-950/20">
+            <div class="pointer-events-none absolute -right-14 -top-16 h-40 w-40 rounded-full border-[24px] border-brand-100/60 dark:border-brand-900/20"></div>
+            <div class="pointer-events-none absolute bottom-0 right-28 h-16 w-16 rounded-full bg-brand-100/30 blur-xl dark:bg-brand-900/10"></div>
 
             <div class="relative flex flex-col gap-5 px-5 py-6 sm:flex-row sm:items-center sm:px-7 sm:py-7">
-                <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-red-500 to-red-700 text-white shadow-lg shadow-red-600/20">
+                <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-500 to-brand-700 text-white shadow-lg shadow-brand-600/20">
                     <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -154,7 +154,7 @@
                         Belum melakukan absensi hari ini
                     </h2>
                     <div class="mt-2 flex items-center gap-2 text-sm font-medium text-gray-500 dark:text-gray-300">
-                        <svg class="h-4 w-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="h-4 w-4 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
@@ -163,8 +163,8 @@
                 </div>
             </div>
 
-            <div class="relative flex items-start gap-3 border-t border-red-100/80 bg-red-50/50 px-5 py-4 sm:items-center sm:px-7 dark:border-gray-700 dark:bg-gray-900/20">
-                <span class="mt-0.5 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-white text-red-600 shadow-sm ring-1 ring-gray-200 sm:mt-0 dark:bg-gray-800 dark:text-red-400 dark:ring-gray-700">
+            <div class="relative flex items-start gap-3 border-t border-brand-100/80 bg-brand-50/50 px-5 py-4 sm:items-center sm:px-7 dark:border-gray-700 dark:bg-gray-900/20">
+                <span class="mt-0.5 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-white text-brand-600 shadow-sm ring-1 ring-gray-200 sm:mt-0 dark:bg-gray-800 dark:text-brand-400 dark:ring-gray-700">
                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M12 4v16m0 0-4-4m4 4 4-4" />

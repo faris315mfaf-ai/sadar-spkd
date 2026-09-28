@@ -76,7 +76,7 @@
                 data-attendance-dates-trigger
                 data-title="Tanggal {{ $card['label'] }}"
                 data-dates='@json($dates)'
-                class="{{ $card['box'] }} w-full cursor-pointer ring-offset-2 transition hover:ring-2 hover:ring-red-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 dark:ring-offset-gray-800 dark:hover:ring-red-700"
+                class="{{ $card['box'] }} w-full cursor-pointer ring-offset-2 transition hover:ring-2 hover:ring-brand-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 dark:ring-offset-gray-800 dark:hover:ring-brand-700"
             >
                 <p class="{{ $card['value'] }}">{{ $card['count'] }}</p>
                 <p class="{{ $card['caption'] }}">{{ $card['label'] }}</p>

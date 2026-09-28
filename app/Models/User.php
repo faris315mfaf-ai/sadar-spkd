@@ -66,7 +66,8 @@ class User extends Authenticatable
             return route('dashboard');
         }
 
-        return route('login');
+        // Signed up but no biodata yet.
+        return route('onboarding.biodata');
     }
 
     public function canAccessPath(string $url): bool
@@ -82,6 +83,10 @@ class User extends Authenticatable
             if (preg_match('#^/attendance/\d+/doctor-note$#', $path)) {
                 return true;
             }
+        }
+
+        if (! $this->isAdmin() && ($path === '/onboarding' || str_starts_with($path, '/onboarding/'))) {
+            return true;
         }
 
         if ($this->employee !== null) {

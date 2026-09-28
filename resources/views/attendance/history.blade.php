@@ -15,29 +15,29 @@
 
             {{-- Page Header --}}
             <section
-                class="relative overflow-hidden rounded-3xl border border-red-900/10 bg-gradient-to-br from-red-700 via-red-600 to-rose-600 px-5 py-6 text-white shadow-lg shadow-red-900/10 sm:px-7 sm:py-7">
+                class="relative overflow-hidden rounded-3xl border border-brand-900/10 bg-gradient-to-br from-brand-700 via-brand-600 to-navy-800 px-5 py-6 text-white shadow-lg shadow-brand-900/10 sm:px-7 sm:py-7">
                 <div class="pointer-events-none absolute -right-16 -top-20 h-52 w-52 rounded-full border-[32px] border-white/10"></div>
                 <div class="pointer-events-none absolute -bottom-20 left-1/3 h-40 w-40 rounded-full bg-white/5 blur-2xl"></div>
 
                 <div class="relative flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
                     <div>
-                        <div class="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-red-50">
+                        <div class="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-brand-50">
                             <span class="h-1.5 w-1.5 rounded-full bg-amber-300"></span>
                             Rekam Kehadiran
                         </div>
                         <h1 class="mt-3 text-2xl font-bold tracking-tight sm:text-3xl">Riwayat Absensi</h1>
-                        <p class="mt-1.5 max-w-xl text-sm leading-relaxed text-red-50/90">
+                        <p class="mt-1.5 max-w-xl text-sm leading-relaxed text-brand-50/90">
                             Pantau catatan kehadiran, jam kerja, lembur, serta pengajuan izin dan sakit Anda.
                         </p>
                     </div>
 
                     <div class="flex items-center gap-3">
                         <div class="rounded-2xl border border-white/15 bg-white/10 px-4 py-3 backdrop-blur-sm">
-                            <p class="text-[10px] font-semibold uppercase tracking-wider text-red-100">Data ditemukan</p>
-                            <p class="mt-0.5 text-xl font-bold">{{ $recordTotal }} <span class="text-xs font-medium text-red-100">catatan</span></p>
+                            <p class="text-[10px] font-semibold uppercase tracking-wider text-brand-100">Data ditemukan</p>
+                            <p class="mt-0.5 text-xl font-bold">{{ $recordTotal }} <span class="text-xs font-medium text-brand-100">catatan</span></p>
                         </div>
                         <a href="{{ route('attendance.index') }}"
-                            class="inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm font-semibold text-red-700 shadow-sm transition hover:bg-red-50">
+                            class="inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl border border-white/20 bg-white px-4 py-3 text-sm font-semibold text-brand-700 shadow-sm transition hover:bg-brand-50">
                             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                             </svg>
@@ -131,7 +131,7 @@
                 {{-- Filter Bar --}}
                 <div class="border-b border-gray-100 bg-gray-50/70 px-4 py-5 sm:px-6 dark:border-gray-700 dark:bg-gray-800">
                     <div class="mb-4 flex items-center gap-3">
-                        <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-red-50 text-red-600 ring-1 ring-red-100 dark:bg-red-950/30 dark:text-red-400 dark:ring-red-900/50">
+                        <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50 text-brand-600 ring-1 ring-brand-100 dark:bg-brand-950/30 dark:text-brand-400 dark:ring-brand-900/50">
                             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707L14 14v5l-4 2v-7L3.293 7.293A1 1 0 013 6.586V4z" />
                             </svg>
@@ -155,7 +155,7 @@
                                 </svg>
                                 <input type="date" name="date" value="{{ $filters['date'] ?? '' }}"
                                     aria-label="Pilih tanggal absensi"
-                                    class="min-h-11 w-full rounded-xl border-gray-200 bg-white pl-10 pr-3 text-sm text-gray-700 shadow-sm transition focus:border-red-500 focus:ring-red-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200">
+                                    class="min-h-11 w-full rounded-xl border-gray-200 bg-white pl-10 pr-3 text-sm text-gray-700 shadow-sm transition focus:border-brand-500 focus:ring-brand-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200">
                             </div>
                         </label>
 
@@ -302,7 +302,7 @@
 
                                 @if ($record->hasDoctorNote())
                                     <x-attendance.doctor-note-link :attendance="$record" modal
-                                        class="mt-3 inline-flex min-h-10 w-full items-center justify-center rounded-xl border border-red-100 bg-red-50 px-4 py-2 text-xs font-semibold text-red-700 transition hover:bg-red-100 dark:border-red-900/50 dark:bg-red-950/20 dark:text-red-300 dark:hover:bg-red-950/40" />
+                                        class="mt-3 inline-flex min-h-10 w-full items-center justify-center rounded-xl border border-brand-100 bg-brand-50 px-4 py-2 text-xs font-semibold text-brand-700 transition hover:bg-brand-100 dark:border-brand-900/50 dark:bg-brand-950/20 dark:text-brand-300 dark:hover:bg-brand-950/40" />
                                 @endif
                             </div>
                         </article>
@@ -337,7 +337,7 @@
                         </thead>
                         <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
                             @forelse ($records as $record)
-                                <tr class="bg-white transition-colors hover:bg-red-50/30 dark:bg-gray-800 dark:hover:bg-gray-700/40">
+                                <tr class="bg-white transition-colors hover:bg-brand-50/30 dark:bg-gray-800 dark:hover:bg-gray-700/40">
                                     <td class="whitespace-nowrap px-5 py-4">
                                         <p class="text-sm font-bold text-gray-900 dark:text-white">{{ $record->date->translatedFormat('d M Y') }}</p>
                                         <p class="mt-0.5 text-xs text-gray-400">{{ $record->date->translatedFormat('l') }}</p>
@@ -399,7 +399,7 @@
                                             @endif
                                             @if ($record->hasDoctorNote())
                                                 <x-attendance.doctor-note-link :attendance="$record" :show-icon="false" modal
-                                                    class="mt-1 text-xs dark:text-red-400 dark:hover:text-red-300" />
+                                                    class="mt-1 text-xs dark:text-brand-400 dark:hover:text-brand-300" />
                                             @endif
                                         @elseif ($record->clockInReportText())
                                             <x-attendance.note-snippet

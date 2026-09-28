@@ -16,7 +16,7 @@ class CompanyProfileSeeder extends Seeder
         CompanyProfile::updateOrCreate(
             ['id' => 1],
             [
-                'name' => 'Nama Perusahaan',
+                'name' => 'PT Sistem Pelayanan Kesehatan dan Data',
                 'logo' => null,
                 'address' => 'Alamat kantor',
                 'email' => 'company@example.com',

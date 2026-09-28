@@ -6,7 +6,6 @@ use App\Enums\AttendanceType;
 use App\Models\Attendance;
 use App\Models\Employee;
 use App\Models\EmployeeSalaryComponent;
-use App\Models\EmployeeSchedule;
 use App\Models\Payroll;
 use App\Models\PayrollDetail;
 use App\Models\PayrollDetailChange;
@@ -273,6 +272,8 @@ class PayrollController extends Controller
 
         DB::transaction(function () use ($detail, $payroll) {
             PayrollChangeLogService::recordDelete($detail, auth()->user());
+            // Marked as a manual change so the next "Proses Gaji" does not recreate it.
+            $detail->forceFill(['is_adjustment' => true])->save();
             $detail->delete();
             $this->recalculatePayroll($payroll);
         });
@@ -408,22 +409,25 @@ class PayrollController extends Controller
             return back()->with('error', 'Kalender kerja belum tersedia untuk periode ini.');
         }
 
-        $workDays = $calendarDays->sum(fn ($day) => $day->type->weight());
-
         $employees = Employee::where('employment_status', 'active')->get();
+        $dateBreakdown = app(PayrollAttendanceDateBreakdown::class);
 
-        DB::transaction(function () use ($employees, $validated, $workDays) {
+        DB::transaction(function () use ($employees, $validated, $dateBreakdown) {
             foreach ($employees as $employee) {
                 $userId = $employee->user_id;
 
-                $offDays = EmployeeSchedule::query()
-                    ->where('employee_id', $employee->id)
-                    ->whereYear('work_date', $validated['period_year'])
-                    ->whereMonth('work_date', $validated['period_month'])
-                    ->whereHas('workSchedule', fn ($query) => $query->where('is_off', true))
-                    ->count();
+                // Per-date, same rules as the payroll detail breakdown: an off day on a holiday
+                // does not reduce work days, and attendance on a holiday does not hide a weekday alfa.
+                $expectedDates = $dateBreakdown->expectedWorkDates(
+                    $employee->id,
+                    $validated['period_month'],
+                    $validated['period_year'],
+                );
+                $coveredDates = $userId
+                    ? $dateBreakdown->coveredDates($userId, $validated['period_month'], $validated['period_year'])
+                    : collect();
 
-                $employeeWorkDays = max($workDays - $offDays, 0);
+                $employeeWorkDays = $expectedDates->count();
 
                 // ── 1. Attendance counts ──────────────────────────────────────
                 $presentDays = $userId
@@ -479,7 +483,7 @@ class PayrollController extends Controller
                         ->sum('overtime_hours')
                     : 0.0;
 
-                $absentDays = max($employeeWorkDays - $presentDays - $reportedSickDays - $leaveDays, 0);
+                $absentDays = $expectedDates->diff($coveredDates)->count();
 
                 // ── 2. Salary components ──────────────────────────────────────
                 $basicSalary = $employee->basic_salary ?? 0;
@@ -567,13 +571,11 @@ class PayrollController extends Controller
                     ->where('is_adjustment', false)
                     ->forceDelete();
 
+                // Only the generated SP rows; a LIKE 'SP%' would also wipe manual items such as "SPPD".
                 PayrollDetail::withTrashed()
                     ->where('payroll_id', $payroll->id)
                     ->where('is_adjustment', true)
-                    ->where(function ($q) {
-                        $q->where('name', 'like', 'Potongan SP%')
-                            ->orWhere('name', 'like', 'SP%');
-                    })
+                    ->whereIn('name', $this->generatedSpNames())
                     ->forceDelete();
 
                 PayrollDetail::create([
@@ -755,9 +757,28 @@ class PayrollController extends Controller
         return $penalties;
     }
 
+    /**
+     * @return list<string>
+     */
+    private function generatedSpNames(): array
+    {
+        $names = [];
+
+        foreach (['SP1', 'SP2', 'SP3'] as $level) {
+            foreach (['Telat', 'Izin', 'Alpha'] as $label) {
+                $names[] = "Potongan {$level} {$label}";
+            }
+        }
+
+        return $names;
+    }
+
+    /**
+     * An edited item, or a system item that HR deleted, keeps the system value from coming back.
+     */
     private function hasManualOverride(Payroll $payroll, string $name, string $type): bool
     {
-        return PayrollDetail::query()
+        return PayrollDetail::withTrashed()
             ->where('payroll_id', $payroll->id)
             ->where('name', $name)
             ->where('type', $type)

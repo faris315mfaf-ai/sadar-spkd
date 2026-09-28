@@ -11,7 +11,7 @@ $variantClasses = match($variant) {
     'red' => 'border-red-100 bg-red-50 dark:border-red-800/40 dark:bg-red-900/20',
     'blue' => 'border-blue-100 bg-blue-50 dark:border-blue-800/40 dark:bg-blue-900/20',
     'purple' => 'border-purple-100 bg-purple-50 dark:border-purple-800/40 dark:bg-purple-900/20',
-    'primary' => 'border-red-200 bg-red-600 dark:border-gray-700 dark:bg-gray-800',
+    'primary' => 'border-brand-200 bg-brand-600 dark:border-gray-700 dark:bg-gray-800',
     default => 'border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800',
 };
 

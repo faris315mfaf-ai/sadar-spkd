@@ -20,7 +20,7 @@
 
     $variantClasses = match ($variant) {
         'primary'
-            => 'bg-red-600 text-white hover:bg-red-700 dark:bg-gray-800 dark:text-gray-100 dark:border dark:border-gray-700 dark:hover:bg-gray-700',
+            => 'bg-brand-600 text-white hover:bg-brand-700 dark:bg-gray-800 dark:text-gray-100 dark:border dark:border-gray-700 dark:hover:bg-gray-700',
 
         'secondary'
             => 'border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700',
@@ -42,7 +42,7 @@
         'icon-danger'
             => 'inline-flex h-9 w-9 items-center justify-center rounded-xl text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10',
 
-        default => 'bg-red-600 text-white hover:bg-red-700',
+        default => 'bg-brand-600 text-white hover:bg-brand-700',
     };
 @endphp
 

@@ -121,12 +121,12 @@
 
     @if ($title)
 
-        <div class="relative overflow-hidden border-b border-red-100 bg-gradient-to-r from-red-50 via-white to-white px-5 py-5 dark:border-gray-700 dark:from-red-950/20 dark:via-gray-800 dark:to-gray-800 sm:px-8 sm:py-6">
-            <div class="pointer-events-none absolute -right-10 -top-14 h-32 w-32 rounded-full border-[20px] border-red-100/50 dark:border-red-900/10"></div>
+        <div class="relative overflow-hidden border-b border-brand-100 bg-gradient-to-r from-brand-50 via-white to-white px-5 py-5 dark:border-gray-700 dark:from-brand-950/20 dark:via-gray-800 dark:to-gray-800 sm:px-8 sm:py-6">
+            <div class="pointer-events-none absolute -right-10 -top-14 h-32 w-32 rounded-full border-[20px] border-brand-100/50 dark:border-brand-900/10"></div>
 
             <div class="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div class="flex min-w-0 items-center gap-4">
-                    <span class="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-red-500 to-red-700 text-white shadow-lg shadow-red-600/20">
+                    <span class="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-500 to-brand-700 text-white shadow-lg shadow-brand-600/20">
                         <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a3 3 0 006 0M9 5a3 3 0 016 0m-6 7 2 2 4-4" />
@@ -299,8 +299,8 @@
 
                         @if ($disableClockIn) title="Selesaikan absen pulang tugas security terlebih dahulu" @endif
 
-                        class="group flex min-h-14 items-center justify-center gap-2.5 rounded-2xl border border-red-200 bg-red-50/50 px-4 py-3.5 text-sm font-semibold text-red-700 shadow-sm transition hover:border-red-300 hover:bg-red-50 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 dark:border-red-900 dark:bg-red-950/20 dark:text-red-300 dark:hover:bg-red-950/30 sm:text-base">
-                        <span class="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-white text-red-600 shadow-sm ring-1 ring-red-100 transition group-hover:scale-105 dark:bg-gray-800 dark:text-red-400 dark:ring-red-900">
+                        class="group flex min-h-14 items-center justify-center gap-2.5 rounded-2xl border border-brand-200 bg-brand-50/50 px-4 py-3.5 text-sm font-semibold text-brand-700 shadow-sm transition hover:border-brand-300 hover:bg-brand-50 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 dark:border-brand-900 dark:bg-brand-950/20 dark:text-brand-300 dark:hover:bg-brand-950/30 sm:text-base">
+                        <span class="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-white text-brand-600 shadow-sm ring-1 ring-brand-100 transition group-hover:scale-105 dark:bg-gray-800 dark:text-brand-400 dark:ring-brand-900">
                             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5 4 12m0 0 7 7m-7-7h16" />
                             </svg>
@@ -315,7 +315,7 @@
 
                         @if ($showClockOutWaiting && $clockOutOpensAt) title="Absen pulang dibuka mulai {{ $clockOutOpensAt }}" @endif
 
-                        class="group flex min-h-14 items-center justify-center gap-2.5 rounded-2xl bg-gradient-to-r from-red-600 to-red-700 px-4 py-3.5 text-sm font-semibold text-white shadow-md shadow-red-600/20 transition hover:from-red-700 hover:to-red-800 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 sm:text-base">
+                        class="group flex min-h-14 items-center justify-center gap-2.5 rounded-2xl bg-gradient-to-r from-brand-600 to-brand-700 px-4 py-3.5 text-sm font-semibold text-white shadow-md shadow-brand-600/20 transition hover:from-brand-700 hover:to-brand-800 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 sm:text-base">
                         Pulang
                         <span class="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-white/15 text-white transition group-hover:scale-105">
                             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -352,7 +352,7 @@
 
                     @if (!$profilePhotoUrl || (!$hasFaceRegistered && !$needsFaceDescriptorSync)) disabled @endif
 
-                    class="flex w-full items-center justify-center gap-2.5 rounded-xl bg-red-600 px-6 py-3.5 text-base font-semibold text-white shadow-sm hover:bg-red-700 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 transition-all">
+                    class="flex w-full items-center justify-center gap-2.5 rounded-xl bg-brand-600 px-6 py-3.5 text-base font-semibold text-white shadow-sm hover:bg-brand-700 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 transition-all">
 
                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 
@@ -392,7 +392,10 @@
 
                         </svg>
 
-                        Foto profil belum tersedia. Hubungi HR untuk menambahkan foto profil. Absensi belum tercatat.
+                        <span>
+                            Wajah Anda belum terdaftar. Absensi belum tercatat.
+                            <a href="{{ route('onboarding.face') }}" class="font-bold underline hover:text-amber-900 dark:hover:text-amber-200">Daftarkan wajah sekarang</a>
+                        </span>
 
                     </div>
 

@@ -27,7 +27,7 @@
     $employeeLabel = $attendanceModel?->user?->employee
         ? "{$attendanceModel->user->employee->name} ({$attendanceModel->user->employee->employee_code})"
         : ($attendanceModel?->user?->name ?? '');
-    $adminEditorClass = 'block w-full rounded-xl border-gray-300 text-sm shadow-sm focus:border-red-500 focus:ring-red-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100';
+    $adminEditorClass = 'block w-full rounded-xl border-gray-300 text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100';
 @endphp
 
 <div class="grid gap-x-6 gap-y-4 md:grid-cols-2">
@@ -53,7 +53,7 @@
                 <input type="text" id="{{ $prefix }}_employee_search" autocomplete="off" x-model="employeeQuery"
                     @input="onEmployeeInput()" @focus="showSuggestions = true" @keydown.escape="showSuggestions = false"
                     @blur="closeSuggestions()" placeholder="Ketik nama atau kode karyawan..."
-                    class="block w-full rounded-xl border-gray-300 text-sm shadow-sm focus:border-red-500 focus:ring-red-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100"
+                    class="block w-full rounded-xl border-gray-300 text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100"
                     :class="employeeError ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''">
                 <div class="pointer-events-none absolute inset-y-0 right-3 flex items-center">
                     <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -109,7 +109,7 @@
             class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Tipe Absensi
             <span class="text-red-500">*</span></label>
         <select name="type" id="{{ $prefix }}_type" x-model="type" required
-            class="block w-full rounded-xl border-gray-300 text-sm shadow-sm focus:border-red-500 focus:ring-red-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100">
+            class="block w-full rounded-xl border-gray-300 text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100">
             @foreach ($types as $typeOption)
                 <option value="{{ $typeOption->value }}" @selected($defaultType === $typeOption->value)>
                     {{ $typeOption->label() }}
@@ -126,7 +126,7 @@
             class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Status
             <span class="text-red-500">*</span></label>
         <select name="status" id="{{ $prefix }}_status" required
-            class="block w-full rounded-xl border-gray-300 text-sm shadow-sm focus:border-red-500 focus:ring-red-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100">
+            class="block w-full rounded-xl border-gray-300 text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100">
             @foreach ($statuses as $statusOption)
                 <option value="{{ $statusOption->value }}" @selected($defaultStatus === $statusOption->value)>
                     {{ $statusOption->label() }}
@@ -151,7 +151,7 @@
                     <span class="text-red-500">*</span></label>
                 <input type="date" name="clock_in_date" id="{{ $prefix }}_clock_in_date" x-model="clockInDate"
                     @change="syncClockOutDate($event)" value="{{ $defaultClockInDate }}" required
-                    class="block w-full rounded-xl border-gray-300 text-sm shadow-sm focus:border-red-500 focus:ring-red-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100">
+                    class="block w-full rounded-xl border-gray-300 text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100">
                 @error('clock_in_date')
                     <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                 @enderror
@@ -163,7 +163,7 @@
                     <span class="text-red-500">*</span></label>
                 <input type="time" name="clock_in_time" id="{{ $prefix }}_clock_in_time"
                     value="{{ $defaultClockInTime }}" :required="isRegular()"
-                    class="block w-full rounded-xl border-gray-300 text-sm shadow-sm focus:border-red-500 focus:ring-red-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100">
+                    class="block w-full rounded-xl border-gray-300 text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100">
                 @error('clock_in_time')
                     <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                 @enderror
@@ -179,7 +179,7 @@
                     class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Tanggal Pulang</label>
                 <input type="date" name="clock_out_date" id="{{ $prefix }}_clock_out_date"
                     x-ref="clockOutDate" @change="markClockOutDateTouched()" value="{{ $defaultClockOutDate }}"
-                    class="block w-full rounded-xl border-gray-300 text-sm shadow-sm focus:border-red-500 focus:ring-red-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100">
+                    class="block w-full rounded-xl border-gray-300 text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100">
                 @error('clock_out_date')
                     <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                 @enderror
@@ -192,7 +192,7 @@
                     class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Jam Pulang</label>
                 <input type="time" name="clock_out_time" id="{{ $prefix }}_clock_out_time"
                     value="{{ $defaultClockOutTime }}"
-                    class="block w-full rounded-xl border-gray-300 text-sm shadow-sm focus:border-red-500 focus:ring-red-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100">
+                    class="block w-full rounded-xl border-gray-300 text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100">
                 @error('clock_out_time')
                     <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                 @enderror
@@ -258,7 +258,7 @@
             <span class="text-red-500">*</span></label>
         <textarea name="manual_reason" id="{{ $prefix }}_manual_reason" rows="3" required
             placeholder="Contoh: Lupa absen masuk dan pulang, server bermasalah, koreksi HR"
-            class="block w-full rounded-xl border-gray-300 text-sm shadow-sm focus:border-red-500 focus:ring-red-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100">{{ old('manual_reason') }}</textarea>
+            class="block w-full rounded-xl border-gray-300 text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100">{{ old('manual_reason') }}</textarea>
         @error('manual_reason')
             <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
         @enderror

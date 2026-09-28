@@ -57,10 +57,11 @@ class ImportEmployees extends Command
 
             [$birthPlace, $birthDate] = $this->parseBirthData($row[8] ?? null);
 
-            // 🔥 FOTO PROCESS (VS CODE → Laravel STYLE)
-            $photo = $this->findAndStorePhoto($name);
-
             $employee = Employee::where('employee_code', $employeeCode)->first();
+
+            // 🔥 FOTO PROCESS (VS CODE → Laravel STYLE)
+            // Re-running the import must not duplicate photos or wipe an existing one.
+            $photo = $employee?->profile_photo ?: $this->findAndStorePhoto($name);
 
             $data = [
                 'name' => $name,
@@ -76,11 +77,15 @@ class ImportEmployees extends Command
                 'bank_account_number' => $row[11] ?? null,
                 'bank_name' => $row[12] ?? null,
                 'bank_account_name' => $row[13] ?? null,
-                'basic_salary' => 1000000,
 
                 // 🔥 FINAL PHOTO PATH (SAME AS WEB UPLOAD)
                 'profile_photo' => $photo,
             ];
+
+            // Default salary only for new employees; re-imports keep what HR has set.
+            if (! $employee) {
+                $data['basic_salary'] = 1000000;
+            }
 
             if ($email !== '') {
                 $user = User::firstOrCreate(

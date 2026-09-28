@@ -25,10 +25,9 @@ class FixSecurityOvertimeHours extends Command
         $query = Attendance::query()
             ->where('type', AttendanceType::Regular)
             ->whereNotNull('clock_out_time')
-            ->whereHas('user.employee', fn ($employee) => $employee->where('staff', 'Security'))
+            ->whereHas('user.employee', fn ($employee) => $employee->whereRaw('LOWER(staff) = ?', ['security']))
             ->with(['workSchedule', 'user.employee'])
-            ->orderBy('date')
-            ->orderBy('id');
+            ->orderBy('id'); // chunkById pages by id; an extra date order would skip rows
 
         if ($from = $this->option('from')) {
             $query->whereDate('date', '>=', Carbon::parse($from, AppTime::timezone())->toDateString());

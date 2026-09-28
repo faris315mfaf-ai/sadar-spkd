@@ -4,10 +4,10 @@
     {{-- Accordion header --}}
     <button type="button" @click="open = !open"
         class="group relative flex w-full items-center justify-between overflow-hidden px-5 py-5 text-left transition sm:px-7 sm:py-6"
-        :class="open ? 'bg-gradient-to-r from-red-50 via-white to-white dark:from-red-950/20 dark:via-gray-800 dark:to-gray-800' : 'bg-white hover:bg-gray-50/80 dark:bg-gray-800 dark:hover:bg-gray-700/50'">
-        <div class="pointer-events-none absolute -right-8 -top-12 h-28 w-28 rounded-full border-[18px] border-red-100/40 dark:border-red-900/10"></div>
+        :class="open ? 'bg-gradient-to-r from-brand-50 via-white to-white dark:from-brand-950/20 dark:via-gray-800 dark:to-gray-800' : 'bg-white hover:bg-gray-50/80 dark:bg-gray-800 dark:hover:bg-gray-700/50'">
+        <div class="pointer-events-none absolute -right-8 -top-12 h-28 w-28 rounded-full border-[18px] border-brand-100/40 dark:border-brand-900/10"></div>
         <div class="relative flex min-w-0 items-center gap-4">
-            <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-red-500 to-red-700 text-white shadow-lg shadow-red-600/20">
+            <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-500 to-brand-700 text-white shadow-lg shadow-brand-600/20">
                 <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
@@ -25,7 +25,7 @@
                 </p>
             </div>
         </div>
-        <span class="relative ml-3 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-400 shadow-sm transition group-hover:text-red-600 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400">
+        <span class="relative ml-3 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-400 shadow-sm transition group-hover:text-brand-600 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400">
             <svg class="h-4 w-4 transition-transform duration-200" :class="open && 'rotate-180'"
                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
@@ -63,14 +63,14 @@
                 <input type="hidden" name="accuracy" :value="location ? location.accuracy : ''">
                 <div>
                     <div class="mb-2.5 flex items-center gap-2">
-                        <span class="inline-flex h-6 w-6 items-center justify-center rounded-lg bg-red-100 text-xs font-bold text-red-700 dark:bg-red-900/30 dark:text-red-300">1</span>
+                        <span class="inline-flex h-6 w-6 items-center justify-center rounded-lg bg-brand-100 text-xs font-bold text-brand-700 dark:bg-brand-900/30 dark:text-brand-300">1</span>
                         <span class="text-sm font-semibold text-gray-800 dark:text-gray-200">Pilih jenis pengajuan</span>
                     </div>
                     <div class="grid grid-cols-2 gap-3">
                         <label class="flex cursor-pointer items-center gap-3 rounded-2xl border p-3.5 transition"
-                            :class="type === 'sick' ? 'border-red-300 bg-red-50 ring-1 ring-red-200 dark:border-red-800 dark:bg-red-950/20 dark:ring-red-900' : 'border-gray-200 bg-white hover:border-gray-300 dark:border-gray-600 dark:bg-gray-800'">
-                            <input type="radio" name="type" value="sick" x-model="type" class="text-red-600 focus:ring-red-500">
-                            <span class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400">
+                            :class="type === 'sick' ? 'border-brand-300 bg-brand-50 ring-1 ring-brand-200 dark:border-brand-800 dark:bg-brand-950/20 dark:ring-brand-900' : 'border-gray-200 bg-white hover:border-gray-300 dark:border-gray-600 dark:bg-gray-800'">
+                            <input type="radio" name="type" value="sick" x-model="type" class="text-brand-600 focus:ring-brand-500">
+                            <span class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-100 text-brand-600 dark:bg-brand-900/30 dark:text-brand-400">
                                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-3-3v6m7-3a7 7 0 11-14 0 7 7 0 0114 0Z" />
                                 </svg>
@@ -82,7 +82,7 @@
                         </label>
                         <label class="flex cursor-pointer items-center gap-3 rounded-2xl border p-3.5 transition"
                             :class="type === 'permission' ? 'border-blue-300 bg-blue-50 ring-1 ring-blue-200 dark:border-blue-800 dark:bg-blue-950/20 dark:ring-blue-900' : 'border-gray-200 bg-white hover:border-gray-300 dark:border-gray-600 dark:bg-gray-800'">
-                            <input type="radio" name="type" value="permission" x-model="type" class="text-red-600 focus:ring-red-500">
+                            <input type="radio" name="type" value="permission" x-model="type" class="text-brand-600 focus:ring-brand-500">
                             <span class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
                                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 3h7l3 3v15H7V3Zm3 7h4m-4 4h4" />
@@ -100,7 +100,7 @@
                 </div>
                 <div>
                     <label for="leave_note" class="mb-2.5 flex items-center gap-2">
-                        <span class="inline-flex h-6 w-6 items-center justify-center rounded-lg bg-red-100 text-xs font-bold text-red-700 dark:bg-red-900/30 dark:text-red-300">2</span>
+                        <span class="inline-flex h-6 w-6 items-center justify-center rounded-lg bg-brand-100 text-xs font-bold text-brand-700 dark:bg-brand-900/30 dark:text-brand-300">2</span>
                         <span class="text-sm font-semibold text-gray-800 dark:text-gray-200">Jelaskan keterangan</span>
                     </label>
                     <x-attendance.report-editor
@@ -110,7 +110,7 @@
                         rows="3"
                         placeholder="Jelaskan alasan izin atau sakit..."
                         :value="old('leave_note')"
-                        textareaClass="mt-1.5 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm shadow-sm focus:border-red-500 focus:ring-red-500 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
+                        textareaClass="mt-1.5 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
                         class="mt-0"
                     />
                     @error('leave_note')
@@ -121,7 +121,7 @@
                 {{-- File upload + preview --}}
                 <div>
                     <label for="doctor_note" class="mb-2.5 flex items-center gap-2">
-                        <span class="inline-flex h-6 w-6 items-center justify-center rounded-lg bg-red-100 text-xs font-bold text-red-700 dark:bg-red-900/30 dark:text-red-300">3</span>
+                        <span class="inline-flex h-6 w-6 items-center justify-center rounded-lg bg-brand-100 text-xs font-bold text-brand-700 dark:bg-brand-900/30 dark:text-brand-300">3</span>
                         <span class="text-sm font-semibold text-gray-800 dark:text-gray-200"
                             x-text="type === 'sick' ? 'Unggah surat dokter' : 'Unggah bukti izin'">Unggah bukti pendukung</span>
                         <span class="text-red-500">*</span>
@@ -129,7 +129,7 @@
 
                     {{-- File input (hidden when file already selected) --}}
                     <div x-show="!filePreview.url && !filePreview.name"
-                        class="rounded-2xl border border-dashed border-gray-300 bg-white p-4 transition hover:border-red-300 hover:bg-red-50/30 dark:border-gray-600 dark:bg-gray-800 dark:hover:border-red-800 dark:hover:bg-red-950/10">
+                        class="rounded-2xl border border-dashed border-gray-300 bg-white p-4 transition hover:border-brand-300 hover:bg-brand-50/30 dark:border-gray-600 dark:bg-gray-800 dark:hover:border-brand-800 dark:hover:bg-brand-950/10">
                         <div class="mb-3 flex items-center gap-3">
                             <span class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-300">
                                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -142,7 +142,7 @@
                             </div>
                         </div>
                         <input id="doctor_note" type="file" name="doctor_note" accept=".pdf,.jpg,.jpeg,.png" required
-                            class="block w-full text-xs text-gray-500 file:mr-3 file:rounded-xl file:border-0 file:bg-red-600 file:px-4 file:py-2 file:text-xs file:font-semibold file:text-white hover:file:bg-red-700 dark:text-gray-400 dark:file:bg-red-700 dark:hover:file:bg-red-600"
+                            class="block w-full text-xs text-gray-500 file:mr-3 file:rounded-xl file:border-0 file:bg-brand-600 file:px-4 file:py-2 file:text-xs file:font-semibold file:text-white hover:file:bg-brand-700 dark:text-gray-400 dark:file:bg-brand-700 dark:hover:file:bg-brand-600"
                             @change="handleFileChange($event)">
                     </div>
 
@@ -164,7 +164,7 @@
                             <p class="truncate text-xs font-medium text-gray-700 dark:text-gray-200" x-text="filePreview.name"></p>
                             <p class="mt-0.5 text-xs text-gray-400 dark:text-gray-500" x-text="filePreview.sizeLabel"></p>
                             <button type="button"
-                                class="mt-1 text-xs font-medium text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+                                class="mt-1 text-xs font-medium text-brand-600 hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300"
                                 @click="clearFile()">
                                 Ganti file
                             </button>
@@ -174,20 +174,20 @@
                     {{-- Preview: PDF chip --}}
                     <div x-show="filePreview.name && !filePreview.isImage" class="mt-2 flex items-center gap-3">
                         <button type="button"
-                            class="flex h-16 w-16 shrink-0 flex-col items-center justify-center gap-1 rounded-xl border border-red-200 bg-red-50 transition hover:bg-red-100 dark:border-red-900/50 dark:bg-red-950/40 dark:hover:bg-red-950/60"
+                            class="flex h-16 w-16 shrink-0 flex-col items-center justify-center gap-1 rounded-xl border border-brand-200 bg-brand-50 transition hover:bg-brand-100 dark:border-brand-900/50 dark:bg-brand-950/40 dark:hover:bg-brand-950/60"
                             @click="openPdf()"
                             title="Buka PDF di tab baru">
-                            <svg class="h-6 w-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="h-6 w-6 text-brand-600 dark:text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                             </svg>
-                            <span class="text-[10px] font-bold uppercase tracking-wider text-red-600 dark:text-red-400">PDF</span>
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-brand-600 dark:text-brand-400">PDF</span>
                         </button>
                         <div class="min-w-0 flex-1">
                             <p class="truncate text-xs font-medium text-gray-700 dark:text-gray-200" x-text="filePreview.name"></p>
                             <p class="mt-0.5 text-xs text-gray-400 dark:text-gray-500" x-text="filePreview.sizeLabel"></p>
                             <button type="button"
-                                class="mt-1 text-xs font-medium text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+                                class="mt-1 text-xs font-medium text-brand-600 hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300"
                                 @click="clearFile()">
                                 Ganti file
                             </button>
@@ -204,7 +204,7 @@
                 </div>
 
                 <button type="submit"
-                    class="group inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-red-600 px-5 py-3 text-sm font-semibold text-white shadow-md shadow-red-600/20 transition hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 active:scale-[0.99] dark:bg-red-700 dark:hover:bg-red-600 dark:focus:ring-offset-gray-800 sm:w-auto">
+                    class="group inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-brand-600 px-5 py-3 text-sm font-semibold text-white shadow-md shadow-brand-600/20 transition hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 active:scale-[0.99] dark:bg-brand-700 dark:hover:bg-brand-600 dark:focus:ring-offset-gray-800 sm:w-auto">
                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 12 20 4l-5 16-3-7-8-1Zm8 1 3-3" />
                     </svg>

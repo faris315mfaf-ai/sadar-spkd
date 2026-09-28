@@ -13,6 +13,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 
 class LeaveVerificationController extends Controller
@@ -120,7 +121,15 @@ class LeaveVerificationController extends Controller
         }
 
         if ($verificationStatus === VerificationStatus::NoDone && $attendance->user?->email) {
-            $attendance->user->notify(new LeaveRejectedNotification($attendance));
+            // The rejection is already saved; a mail server outage must not turn this into a 500.
+            try {
+                $attendance->user->notify(new LeaveRejectedNotification($attendance));
+            } catch (\Throwable $e) {
+                Log::warning('Gagal mengirim email penolakan izin', [
+                    'attendance_id' => $attendance->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
         }
 
         $actionLabel = $verificationStatus === VerificationStatus::Done

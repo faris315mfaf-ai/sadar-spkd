@@ -83,8 +83,9 @@ class PayrollExportTest extends TestCase
         $employee = User::factory()->employee()->create();
         $employee->roles()->attach(Role::where('name', 'employee')->firstOrFail());
 
+        // No employee record yet, so the user is sent to finish their sign-up biodata.
         $this->actingAs($employee)
             ->get(route('payrolls.export'))
-            ->assertRedirect(route('login'));
+            ->assertRedirect(route('onboarding.biodata'));
     }
 }

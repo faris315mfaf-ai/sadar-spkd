@@ -136,8 +136,8 @@
                                             this.userAccuracyCircle.setRadius(accuracy);
                                         } else {
                                             this.userAccuracyCircle = L.circle([userLat, userLng], {
-                                                color: '#ef4444',
-                                                fillColor: '#f87171',
+                                                color: '#1f969e',
+                                                fillColor: '#3fb2bb',
                                                 fillOpacity: 0.15,
                                                 radius: accuracy,
                                                 weight: 1,

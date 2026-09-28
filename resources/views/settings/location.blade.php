@@ -45,10 +45,10 @@
 
             {{-- Header --}}
             <section class="relative overflow-hidden rounded-[1.75rem] border border-gray-200/80 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
-                <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-red-600 via-rose-500 to-amber-400"></div>
+                <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-brand-600 via-brand-400 to-navy-700"></div>
                 <div class="grid gap-5 px-5 py-5 sm:px-6 sm:py-6 lg:grid-cols-[minmax(0,1.2fr)_auto] lg:items-center">
                     <div>
-                        <div class="inline-flex items-center gap-2 rounded-full bg-red-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-red-700 ring-1 ring-inset ring-red-100 dark:bg-red-950/40 dark:text-red-300 dark:ring-red-900/50">
+                        <div class="inline-flex items-center gap-2 rounded-full bg-brand-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-brand-700 ring-1 ring-inset ring-brand-100 dark:bg-brand-950/40 dark:text-brand-300 dark:ring-brand-900/50">
                             <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
                             Geofence Absensi
                         </div>
@@ -67,9 +67,9 @@
                             <p class="text-[10px] font-semibold uppercase tracking-wider text-gray-400">Longitude</p>
                             <p class="mt-1 truncate text-sm font-bold tabular-nums text-gray-900 dark:text-white" x-text="Number(lng).toFixed(6)"></p>
                         </div>
-                        <div class="rounded-2xl border border-red-100 bg-red-50 px-3 py-3 dark:border-red-900/40 dark:bg-red-950/30">
-                            <p class="text-[10px] font-semibold uppercase tracking-wider text-red-500 dark:text-red-300">Radius</p>
-                            <p class="mt-1 truncate text-sm font-bold tabular-nums text-red-700 dark:text-red-200" x-text="radiusLabel()"></p>
+                        <div class="rounded-2xl border border-brand-100 bg-brand-50 px-3 py-3 dark:border-brand-900/40 dark:bg-brand-950/30">
+                            <p class="text-[10px] font-semibold uppercase tracking-wider text-brand-500 dark:text-brand-300">Radius</p>
+                            <p class="mt-1 truncate text-sm font-bold tabular-nums text-brand-700 dark:text-brand-200" x-text="radiusLabel()"></p>
                         </div>
                     </div>
                 </div>
@@ -112,7 +112,7 @@
                                     </span>
                                     <input id="office_latitude" type="number" step="any" name="office_latitude" required
                                         value="{{ $latitude }}"
-                                        class="block min-h-11 w-full rounded-2xl border-gray-200 bg-gray-50 text-sm font-semibold tabular-nums text-gray-900 shadow-sm transition focus:border-red-500 focus:bg-white focus:ring-red-500 dark:border-gray-600 dark:bg-gray-900 dark:text-white">
+                                        class="block min-h-11 w-full rounded-2xl border-gray-200 bg-gray-50 text-sm font-semibold tabular-nums text-gray-900 shadow-sm transition focus:border-brand-500 focus:bg-white focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-900 dark:text-white">
                                     @error('office_latitude')
                                         <span class="mt-1.5 block text-sm text-red-600 dark:text-red-400">{{ $message }}</span>
                                     @enderror
@@ -124,7 +124,7 @@
                                     </span>
                                     <input id="office_longitude" type="number" step="any" name="office_longitude" required
                                         value="{{ $longitude }}"
-                                        class="block min-h-11 w-full rounded-2xl border-gray-200 bg-gray-50 text-sm font-semibold tabular-nums text-gray-900 shadow-sm transition focus:border-red-500 focus:bg-white focus:ring-red-500 dark:border-gray-600 dark:bg-gray-900 dark:text-white">
+                                        class="block min-h-11 w-full rounded-2xl border-gray-200 bg-gray-50 text-sm font-semibold tabular-nums text-gray-900 shadow-sm transition focus:border-brand-500 focus:bg-white focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-900 dark:text-white">
                                     @error('office_longitude')
                                         <span class="mt-1.5 block text-sm text-red-600 dark:text-red-400">{{ $message }}</span>
                                     @enderror
@@ -136,7 +136,7 @@
                                     </label>
                                     <input id="attendance_radius_meters" type="number" min="1" max="50000" step="1" name="attendance_radius_meters" required
                                         value="{{ $radius }}"
-                                        class="block min-h-11 w-full rounded-2xl border-gray-200 bg-gray-50 text-sm font-semibold tabular-nums text-gray-900 shadow-sm transition focus:border-red-500 focus:bg-white focus:ring-red-500 dark:border-gray-600 dark:bg-gray-900 dark:text-white">
+                                        class="block min-h-11 w-full rounded-2xl border-gray-200 bg-gray-50 text-sm font-semibold tabular-nums text-gray-900 shadow-sm transition focus:border-brand-500 focus:bg-white focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-900 dark:text-white">
                                     <p class="mt-1.5 text-xs text-gray-500 dark:text-gray-400">Lingkaran di peta mengikuti nilai ini.</p>
                                     @error('attendance_radius_meters')
                                         <p class="mt-1.5 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
@@ -152,8 +152,8 @@
                                                 data-radius-preset="{{ $preset }}"
                                                 @click="applyPreset({{ $preset }})"
                                                 :class="radius === {{ $preset }}
-                                                    ? 'border-red-500 bg-red-600 text-white shadow-sm shadow-red-900/10'
-                                                    : 'border-gray-200 bg-white text-gray-700 hover:border-red-300 hover:bg-red-50 hover:text-red-700 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-red-700 dark:hover:bg-red-950/40 dark:hover:text-red-300'"
+                                                    ? 'border-brand-500 bg-brand-600 text-white shadow-sm shadow-brand-900/10'
+                                                    : 'border-gray-200 bg-white text-gray-700 hover:border-brand-300 hover:bg-brand-50 hover:text-brand-700 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-brand-700 dark:hover:bg-brand-950/40 dark:hover:text-brand-300'"
                                                 class="rounded-xl border px-2.5 py-2 text-xs font-bold transition">
                                                 {{ $preset >= 1000 && $preset % 1000 === 0 ? ($preset / 1000).' KM' : $preset.' m' }}
                                             </button>
@@ -167,15 +167,15 @@
                             <h3 class="text-sm font-bold text-gray-900 dark:text-white">Panduan singkat</h3>
                             <ul class="mt-3 space-y-2.5 text-xs leading-relaxed text-gray-500 dark:text-gray-400">
                                 <li class="flex gap-2">
-                                    <span class="mt-0.5 inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-red-50 text-[10px] font-bold text-red-600 dark:bg-red-950/40 dark:text-red-300">1</span>
+                                    <span class="mt-0.5 inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-brand-50 text-[10px] font-bold text-brand-600 dark:bg-brand-950/40 dark:text-brand-300">1</span>
                                     <span>Geser pin di peta untuk memindahkan titik pusat kantor.</span>
                                 </li>
                                 <li class="flex gap-2">
-                                    <span class="mt-0.5 inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-red-50 text-[10px] font-bold text-red-600 dark:bg-red-950/40 dark:text-red-300">2</span>
+                                    <span class="mt-0.5 inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-brand-50 text-[10px] font-bold text-brand-600 dark:bg-brand-950/40 dark:text-brand-300">2</span>
                                     <span>Pilih preset radius atau isi manual sesuai area absensi.</span>
                                 </li>
                                 <li class="flex gap-2">
-                                    <span class="mt-0.5 inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-red-50 text-[10px] font-bold text-red-600 dark:bg-red-950/40 dark:text-red-300">3</span>
+                                    <span class="mt-0.5 inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-brand-50 text-[10px] font-bold text-brand-600 dark:bg-brand-950/40 dark:text-brand-300">3</span>
                                     <span>Tekan Simpan Lokasi agar aturan baru aktif untuk karyawan.</span>
                                 </li>
                             </ul>
@@ -193,7 +193,7 @@
                             </div>
                             <div class="flex flex-wrap items-center gap-2">
                                 <span class="inline-flex items-center gap-1.5 rounded-full bg-gray-100 px-2.5 py-1 text-[11px] font-semibold text-gray-600 ring-1 ring-inset ring-gray-200 dark:bg-gray-900 dark:text-gray-300 dark:ring-gray-700">
-                                    <span class="h-1.5 w-1.5 rounded-full bg-red-500"></span>
+                                    <span class="h-1.5 w-1.5 rounded-full bg-brand-500"></span>
                                     Titik pusat
                                 </span>
                                 <span class="inline-flex items-center gap-1.5 rounded-full bg-sky-50 px-2.5 py-1 text-[11px] font-semibold text-sky-700 ring-1 ring-inset ring-sky-100 dark:bg-sky-950/40 dark:text-sky-300 dark:ring-sky-900/50">
@@ -225,7 +225,7 @@
                             Perubahan baru aktif setelah lokasi disimpan.
                         </p>
                         <button type="submit"
-                            class="inline-flex min-h-11 items-center justify-center gap-2 rounded-2xl bg-red-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm shadow-red-900/10 transition hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900">
+                            class="inline-flex min-h-11 items-center justify-center gap-2 rounded-2xl bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm shadow-brand-900/10 transition hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900">
                             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                             </svg>

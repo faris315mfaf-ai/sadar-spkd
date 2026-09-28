@@ -12,11 +12,11 @@
 
             {{-- Header --}}
             <section class="relative overflow-hidden rounded-[1.75rem] border border-gray-200/80 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
-                <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-red-600 via-rose-500 to-amber-400"></div>
+                <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-brand-600 via-brand-400 to-navy-700"></div>
 
                 <div class="grid gap-5 px-5 py-5 sm:px-6 sm:py-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
                     <div>
-                        <div class="inline-flex items-center gap-2 rounded-full bg-red-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-red-700 ring-1 ring-inset ring-red-100 dark:bg-red-950/40 dark:text-red-300 dark:ring-red-900/50">
+                        <div class="inline-flex items-center gap-2 rounded-full bg-brand-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-brand-700 ring-1 ring-inset ring-brand-100 dark:bg-brand-950/40 dark:text-brand-300 dark:ring-brand-900/50">
                             <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
                             Pengaturan Sistem
                         </div>
@@ -52,7 +52,7 @@
                 <form method="GET" action="{{ route('work-calendars.index') }}" class="flex items-center gap-3">
                     <label for="calendar-year" class="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Tahun</label>
                     <select id="calendar-year" name="year" onchange="this.form.submit()"
-                        class="min-h-11 rounded-2xl border-gray-200 bg-gray-50 text-sm font-semibold text-gray-800 shadow-sm focus:border-red-500 focus:bg-white focus:ring-red-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100">
+                        class="min-h-11 rounded-2xl border-gray-200 bg-gray-50 text-sm font-semibold text-gray-800 shadow-sm focus:border-brand-500 focus:bg-white focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100">
                         @foreach (range(now()->year - 1, now()->year + 2) as $y)
                             <option value="{{ $y }}" @selected($y === $year)>{{ $y }}</option>
                         @endforeach
@@ -70,7 +70,7 @@
                             @csrf
                             <input type="hidden" name="year" value="{{ $year }}">
                             <button type="submit"
-                                class="inline-flex min-h-11 items-center gap-2 rounded-2xl border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition hover:border-red-200 hover:bg-red-50 hover:text-red-700 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200 dark:hover:border-red-800 dark:hover:bg-red-950/30 dark:hover:text-red-300">
+                                class="inline-flex min-h-11 items-center gap-2 rounded-2xl border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition hover:border-brand-200 hover:bg-brand-50 hover:text-brand-700 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200 dark:hover:border-brand-800 dark:hover:bg-brand-950/30 dark:hover:text-brand-300">
                                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
                                 Sync Ulang Hari Libur
                                 @if ($lastImport)
@@ -83,7 +83,7 @@
                             @csrf
                             <input type="hidden" name="year" value="{{ $year }}">
                             <button type="submit"
-                                class="inline-flex min-h-11 items-center gap-2 rounded-2xl bg-red-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm shadow-red-900/10 transition hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900">
+                                class="inline-flex min-h-11 items-center gap-2 rounded-2xl bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm shadow-brand-900/10 transition hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900">
                                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                                 Buat Kalender {{ $year }}
                             </button>
@@ -138,7 +138,7 @@
                         @endphp
                         <article @class([
                             'overflow-hidden rounded-[1.5rem] border bg-white shadow-sm transition hover:shadow-md dark:bg-gray-800',
-                            'border-red-200 ring-1 ring-red-100 dark:border-red-900/50 dark:ring-red-900/30' => $isCurrentMonth,
+                            'border-brand-200 ring-1 ring-brand-100 dark:border-brand-900/50 dark:ring-brand-900/30' => $isCurrentMonth,
                             'border-gray-200/80 dark:border-gray-700' => ! $isCurrentMonth,
                         ])>
                             <div class="flex items-center justify-between gap-3 border-b border-gray-100 px-4 py-3.5 dark:border-gray-700">
@@ -148,7 +148,7 @@
                                         <span class="font-semibold text-gray-400 dark:text-gray-500">{{ $year }}</span>
                                     </h2>
                                     @if ($isCurrentMonth)
-                                        <p class="mt-0.5 text-[11px] font-semibold uppercase tracking-wide text-red-600 dark:text-red-300">Bulan ini</p>
+                                        <p class="mt-0.5 text-[11px] font-semibold uppercase tracking-wide text-brand-600 dark:text-brand-300">Bulan ini</p>
                                     @endif
                                 </div>
                                 <div class="flex items-center gap-2 text-[11px] font-semibold">
@@ -205,7 +205,7 @@
                                             title="{{ $day->date->format('d M') }}{{ $day->name ? ' — '.$day->name : '' }}">
                                             <span @class([
                                                 'flex h-7 w-7 items-center justify-center rounded-full tabular-nums',
-                                                'bg-red-600 font-bold text-white shadow-sm shadow-red-900/20' => $isToday,
+                                                'bg-brand-600 font-bold text-white shadow-sm shadow-brand-900/20' => $isToday,
                                                 'text-rose-600 dark:text-rose-300' => ! $isToday && $isSunday && $day->type->value !== 'holiday',
                                             ])>{{ $day->date->format('j') }}</span>
 

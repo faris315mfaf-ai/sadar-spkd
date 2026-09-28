@@ -114,4 +114,17 @@ return [
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Self Registration
+    |--------------------------------------------------------------------------
+    |
+    | Lets employees create their own account (email + password), then fill in
+    | their biodata, register their face and check their location. Set to false
+    | to hide the sign-up page so only HR can add employees.
+    |
+    */
+
+    'self_registration' => (bool) env('SELF_REGISTRATION', true),
+
 ];

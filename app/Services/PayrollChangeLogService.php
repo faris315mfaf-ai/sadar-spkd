@@ -146,6 +146,10 @@ class PayrollChangeLogService
 
                 $detail->restore();
 
+                if (is_array($change->before) && array_key_exists('is_adjustment', $change->before)) {
+                    $detail->update(['is_adjustment' => $change->before['is_adjustment']]);
+                }
+
                 return;
             }
 

@@ -88,6 +88,22 @@ function bootPageModules() {
     );
     loadPageModule(() => import("./attendance-face-verification.js"));
   }
+
+  const onboardingFace = document.getElementById("onboarding-face");
+  if (onboardingFace) {
+    loadPageModule(
+      () => import("./onboarding.js"),
+      (module) => module.initFaceRegistration(onboardingFace),
+    );
+  }
+
+  const onboardingLocation = document.getElementById("onboarding-location");
+  if (onboardingLocation) {
+    loadPageModule(
+      () => import("./onboarding.js"),
+      (module) => module.initLocationCheck(onboardingLocation),
+    );
+  }
 }
 
 if (document.readyState === "loading") {

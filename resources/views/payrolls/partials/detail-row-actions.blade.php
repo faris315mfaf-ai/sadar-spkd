@@ -2,7 +2,7 @@
     <div class="flex items-center justify-end gap-0.5">
         <button type="button"
             title="Edit"
-            onclick="openItemEditModal({{ $detail->id }}, '{{ addslashes($detail->name) }}', {{ (int) $detail->amount }}, '{{ addslashes($detail->notes ?? '') }}', '{{ route('payroll-details.update', $detail) }}')"
+            onclick="openItemEditModal({{ $detail->id }}, {{ Js::from($detail->name) }}, {{ Js::from(rtrim(rtrim((string) $detail->amount, '0'), '.')) }}, {{ Js::from($detail->notes ?? '') }}, {{ Js::from(route('payroll-details.update', $detail)) }})"
             class="inline-flex items-center justify-center rounded-lg p-1.5 text-gray-500 transition hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700">
             <svg class="h-4 w-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -15,7 +15,7 @@
         </form>
         <button type="button"
             title="Hapus"
-            onclick="openItemDeleteModal({{ $detail->id }}, '{{ addslashes($detail->name) }}')"
+            onclick="openItemDeleteModal({{ $detail->id }}, {{ Js::from($detail->name) }})"
             class="inline-flex items-center justify-center rounded-lg p-1.5 text-red-500 transition hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20">
             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

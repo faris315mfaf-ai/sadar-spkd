@@ -73,6 +73,8 @@ class WhatsAppBotService {
       });
     } catch (error) {
       console.error('Failed to start WhatsApp:', error);
+      // scheduleReconnect() ignores calls while isStarting is true, so clear it first.
+      this.isStarting = false;
       this.scheduleReconnect();
     } finally {
       this.isStarting = false;

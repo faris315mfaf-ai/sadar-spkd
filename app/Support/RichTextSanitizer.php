@@ -5,8 +5,13 @@ namespace App\Support;
 final class RichTextSanitizer
 {
     /**
+     * Tags the attendance editor (CKEditor: bold, italic, lists) can produce.
+     */
+    private const ALLOWED_TAGS = ['p', 'br', 'strong', 'b', 'em', 'i', 'u', 'ul', 'ol', 'li', 'blockquote'];
+
+    /**
      * Normalize CKEditor HTML before persisting to the database.
-     * Returns HTML with valid tags preserved.
+     * Keeps only formatting tags without attributes, so the result is safe to render as HTML.
      */
     public static function sanitizeHtml(?string $html): ?string
     {
@@ -20,7 +25,10 @@ final class RichTextSanitizer
             return null;
         }
 
-        $html = self::replaceNonBreakingSpaces($html);
+        // Entities stay encoded here: decoding would turn typed "&lt;img ...&gt;" into a real tag.
+        $html = str_replace("\xc2\xa0", ' ', $html);
+        $html = preg_replace('/&nbsp;|&#(?:160|xA0);/iu', ' ', $html) ?? $html;
+        $html = self::stripUnsafeMarkup($html);
 
         $emptyBlockPattern = '/<(p|blockquote|div|span)[^>]*>(?:\s|<br\s*\/?>)*<\/\1>/iu';
         $previous = null;
@@ -90,6 +98,14 @@ final class RichTextSanitizer
         $text = trim(preg_replace("/\n{2,}/", "\n", $text) ?? $text);
 
         return $text !== '' ? $text : null;
+    }
+
+    private static function stripUnsafeMarkup(string $html): string
+    {
+        $html = preg_replace('#<(script|style)\b[^>]*>.*?</\1\s*>#isu', '', $html) ?? '';
+        $html = strip_tags($html, self::ALLOWED_TAGS);
+
+        return preg_replace('#<(/?)([a-z0-9]+)\b[^>]*?(/?)>#iu', '<$1$2$3>', $html) ?? '';
     }
 
     private static function replaceNonBreakingSpaces(string $value): string

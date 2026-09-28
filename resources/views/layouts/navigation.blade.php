@@ -12,7 +12,7 @@
         request()->routeIs('payrolls.*') => 'Penggajian',
         request()->routeIs('activity-log.*') => 'Log Aktivitas',
         request()->routeIs('settings.*', 'work-calendars.*') => 'Pengaturan',
-        default => 'SADAR-PRI',
+        default => 'SADAR-SPKD',
     };
     $navigationOnAdmin = \App\Support\NavigationContext::onAdminRoute();
     $navigationSpace = $navigationOnAdmin ? 'Portal Admin' : 'Portal Karyawan';
@@ -28,7 +28,7 @@
                 <button
                     id="sidebar-toggle-btn"
                     type="button"
-                    class="inline-flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-2xl border border-gray-200/80 bg-white text-gray-500 shadow-sm transition hover:border-red-200 hover:bg-red-50 hover:text-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:border-red-800 dark:hover:bg-red-950/40 dark:hover:text-red-300 dark:focus:ring-offset-gray-900"
+                    class="inline-flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-2xl border border-gray-200/80 bg-white text-gray-500 shadow-sm transition hover:border-brand-200 hover:bg-brand-50 hover:text-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:border-brand-800 dark:hover:bg-brand-950/40 dark:hover:text-brand-300 dark:focus:ring-offset-gray-900"
                     aria-label="Toggle Sidebar"
                     aria-expanded="true"
                 >
@@ -42,7 +42,7 @@
 
                 <div class="flex shrink-0 items-center md:hidden">
                     <a href="{{ auth()->user()->homeUrl() }}" class="rounded-xl p-1 transition hover:bg-gray-50 dark:hover:bg-gray-800">
-                        <img src="{{ asset('images/logo/logo_SADAR.png') }}" alt="SADAR-PRI Logo" class="block h-9 w-auto object-contain">
+                        <img src="{{ asset('images/logo/logo_SPKD_mark.png') }}" alt="SADAR-SPKD Logo" class="block h-9 w-auto object-contain">
                     </a>
                 </div>
 
@@ -50,7 +50,7 @@
                     <span class="hidden h-8 w-px bg-gray-200 dark:bg-gray-700 sm:block"></span>
                     <div class="min-w-0">
                         <div class="flex items-center gap-2">
-                            <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] {{ $navigationOnAdmin ? 'bg-red-50 text-red-700 ring-1 ring-red-100 dark:bg-red-950/40 dark:text-red-300 dark:ring-red-900/50' : 'bg-gray-100 text-gray-600 ring-1 ring-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700' }}">
+                            <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] {{ $navigationOnAdmin ? 'bg-brand-50 text-brand-700 ring-1 ring-brand-100 dark:bg-brand-950/40 dark:text-brand-300 dark:ring-brand-900/50' : 'bg-gray-100 text-gray-600 ring-1 ring-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700' }}">
                                 {{ $navigationSpace }}
                             </span>
                         </div>
@@ -74,7 +74,7 @@
                 </script>
 
                 <button onclick="toggleTheme()"
-                    class="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-gray-200/80 bg-white text-gray-500 shadow-sm transition hover:border-red-200 hover:bg-red-50 hover:text-red-600 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:border-red-800 dark:hover:bg-red-950/40 dark:hover:text-red-300"
+                    class="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-gray-200/80 bg-white text-gray-500 shadow-sm transition hover:border-brand-200 hover:bg-brand-50 hover:text-brand-600 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:border-brand-800 dark:hover:bg-brand-950/40 dark:hover:text-brand-300"
                     aria-label="Toggle Dark Mode">
                     <svg class="hidden h-5 w-5 dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -88,12 +88,12 @@
 
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
-                        <button class="inline-flex max-w-[13rem] items-center gap-2.5 rounded-2xl border border-gray-200/80 bg-white px-1.5 py-1.5 text-left shadow-sm transition hover:border-red-200 hover:bg-red-50/60 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:hover:border-red-800 dark:hover:bg-red-950/30 sm:max-w-[17rem] sm:pr-3">
+                        <button class="inline-flex max-w-[13rem] items-center gap-2.5 rounded-2xl border border-gray-200/80 bg-white px-1.5 py-1.5 text-left shadow-sm transition hover:border-brand-200 hover:bg-brand-50/60 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:hover:border-brand-800 dark:hover:bg-brand-950/30 sm:max-w-[17rem] sm:pr-3">
                             @if ($navigationPhotoUrl)
                                 <img src="{{ $navigationPhotoUrl }}" alt="Foto profil {{ Auth::user()->name }}"
                                     class="h-9 w-9 flex-shrink-0 rounded-xl object-cover ring-1 ring-gray-200 dark:ring-gray-600">
                             @else
-                                <span class="inline-flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-red-500 to-rose-600 text-white shadow-sm">
+                                <span class="inline-flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-brand-600 text-white shadow-sm">
                                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0Zm4 10a7 7 0 00-14 0" />
                                     </svg>

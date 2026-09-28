@@ -69,7 +69,10 @@ class AttendanceVerificationPhotoService
 
         $binary = $this->decodeBase64($base64);
 
-        if ($binary === null) {
+        // This becomes the profile photo, so it must really be a JPEG/PNG image.
+        $info = $binary !== null ? @getimagesizefromstring($binary) : false;
+
+        if ($info === false || ! in_array($info[2], [IMAGETYPE_JPEG, IMAGETYPE_PNG], true)) {
             return null;
         }
 

@@ -3,7 +3,7 @@
     <div class="absolute inset-0 bg-gray-900/40 transition-opacity duration-300 opacity-0" data-backdrop data-action="close-modal" data-modal-id="show-modal"></div>
 
     <div class="relative mx-auto w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-[1.75rem] border border-gray-200/80 bg-white shadow-2xl shadow-gray-900/10 dark:border-gray-700 dark:bg-gray-800 transition-all duration-300 ease-out transform scale-95 opacity-0" data-modal-content>
-        <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-red-600 via-rose-500 to-amber-400"></div>
+        <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-brand-600 via-brand-400 to-navy-700"></div>
 
         <div class="flex items-start justify-between gap-3 border-b border-gray-100 px-5 py-4 sm:px-6 dark:border-gray-700">
             <div>
@@ -32,7 +32,7 @@
 
         <div id="show-content" class="hidden">
 
-            <div class="border-b border-gray-100 bg-gradient-to-r from-gray-50 via-white to-rose-50/40 px-5 py-6 sm:px-6 dark:border-gray-700 dark:from-gray-900/50 dark:via-gray-800 dark:to-gray-800">
+            <div class="border-b border-gray-100 bg-gradient-to-r from-gray-50 via-white to-brand-50/40 px-5 py-6 sm:px-6 dark:border-gray-700 dark:from-gray-900/50 dark:via-gray-800 dark:to-gray-800">
                 <div class="flex items-start gap-4">
                     <div class="relative flex-shrink-0">
                         <img id="show_photo" src="" class="hidden h-24 w-24 rounded-2xl border-2 border-white object-cover shadow-md dark:border-gray-700" alt="">
@@ -142,10 +142,10 @@
                             </div>
                         </div>
 
-                        <div class="mt-4 flex items-center justify-between rounded-2xl bg-gradient-to-r from-red-600 to-rose-600 px-4 py-4 text-white shadow-sm shadow-red-900/10">
+                        <div class="mt-4 flex items-center justify-between rounded-2xl bg-gradient-to-r from-brand-600 to-navy-700 px-4 py-4 text-white shadow-sm shadow-brand-900/10">
                             <div>
                                 <p class="text-sm font-semibold">Gaji Gross</p>
-                                <p class="text-xs text-red-100/90">Gaji Pokok + Tunjangan</p>
+                                <p class="text-xs text-brand-100/90">Gaji Pokok + Tunjangan</p>
                             </div>
                             <p id="show_gross_salary" class="text-xl font-bold tabular-nums">-</p>
                         </div>

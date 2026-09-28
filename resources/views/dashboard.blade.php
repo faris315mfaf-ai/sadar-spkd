@@ -17,34 +17,34 @@
 
             {{-- Header --}}
             <section
-                class="relative overflow-hidden rounded-3xl border border-red-900/10 bg-gradient-to-br from-red-700 via-red-600 to-rose-600 px-5 py-6 text-white shadow-lg shadow-red-900/10 sm:px-7 sm:py-7">
+                class="relative overflow-hidden rounded-3xl border border-brand-900/10 bg-gradient-to-br from-brand-700 via-brand-600 to-navy-800 px-5 py-6 text-white shadow-lg shadow-brand-900/10 sm:px-7 sm:py-7">
                 <div class="pointer-events-none absolute -right-16 -top-20 h-52 w-52 rounded-full border-[32px] border-white/10"></div>
                 <div class="pointer-events-none absolute -bottom-16 left-1/3 h-40 w-40 rounded-full bg-white/10 blur-3xl"></div>
 
                 <div class="relative flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
                     <div>
-                        <div class="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-red-50">
+                        <div class="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-brand-50">
                             <span class="h-1.5 w-1.5 rounded-full bg-emerald-300"></span>
                             Admin Portal
                         </div>
                         <h1 class="mt-3 text-2xl font-bold tracking-tight sm:text-3xl">Dashboard Kehadiran</h1>
-                        <p class="mt-1.5 max-w-xl text-sm leading-relaxed text-red-50/90">
+                        <p class="mt-1.5 max-w-xl text-sm leading-relaxed text-brand-50/90">
                             Ringkasan kehadiran karyawan hari ini beserta tren mingguan dan bulanan.
                         </p>
-                        <p class="mt-3 text-xs font-medium text-red-100/90">{{ $todayLabel }}</p>
+                        <p class="mt-3 text-xs font-medium text-brand-100/90">{{ $todayLabel }}</p>
                     </div>
 
                     <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
                         <div class="rounded-2xl border border-white/15 bg-white/10 px-4 py-3 backdrop-blur-sm">
-                            <p class="text-[10px] font-semibold uppercase tracking-wider text-red-100">Aktif</p>
+                            <p class="text-[10px] font-semibold uppercase tracking-wider text-brand-100">Aktif</p>
                             <p class="mt-0.5 text-xl font-bold tabular-nums">{{ $activeEmployees }}</p>
                         </div>
                         <div class="rounded-2xl border border-white/15 bg-white/10 px-4 py-3 backdrop-blur-sm">
-                            <p class="text-[10px] font-semibold uppercase tracking-wider text-red-100">Hadir</p>
+                            <p class="text-[10px] font-semibold uppercase tracking-wider text-brand-100">Hadir</p>
                             <p class="mt-0.5 text-xl font-bold tabular-nums">{{ $presentToday }}</p>
                         </div>
                         <div class="col-span-2 rounded-2xl border border-white/15 bg-white/10 px-4 py-3 backdrop-blur-sm sm:col-span-1">
-                            <p class="text-[10px] font-semibold uppercase tracking-wider text-red-100">Tingkat hadir</p>
+                            <p class="text-[10px] font-semibold uppercase tracking-wider text-brand-100">Tingkat hadir</p>
                             <p class="mt-0.5 text-xl font-bold tabular-nums">{{ $attendanceRate }}%</p>
                         </div>
                     </div>
@@ -191,13 +191,13 @@
                             @php
                                 $photoUrl = $attendance->user?->employee?->profilePhotoUrl();
                             @endphp
-                            <div class="flex items-center justify-between gap-3 rounded-2xl border border-gray-100/90 bg-white/80 px-3.5 py-3 shadow-sm shadow-gray-900/[0.02] transition hover:-translate-y-0.5 hover:border-red-100 hover:shadow-md dark:border-gray-700/70 dark:bg-gray-900/40 dark:hover:border-red-900/40">
+                            <div class="flex items-center justify-between gap-3 rounded-2xl border border-gray-100/90 bg-white/80 px-3.5 py-3 shadow-sm shadow-gray-900/[0.02] transition hover:-translate-y-0.5 hover:border-brand-100 hover:shadow-md dark:border-gray-700/70 dark:bg-gray-900/40 dark:hover:border-brand-900/40">
                                 <div class="flex min-w-0 items-center gap-3">
                                     @if ($photoUrl)
                                         <img src="{{ $photoUrl }}" alt="{{ $attendance->user->name }}"
                                             class="h-11 w-11 flex-shrink-0 rounded-2xl object-cover ring-2 ring-white dark:ring-gray-700">
                                     @else
-                                        <div class="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-red-500 to-rose-600 text-sm font-bold text-white shadow-sm">
+                                        <div class="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-500 to-navy-700 text-sm font-bold text-white shadow-sm">
                                             {{ strtoupper(substr($attendance->user->name, 0, 1)) }}
                                         </div>
                                     @endif

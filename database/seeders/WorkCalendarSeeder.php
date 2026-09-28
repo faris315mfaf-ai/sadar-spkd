@@ -25,7 +25,7 @@ class WorkCalendarSeeder extends Seeder
             };
 
             WorkCalendar::updateOrCreate(
-                ['date' => $current->toDateString()],
+                ['date' => $current->copy()->startOfDay()],
                 [
                     'type' => $type->value,
                     'name' => null,

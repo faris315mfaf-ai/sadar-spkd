@@ -20,32 +20,32 @@
 
     $adminLink = function (bool $active): string {
         return $active
-            ? 'bg-white text-red-700 shadow-md shadow-red-950/15'
-            : 'text-red-50/90 hover:bg-white/10 hover:text-white';
+            ? 'bg-white text-brand-700 shadow-md shadow-navy-950/15'
+            : 'text-brand-50/90 hover:bg-white/10 hover:text-white';
     };
 
     $employeeLink = function (bool $active): string {
         return $active
-            ? 'bg-white text-red-700 shadow-md shadow-red-950/10 dark:bg-slate-700 dark:text-white'
-            : 'text-red-100 hover:translate-x-0.5 hover:bg-white/10 hover:text-white dark:text-slate-300 dark:hover:bg-slate-700/50';
+            ? 'bg-white text-brand-700 shadow-md shadow-navy-950/10 dark:bg-slate-700 dark:text-white'
+            : 'text-brand-100 hover:translate-x-0.5 hover:bg-white/10 hover:text-white dark:text-slate-300 dark:hover:bg-slate-700/50';
     };
 @endphp
 
 <aside id="app-sidebar"
-    class="relative flex h-full w-full flex-col overflow-hidden bg-gradient-to-b from-red-600 via-red-700 to-red-900 shadow-2xl shadow-red-950/20 dark:from-slate-800 dark:via-slate-900 dark:to-slate-950 dark:shadow-black/30">
+    class="relative flex h-full w-full flex-col overflow-hidden bg-gradient-to-b from-navy-800 via-navy-900 to-navy-950 shadow-2xl shadow-navy-950/20 dark:from-slate-800 dark:via-slate-900 dark:to-slate-950 dark:shadow-black/30">
     <div class="pointer-events-none absolute -right-16 top-24 h-44 w-44 rounded-full border-[28px] border-white/5"></div>
     <div class="pointer-events-none absolute -left-20 bottom-24 h-48 w-48 rounded-full border-[32px] border-white/[0.04]"></div>
     <div class="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-white/10 to-transparent"></div>
 
     <div class="relative flex h-[4.5rem] flex-shrink-0 items-center border-b border-white/10 px-5">
         <a href="{{ $homeRoute }}" class="group flex min-w-0 items-center gap-3">
-            <span class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-2xl bg-white/10 ring-1 ring-white/15 transition group-hover:bg-white/15">
-                <img src="{{ asset('images/logo/logo_SADAR.png') }}" alt="SADAR-PRI Logo"
+            <span class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-2xl bg-white ring-1 ring-white/15 transition group-hover:ring-white/40">
+                <img src="{{ asset('images/logo/logo_SPKD_mark.png') }}" alt="SADAR-SPKD Logo"
                     class="block h-7 w-auto object-contain">
             </span>
             <span class="min-w-0">
-                <span class="block text-base font-extrabold uppercase tracking-[0.16em] text-white">SADAR-PRI</span>
-                <span class="mt-0.5 block text-[10px] font-semibold uppercase tracking-[0.18em] text-red-100/85 dark:text-slate-400">
+                <span class="block text-base font-extrabold uppercase tracking-[0.16em] text-white">SADAR-SPKD</span>
+                <span class="mt-0.5 block text-[10px] font-semibold uppercase tracking-[0.18em] text-brand-100/85 dark:text-slate-400">
                     {{ $showAdminSpace ? 'Admin Portal' : 'Employee Portal' }}
                 </span>
             </span>
@@ -55,7 +55,7 @@
     <nav class="relative flex-1 space-y-1 overflow-y-auto px-3.5 py-5 scrollbar-none">
 
         @if ($showAdminSpace)
-            <p class="mb-3 px-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-red-100/70 dark:text-slate-500">
+            <p class="mb-3 px-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-100/70 dark:text-slate-500">
                 Menu Admin
             </p>
 
@@ -67,7 +67,7 @@
                 </svg>
                 Dashboard
                 @if (request()->routeIs('dashboard'))
-                    <span class="ml-auto h-1.5 w-1.5 rounded-full bg-red-500"></span>
+                    <span class="ml-auto h-1.5 w-1.5 rounded-full bg-brand-500"></span>
                 @endif
             </a>
 
@@ -79,7 +79,7 @@
                 </svg>
                 Karyawan
                 @if (request()->routeIs('employees.*'))
-                    <span class="ml-auto h-1.5 w-1.5 rounded-full bg-red-500"></span>
+                    <span class="ml-auto h-1.5 w-1.5 rounded-full bg-brand-500"></span>
                 @endif
             </a>
 
@@ -91,7 +91,7 @@
                 </svg>
                 Admin Absensi
                 @if (request()->routeIs('admin.attendance.*'))
-                    <span class="ml-auto h-1.5 w-1.5 rounded-full bg-red-500"></span>
+                    <span class="ml-auto h-1.5 w-1.5 rounded-full bg-brand-500"></span>
                 @endif
             </a>
 
@@ -104,12 +104,12 @@
                 Alfa &amp; Izin
                 @if (($absenceThresholdCount ?? 0) > 0)
                     <span
-                        class="ml-auto inline-flex min-w-[1.5rem] items-center justify-center rounded-full px-1.5 py-0.5 text-[11px] font-bold tabular-nums {{ request()->routeIs('admin.absence-threshold.*') ? 'bg-red-600 text-white' : 'bg-white/20 text-white ring-1 ring-white/25' }}"
+                        class="ml-auto inline-flex min-w-[1.5rem] items-center justify-center rounded-full px-1.5 py-0.5 text-[11px] font-bold tabular-nums {{ request()->routeIs('admin.absence-threshold.*') ? 'bg-brand-600 text-white' : 'bg-white/20 text-white ring-1 ring-white/25' }}"
                         title="{{ $absenceThresholdCount }} karyawan kena threshold bulan ini">
                         {{ $absenceThresholdCount > 99 ? '99+' : $absenceThresholdCount }}
                     </span>
                 @elseif (request()->routeIs('admin.absence-threshold.*'))
-                    <span class="ml-auto h-1.5 w-1.5 rounded-full bg-red-500"></span>
+                    <span class="ml-auto h-1.5 w-1.5 rounded-full bg-brand-500"></span>
                 @endif
             </a>
 
@@ -122,12 +122,12 @@
                 Verifikasi
                 @if (($pendingLeaveVerificationCount ?? 0) > 0)
                     <span
-                        class="ml-auto inline-flex min-w-[1.5rem] items-center justify-center rounded-full px-1.5 py-0.5 text-[11px] font-bold tabular-nums {{ request()->routeIs('leave-verification.*') ? 'bg-red-600 text-white' : 'bg-white/20 text-white ring-1 ring-white/25' }}"
+                        class="ml-auto inline-flex min-w-[1.5rem] items-center justify-center rounded-full px-1.5 py-0.5 text-[11px] font-bold tabular-nums {{ request()->routeIs('leave-verification.*') ? 'bg-brand-600 text-white' : 'bg-white/20 text-white ring-1 ring-white/25' }}"
                         title="{{ $pendingLeaveVerificationCount }} pengajuan menunggu verifikasi">
                         {{ $pendingLeaveVerificationCount > 99 ? '99+' : $pendingLeaveVerificationCount }}
                     </span>
                 @elseif (request()->routeIs('leave-verification.index'))
-                    <span class="ml-auto h-1.5 w-1.5 rounded-full bg-red-500"></span>
+                    <span class="ml-auto h-1.5 w-1.5 rounded-full bg-brand-500"></span>
                 @endif
             </a>
 
@@ -139,7 +139,7 @@
                 </svg>
                 Penggajian
                 @if (request()->routeIs('payrolls.*'))
-                    <span class="ml-auto h-1.5 w-1.5 rounded-full bg-red-500"></span>
+                    <span class="ml-auto h-1.5 w-1.5 rounded-full bg-brand-500"></span>
                 @endif
             </a>
 
@@ -151,13 +151,13 @@
                 </svg>
                 Log Aktivitas
                 @if (request()->routeIs('activity-log.*'))
-                    <span class="ml-auto h-1.5 w-1.5 rounded-full bg-red-500"></span>
+                    <span class="ml-auto h-1.5 w-1.5 rounded-full bg-brand-500"></span>
                 @endif
             </a>
 
             <div class="my-3 border-t border-white/10"></div>
 
-            <p class="mb-2 px-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-red-100/70 dark:text-slate-500">
+            <p class="mb-2 px-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-100/70 dark:text-slate-500">
                 Sistem
             </p>
 
@@ -187,32 +187,32 @@
                 <div x-show="open" x-cloak class="mt-1.5 space-y-0.5 rounded-2xl bg-black/10 p-1.5 ring-1 ring-white/10">
                     <a href="{{ route('settings.work-hours.edit') }}"
                         class="flex w-full items-center rounded-xl px-3.5 py-2 text-sm font-medium transition-colors duration-150
-                            {{ request()->routeIs('settings.work-hours.*') ? 'bg-white/20 text-white' : 'text-red-100/90 hover:bg-white/10 hover:text-white dark:text-slate-400 dark:hover:text-slate-200' }}">
-                        <span class="mr-3 h-1.5 w-1.5 flex-shrink-0 rounded-full {{ request()->routeIs('settings.work-hours.*') ? 'bg-white' : 'bg-red-300/60 dark:bg-slate-500' }}"></span>
+                            {{ request()->routeIs('settings.work-hours.*') ? 'bg-white/20 text-white' : 'text-brand-100/90 hover:bg-white/10 hover:text-white dark:text-slate-400 dark:hover:text-slate-200' }}">
+                        <span class="mr-3 h-1.5 w-1.5 flex-shrink-0 rounded-full {{ request()->routeIs('settings.work-hours.*') ? 'bg-white' : 'bg-brand-300/60 dark:bg-slate-500' }}"></span>
                         Jam Kerja
                     </a>
                     <a href="{{ route('settings.security-schedules.index') }}"
                         class="flex w-full items-center rounded-xl px-3.5 py-2 text-sm font-medium transition-colors duration-150
-                            {{ request()->routeIs('settings.security-schedules.*') ? 'bg-white/20 text-white' : 'text-red-100/90 hover:bg-white/10 hover:text-white dark:text-slate-400 dark:hover:text-slate-200' }}">
-                        <span class="mr-3 h-1.5 w-1.5 flex-shrink-0 rounded-full {{ request()->routeIs('settings.security-schedules.*') ? 'bg-white' : 'bg-red-300/60 dark:bg-slate-500' }}"></span>
+                            {{ request()->routeIs('settings.security-schedules.*') ? 'bg-white/20 text-white' : 'text-brand-100/90 hover:bg-white/10 hover:text-white dark:text-slate-400 dark:hover:text-slate-200' }}">
+                        <span class="mr-3 h-1.5 w-1.5 flex-shrink-0 rounded-full {{ request()->routeIs('settings.security-schedules.*') ? 'bg-white' : 'bg-brand-300/60 dark:bg-slate-500' }}"></span>
                         Jadwal Security
                     </a>
                     <a href="{{ route('settings.location.edit') }}"
                         class="flex w-full items-center rounded-xl px-3.5 py-2 text-sm font-medium transition-colors duration-150
-                            {{ request()->routeIs('settings.location.*') ? 'bg-white/20 text-white' : 'text-red-100/90 hover:bg-white/10 hover:text-white dark:text-slate-400 dark:hover:text-slate-200' }}">
-                        <span class="mr-3 h-1.5 w-1.5 flex-shrink-0 rounded-full {{ request()->routeIs('settings.location.*') ? 'bg-white' : 'bg-red-300/60 dark:bg-slate-500' }}"></span>
+                            {{ request()->routeIs('settings.location.*') ? 'bg-white/20 text-white' : 'text-brand-100/90 hover:bg-white/10 hover:text-white dark:text-slate-400 dark:hover:text-slate-200' }}">
+                        <span class="mr-3 h-1.5 w-1.5 flex-shrink-0 rounded-full {{ request()->routeIs('settings.location.*') ? 'bg-white' : 'bg-brand-300/60 dark:bg-slate-500' }}"></span>
                         Lokasi GPS
                     </a>
                     <a href="{{ route('work-calendars.index') }}"
                         class="flex w-full items-center rounded-xl px-3.5 py-2 text-sm font-medium transition-colors duration-150
-                            {{ request()->routeIs('work-calendars.*') ? 'bg-white/20 text-white' : 'text-red-100/90 hover:bg-white/10 hover:text-white dark:text-slate-400 dark:hover:text-slate-200' }}">
-                        <span class="mr-3 h-1.5 w-1.5 flex-shrink-0 rounded-full {{ request()->routeIs('work-calendars.*') ? 'bg-white' : 'bg-red-300/60 dark:bg-slate-500' }}"></span>
+                            {{ request()->routeIs('work-calendars.*') ? 'bg-white/20 text-white' : 'text-brand-100/90 hover:bg-white/10 hover:text-white dark:text-slate-400 dark:hover:text-slate-200' }}">
+                        <span class="mr-3 h-1.5 w-1.5 flex-shrink-0 rounded-full {{ request()->routeIs('work-calendars.*') ? 'bg-white' : 'bg-brand-300/60 dark:bg-slate-500' }}"></span>
                         Kalender Kerja
                     </a>
                 </div>
             </div>
         @else
-            <p class="mb-3 px-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-red-200/80 dark:text-slate-500">
+            <p class="mb-3 px-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-200/80 dark:text-slate-500">
                 Menu Karyawan
             </p>
 
@@ -224,7 +224,7 @@
                 </svg>
                 Absensi
                 @if (request()->routeIs('attendance.index'))
-                    <span class="ml-auto h-1.5 w-1.5 rounded-full bg-red-500 dark:bg-white"></span>
+                    <span class="ml-auto h-1.5 w-1.5 rounded-full bg-brand-500 dark:bg-white"></span>
                 @endif
             </a>
 
@@ -236,7 +236,7 @@
                 </svg>
                 Riwayat Absensi
                 @if (request()->routeIs('attendance.history'))
-                    <span class="ml-auto h-1.5 w-1.5 rounded-full bg-red-500 dark:bg-white"></span>
+                    <span class="ml-auto h-1.5 w-1.5 rounded-full bg-brand-500 dark:bg-white"></span>
                 @endif
             </a>
 
@@ -248,7 +248,7 @@
                 </svg>
                 Status Pengajuan
                 @if (request()->routeIs('leave-verification.my-submissions'))
-                    <span class="ml-auto h-1.5 w-1.5 rounded-full bg-red-500 dark:bg-white"></span>
+                    <span class="ml-auto h-1.5 w-1.5 rounded-full bg-brand-500 dark:bg-white"></span>
                 @endif
             </a>
 
@@ -260,7 +260,7 @@
                 </svg>
                 Slip Gaji
                 @if (request()->routeIs('my-payrolls.*'))
-                    <span class="ml-auto h-1.5 w-1.5 rounded-full bg-red-500 dark:bg-white"></span>
+                    <span class="ml-auto h-1.5 w-1.5 rounded-full bg-brand-500 dark:bg-white"></span>
                 @endif
             </a>
         @endif
@@ -273,7 +273,7 @@
                 <img src="{{ $sidebarPhotoUrl }}" alt="Foto profil {{ $authUser->name }}"
                     class="h-10 w-10 flex-shrink-0 rounded-xl object-cover shadow-sm ring-2 ring-white/25">
             @else
-                <span class="inline-flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-white/10 text-red-50 shadow-sm ring-1 ring-white/15">
+                <span class="inline-flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-white/10 text-brand-50 shadow-sm ring-1 ring-white/15">
                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0Zm4 10a7 7 0 00-14 0" />
                     </svg>
@@ -281,7 +281,7 @@
             @endif
             <span class="min-w-0">
                 <span class="block truncate text-sm font-semibold text-white">{{ $authUser->name }}</span>
-                <span class="mt-0.5 block truncate text-[11px] text-red-100/85">{{ $authUser->email }}</span>
+                <span class="mt-0.5 block truncate text-[11px] text-brand-100/85">{{ $authUser->email }}</span>
             </span>
         </div>
     </div>

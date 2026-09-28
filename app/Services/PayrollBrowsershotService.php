@@ -85,8 +85,9 @@ class PayrollBrowsershotService
         }
 
         // Group salary components by type
+        // "Total Gross" is a summary row, not an income line (the web views skip it too).
         $salaryComponents = $payroll->details
-            ->filter(fn ($detail) => $detail->type === 'salary')
+            ->filter(fn ($detail) => $detail->type === 'salary' && $detail->name !== 'Total Gross')
             ->sortBy('name')
             ->values();
 

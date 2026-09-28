@@ -170,7 +170,8 @@ const ManualAttendanceModule = {
             subtitle.textContent = `${data.employee_label} — koreksi absensi manual`;
         }
 
-        this.setFieldValue(form, 'manual_edit_employee_display', data.employee_label);
+        this.setFieldValue(form, 'user_id', data.user_id);
+        this.setFieldValue(form, null, data.employee_label, 'manual_edit_employee_display');
         this.setFieldValue(form, 'type', data.type, 'manual_edit_type');
         this.setFieldValue(form, 'status', data.status, 'manual_edit_status');
         this.setFieldValue(form, 'clock_in_date', data.clock_in_date, 'manual_edit_clock_in_date');

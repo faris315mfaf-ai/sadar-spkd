@@ -11,7 +11,7 @@
 @endphp
 
 <div data-server-time-url="{{ route('attendance.server-time') }}"
-    {{ $attributes->merge(['class' => 'relative w-full overflow-hidden rounded-3xl border border-red-500/20 bg-gradient-to-br from-red-600 via-red-700 to-red-900 shadow-lg shadow-red-900/10 dark:border-gray-700 dark:from-gray-800 dark:via-gray-800 dark:to-gray-900']) }}>
+    {{ $attributes->merge(['class' => 'relative w-full overflow-hidden rounded-3xl border border-brand-500/20 bg-gradient-to-br from-brand-600 via-navy-800 to-navy-900 shadow-lg shadow-navy-900/10 dark:border-gray-700 dark:from-gray-800 dark:via-gray-800 dark:to-gray-900']) }}>
     {{-- Motif geometris terinspirasi batik, dibuat ringan agar teks tetap jelas. --}}
     <svg class="pointer-events-none absolute inset-0 h-full w-full opacity-[0.12]" aria-hidden="true">
         <defs>
@@ -32,25 +32,25 @@
 
     <div class="relative grid gap-6 px-5 py-6 text-white sm:px-8 sm:py-8 md:grid-cols-[1fr_auto] md:items-center lg:px-10">
         <div class="min-w-0">
-            <div class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-medium text-red-50 backdrop-blur-sm dark:text-gray-200">
+            <div class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-medium text-brand-50 backdrop-blur-sm dark:text-gray-200">
                 <span class="h-2 w-2 rounded-full bg-amber-300 shadow-[0_0_0_4px_rgba(253,224,71,0.12)]"></span>
                 Portal Kehadiran Karyawan
             </div>
-            <p class="mt-5 text-sm font-medium text-red-100 dark:text-gray-300">{{ $greeting }},</p>
+            <p class="mt-5 text-sm font-medium text-brand-100 dark:text-gray-300">{{ $greeting }},</p>
             <p class="mt-1 truncate text-2xl font-bold tracking-tight sm:text-3xl">{{ auth()->user()->name }}</p>
-            <p class="mt-2 max-w-lg text-sm leading-relaxed text-red-100/90 dark:text-gray-400">
+            <p class="mt-2 max-w-lg text-sm leading-relaxed text-brand-100/90 dark:text-gray-400">
                 Semoga aktivitas Anda hari ini berjalan lancar dan produktif.
             </p>
         </div>
 
         <div class="rounded-2xl border border-white/15 bg-black/10 p-4 backdrop-blur-sm sm:p-5 md:min-w-72 md:text-right">
-            <p id="digital-date" class="text-xs font-semibold capitalize tracking-wide text-red-100 sm:text-sm dark:text-gray-300">
+            <p id="digital-date" class="text-xs font-semibold capitalize tracking-wide text-brand-100 sm:text-sm dark:text-gray-300">
                 {{ \App\Support\AppTime::now()->translatedFormat('l, d F Y') }}
             </p>
             <p id="digital-clock" class="mt-2 whitespace-nowrap font-mono text-4xl font-bold tracking-tight tabular-nums sm:text-5xl dark:text-white">
                 {{ \App\Support\AppTime::now()->format('H:i:s') }}
             </p>
-            <p class="mt-2 text-[11px] font-medium uppercase tracking-[0.16em] text-red-200 dark:text-gray-400">
+            <p class="mt-2 text-[11px] font-medium uppercase tracking-[0.16em] text-brand-200 dark:text-gray-400">
                 Waktu Indonesia Barat
             </p>
         </div>

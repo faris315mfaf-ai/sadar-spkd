@@ -99,9 +99,34 @@ class PayrollAttendanceDateBreakdown
     }
 
     /**
+     * Dates with a clock-in, an approved leave or a reported sick day (approved or rejected).
+     *
      * @return Collection<int, string>
      */
-    private function expectedWorkDates(int $employeeId, int $month, int $year): Collection
+    public function coveredDates(int $userId, int $month, int $year): Collection
+    {
+        return Attendance::query()
+            ->where('user_id', $userId)
+            ->whereMonth('date', $month)
+            ->whereYear('date', $year)
+            ->where(fn ($query) => $query
+                ->where(fn ($present) => $present
+                    ->where('type', AttendanceType::Regular)
+                    ->whereNotNull('clock_in_time'))
+                ->orWhere(fn ($leave) => $leave->approvedLeave())
+                ->orWhere(fn ($sick) => $sick->rejectedSick()))
+            ->pluck('date')
+            ->map(fn ($date) => Carbon::parse($date, AppTime::timezone())->toDateString())
+            ->unique()
+            ->values();
+    }
+
+    /**
+     * Calendar work days (full or half) minus the employee's scheduled off days.
+     *
+     * @return Collection<int, string>
+     */
+    public function expectedWorkDates(int $employeeId, int $month, int $year): Collection
     {
         $calendarDates = WorkCalendar::query()
             ->whereMonth('date', $month)

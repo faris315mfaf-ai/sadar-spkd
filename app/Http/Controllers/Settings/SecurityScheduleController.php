@@ -27,15 +27,16 @@ class SecurityScheduleController extends Controller
             ->map(fn ($day) => $weekStart->copy()->addDays($day));
 
         $employees = Employee::query()
-            ->where('staff', 'Security')
+            ->whereRaw('LOWER(staff) = ?', ['security'])
             ->orderBy('name')
             ->get();
 
         $assignments = EmployeeSchedule::with('workSchedule')
             ->whereIn('employee_id', $employees->pluck('id'))
+            // Full-day bounds: SQLite stores dates as "Y-m-d 00:00:00", so a plain "Y-m-d" end drops the last day.
             ->whereBetween('work_date', [
-                $days->first()->toDateString(),
-                $days->last()->toDateString(),
+                $days->first()->copy()->startOfDay(),
+                $days->last()->copy()->endOfDay(),
             ])
             ->get()
             ->keyBy(fn ($item) => $item->employee_id.'_'.$item->work_date->format('Y-m-d'));
@@ -79,7 +80,7 @@ class SecurityScheduleController extends Controller
             ->map(fn ($day) => $weekStart->copy()->addDays($day)->toDateString());
 
         $securityEmployeeIds = Employee::query()
-            ->where('staff', 'Security')
+            ->whereRaw('LOWER(staff) = ?', ['security'])
             ->pluck('id')
             ->map(fn ($id) => (string) $id)
             ->all();
@@ -116,7 +117,7 @@ class SecurityScheduleController extends Controller
                 EmployeeSchedule::updateOrCreate(
                     [
                         'employee_id' => $employeeId,
-                        'work_date' => $date,
+                        'work_date' => Carbon::parse($date)->startOfDay(),
                     ],
                     [
                         'work_schedule_id' => $workSchedule->id,

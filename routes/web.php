@@ -10,6 +10,7 @@ use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\FaceVerificationController;
 use App\Http\Controllers\LeaveVerificationController;
 use App\Http\Controllers\MyPayrollController;
+use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\PayrollController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Settings\LocationSettingController;
@@ -25,8 +26,8 @@ Route::get('/', function () {
 Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware(['auth', 'verified', 'role:employee,hr,admin'])->group(function () {
-    Route::get('/attendance', [AttendanceController::class, 'index'])->name('attendance.index');
-    Route::get('/attendance/history', [AttendanceController::class, 'history'])->name('attendance.history');
+    Route::get('/attendance', [AttendanceController::class, 'index'])->middleware('onboarded')->name('attendance.index');
+    Route::get('/attendance/history', [AttendanceController::class, 'history'])->middleware('onboarded')->name('attendance.history');
     Route::get('/leave-verification/my-submissions', [LeaveVerificationController::class, 'mySubmissions'])
         ->name('leave-verification.my-submissions');
     Route::get('/attendance/server-time', [AttendanceController::class, 'serverTime'])->name('attendance.server-time');
@@ -35,7 +36,7 @@ Route::middleware(['auth', 'verified', 'role:employee,hr,admin'])->group(functio
     Route::post('/attendance/leave', [AttendanceController::class, 'submitLeave'])->name('attendance.leave');
     Route::post('/attendance/face/verify', [FaceVerificationController::class, 'verify'])->name('attendance.face.verify');
     Route::post('/attendance/face/sync-descriptor', [FaceVerificationController::class, 'syncDescriptor'])->name('attendance.face.sync-descriptor');
-    Route::get('/my-payrolls', [MyPayrollController::class, 'index'])->name('my-payrolls.index');
+    Route::get('/my-payrolls', [MyPayrollController::class, 'index'])->middleware('onboarded')->name('my-payrolls.index');
     Route::get('/my-payrolls/{payroll}', [MyPayrollController::class, 'show'])->name('my-payrolls.show');
     Route::get('/my-payrolls/{payroll}/pdf', [MyPayrollController::class, 'downloadPdf'])->name('my-payrolls.pdf');
 });
@@ -102,6 +103,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('employees.profile-photo.show');
     Route::get('/attendance/{attendance}/note', [DoctorNoteController::class, 'show'])
         ->name('attendance.note.show');
+});
+
+// Sign-up follow-up: biodata → face registration → location check.
+Route::middleware(['auth', 'verified'])->prefix('onboarding')->name('onboarding.')->group(function () {
+    Route::get('/biodata', [OnboardingController::class, 'biodata'])->name('biodata');
+    Route::post('/biodata', [OnboardingController::class, 'storeBiodata'])->name('biodata.store');
+    Route::get('/face', [OnboardingController::class, 'face'])->name('face');
+    Route::post('/face', [OnboardingController::class, 'storeFace'])->middleware('throttle:10,1')->name('face.store');
+    Route::get('/location', [OnboardingController::class, 'location'])->name('location');
 });
 
 Route::middleware('auth')->group(function () {

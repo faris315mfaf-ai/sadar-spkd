@@ -25,17 +25,17 @@
                             </svg>
                             <input type="text" name="search" value="{{ request('search') }}"
                                 placeholder="Cari log..."
-                                class="w-full rounded-xl border-gray-300 pl-9 text-sm shadow-sm focus:border-red-500 focus:ring-red-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:placeholder-gray-400">
+                                class="w-full rounded-xl border-gray-300 pl-9 text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:placeholder-gray-400">
                         </div>
                         <select name="role"
-                            class="rounded-xl border-gray-300 text-sm shadow-sm focus:border-red-500 focus:ring-red-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200">
+                            class="rounded-xl border-gray-300 text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200">
                             <option value="">Semua Role</option>
                             <option value="admin" {{ request('role') === 'admin' ? 'selected' : '' }}>Admin</option>
                             <option value="hr" {{ request('role') === 'hr' ? 'selected' : '' }}>HR</option>
                             <option value="user" {{ request('role') === 'user' ? 'selected' : '' }}>User</option>
                         </select>
                         <button type="submit"
-                            class="inline-flex items-center gap-2 rounded-xl bg-red-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-red-700 dark:bg-gray-800 dark:text-gray-100 dark:border dark:border-gray-700 dark:hover:bg-gray-700">
+                            class="inline-flex items-center gap-2 rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-brand-700 dark:bg-gray-800 dark:text-gray-100 dark:border dark:border-gray-700 dark:hover:bg-gray-700">
                             Filter
                         </button>
                         @if (request()->hasAny(['search', 'role']))

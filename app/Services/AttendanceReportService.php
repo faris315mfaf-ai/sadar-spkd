@@ -34,16 +34,17 @@ class AttendanceReportService
             ->when($filter === 'alfa', fn ($q) => $q->where(function ($q) {
                 $q->whereNull('attendances.id')
                     ->orWhere('attendances.status', AttendanceStatus::Alpha->value)
+                    // Rejected izin counts as alfa; rejected sick stays "sakit" (same as payroll).
                     ->orWhere(function ($q) {
-                        $q->whereIn('attendances.type', [
-                            AttendanceType::Sick->value,
-                            AttendanceType::Permission->value,
-                        ])->where('attendances.verification_status', VerificationStatus::NoDone->value);
+                        $q->where('attendances.type', AttendanceType::Permission->value)
+                            ->where('attendances.verification_status', VerificationStatus::NoDone->value);
                     });
             }))
+            // Filters mirror AttendanceReportStatus::fromAttendance(), which drives the summary cards.
             ->when($filter === 'sakit', fn ($q) => $q->where('attendances.type', AttendanceType::Sick->value)
-                ->where('attendances.verification_status', '!=', VerificationStatus::NoDone->value))
+                ->where('attendances.status', '!=', AttendanceStatus::Alpha->value))
             ->when($filter === 'izin', fn ($q) => $q->where('attendances.type', AttendanceType::Permission->value)
+                ->where('attendances.status', '!=', AttendanceStatus::Alpha->value)
                 ->where('attendances.verification_status', '!=', VerificationStatus::NoDone->value))
             ->when($filter === 'telat', fn ($q) => $q
                 ->whereNotNull('attendances.id')
@@ -52,15 +53,7 @@ class AttendanceReportService
             ->when($filter === 'hadir', fn ($q) => $q
                 ->whereNotNull('attendances.id')
                 ->where('attendances.type', AttendanceType::Regular->value)
-                ->where(function ($q) {
-                    $q->whereIn('attendances.status', [
-                        AttendanceStatus::OnTime->value,
-                        AttendanceStatus::LateOut->value,
-                    ])->orWhere(function ($q) {
-                        $q->whereNull('attendances.clock_out_time')
-                            ->where('attendances.status', '!=', AttendanceStatus::Late->value);
-                    });
-                }))
+                ->where('attendances.status', '!=', AttendanceStatus::Alpha->value))
             ->when(
                 $isToday,
                 fn ($q) => $q

@@ -310,12 +310,20 @@ const EmployeeModule = {
             if (input) input.value = employee[field] ?? '';
         });
 
+        // Reset first: the modal is reused, so values from the previously opened employee must not leak.
         const scheduleSelect = document.getElementById('edit_default_work_schedule_id');
-        if (scheduleSelect && employee.default_work_schedule_id) {
-            scheduleSelect.value = String(employee.default_work_schedule_id);
+        if (scheduleSelect) {
+            const regularOption = scheduleSelect.querySelector('option[data-code="regular"]');
+            scheduleSelect.value = employee.default_work_schedule_id
+                ? String(employee.default_work_schedule_id)
+                : (regularOption?.value ?? scheduleSelect.options[0]?.value ?? '');
         }
 
         // Salary components
+        document.querySelectorAll('#edit-form input[id^="edit_sc_"]').forEach((input) => {
+            input.value = 0;
+        });
+
         if (employee.salary_components) {
             Object.entries(employee.salary_components).forEach(([componentId, amount]) => {
                 const input = document.getElementById(`edit_sc_${componentId}`);

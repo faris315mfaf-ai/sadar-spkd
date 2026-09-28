@@ -25,9 +25,9 @@ export const authenticatePdfToken = (
   _res: Response,
   next: NextFunction
 ): void => {
-  // Skip authentication if no token is configured
+  // Fail closed like the bot route: an unset token must not open the PDF renderer to everyone.
   if (!config.authToken) {
-    return next();
+    throw new UnauthorizedError('AUTH_TOKEN is not configured');
   }
 
   const authHeader = req.headers['authorization'];

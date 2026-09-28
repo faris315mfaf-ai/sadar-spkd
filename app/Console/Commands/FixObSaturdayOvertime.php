@@ -30,8 +30,7 @@ class FixObSaturdayOvertime extends Command
                     ->orWhere('position', 'OB');
             })
             ->with(['workSchedule', 'user.employee'])
-            ->orderBy('date')
-            ->orderBy('id');
+            ->orderBy('id'); // chunkById pages by id; an extra date order would skip rows
 
         if ($from = $this->option('from')) {
             $query->whereDate('date', '>=', Carbon::parse($from, AppTime::timezone())->toDateString());

@@ -28,7 +28,7 @@
     </td>
     <td class="px-6 py-4">
         @if($log->role === 'admin')
-            <span class="inline-flex items-center rounded-full bg-red-50 px-2.5 py-0.5 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10 dark:bg-red-400/10 dark:text-red-400 dark:ring-red-400/20">Admin</span>
+            <span class="inline-flex items-center rounded-full bg-brand-50 px-2.5 py-0.5 text-xs font-medium text-brand-700 ring-1 ring-inset ring-brand-600/10 dark:bg-brand-400/10 dark:text-brand-400 dark:ring-brand-400/20">Admin</span>
         @elseif($log->role === 'hr')
             <span class="inline-flex items-center rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10 dark:bg-blue-400/10 dark:text-blue-400 dark:ring-blue-400/30">HR</span>
         @else

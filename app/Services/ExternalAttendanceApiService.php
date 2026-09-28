@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\AttendanceStatus;
+use App\Enums\AttendanceType;
 use App\Models\Attendance;
 use App\Models\Employee;
 use App\Support\AppTime;
@@ -17,12 +18,19 @@ class ExternalAttendanceApiService
         $value = filled($date) ? $date : AppTime::today()->toDateString();
 
         try {
-            return Carbon::createFromFormat('Y-m-d', $value, AppTime::timezone())->startOfDay();
+            $parsed = Carbon::createFromFormat('Y-m-d', $value, AppTime::timezone())->startOfDay();
         } catch (\Throwable) {
+            $parsed = null;
+        }
+
+        // createFromFormat rolls impossible dates over (2026-02-30 → 2026-03-02); reject those too.
+        if ($parsed === null || $parsed->format('Y-m-d') !== $value) {
             throw ValidationException::withMessages([
                 'date' => 'The date must be a valid YYYY-MM-DD value.',
             ]);
         }
+
+        return $parsed;
     }
 
     /**
@@ -92,7 +100,14 @@ class ExternalAttendanceApiService
     {
         $employee = $attendance->user?->employee;
         $status = $attendance->status?->value;
-        $present = $status !== null && $status !== AttendanceStatus::Alpha->value;
+        $isRegular = $attendance->type === AttendanceType::Regular;
+        // Sick and permission (even rejected) are absences, not presence.
+        $present = $isRegular && in_array($attendance->status, [
+            AttendanceStatus::OnTime,
+            AttendanceStatus::Late,
+            AttendanceStatus::EarlyOut,
+            AttendanceStatus::LateOut,
+        ], true);
 
         return [
             'employee_code' => $employee?->employee_code,
@@ -104,7 +119,8 @@ class ExternalAttendanceApiService
             'type' => $attendance->type?->value,
             'clock_in' => $this->formatTime($attendance->clock_in_time),
             'clock_out' => $this->formatTime($attendance->clock_out_time),
-            'verification_status' => $attendance->verification_status?->value,
+            // Only leave requests are verified; regular rows just carry the column default.
+            'verification_status' => $isRegular ? null : $attendance->verification_status?->value,
         ];
     }
 

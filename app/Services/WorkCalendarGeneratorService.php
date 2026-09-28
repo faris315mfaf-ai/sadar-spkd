@@ -32,7 +32,7 @@ class WorkCalendarGeneratorService
             };
 
             WorkCalendar::updateOrCreate(
-                ['date' => $current->toDateString()],
+                ['date' => $current->copy()->startOfDay()],
                 ['type' => $type]
             );
 
@@ -98,7 +98,7 @@ class WorkCalendarGeneratorService
                     continue;
                 }
 
-                $row = WorkCalendar::where('date', $date)->first();
+                $row = WorkCalendar::whereDate('date', $date)->first();
 
                 if (! $row) {
                     continue;
@@ -163,7 +163,7 @@ class WorkCalendarGeneratorService
                         continue;
                     }
 
-                    $row = WorkCalendar::where('date', $date)->first();
+                    $row = WorkCalendar::whereDate('date', $date)->first();
 
                     if (! $row || $row->is_manual_override) {
                         continue;

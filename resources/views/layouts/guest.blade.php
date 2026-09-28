@@ -4,11 +4,13 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
+        <meta name="face-model-path" content="{{ asset('models') }}">
+        <meta name="face-api-script-url" content="{{ asset('face-api/face-api.min.js') }}">
 
-        <title>SADAR-PRI - Login</title>
+        <title>{{ $title ?? 'Masuk' }} - SADAR-SPKD</title>
 
         <!-- Favicon -->
-        <link rel="icon" type="image/png" href="{{ asset('images/logo/logo_SADAR.png') }}">
+        <link rel="icon" type="image/png" href="{{ asset('images/logo/favicon_SPKD.png') }}">
 
         <!-- Fonts -->
         {{-- <link rel="preconnect" href="https://fonts.bunny.net"> --}}
@@ -25,7 +27,7 @@
     <body class="bg-white font-sans text-gray-900 antialiased transition-colors duration-300 dark:bg-gray-900">
         <main class="relative min-h-screen overflow-hidden lg:grid lg:grid-cols-[1.05fr_0.95fr]">
             {{-- Brand panel --}}
-            <section class="relative hidden overflow-hidden bg-gradient-to-br from-red-600 via-red-700 to-red-950 p-12 text-white lg:flex lg:flex-col lg:justify-between xl:p-16">
+            <section class="relative hidden overflow-hidden bg-gradient-to-br from-brand-600 via-navy-800 to-navy-950 p-12 text-white lg:flex lg:flex-col lg:justify-between xl:p-16">
                 <svg class="pointer-events-none absolute inset-0 h-full w-full opacity-[0.1]" aria-hidden="true">
                     <defs>
                         <pattern id="login-batik-pattern" width="84" height="84" patternUnits="userSpaceOnUse">
@@ -43,24 +45,24 @@
                 <div class="pointer-events-none absolute -bottom-28 -left-28 h-80 w-80 rounded-full bg-black/10 blur-3xl"></div>
 
                 <a href="/" class="relative inline-flex w-fit items-center gap-4">
-                    <span class="inline-flex h-14 w-14 items-center justify-center rounded-2xl border border-white/20 bg-white/10 p-1.5 shadow-xl backdrop-blur-sm">
-                        <img src="{{ asset('images/logo/logo_SADAR.png') }}" alt="Logo SADAR-PRI" class="h-full w-full object-contain">
+                    <span class="inline-flex h-14 w-14 items-center justify-center rounded-2xl border border-white/20 bg-white p-1.5 shadow-xl">
+                        <img src="{{ asset('images/logo/logo_SPKD_mark.png') }}" alt="Logo SADAR-SPKD" class="h-full w-full object-contain">
                     </span>
                     <span>
-                        <span class="block text-xl font-extrabold uppercase tracking-[0.18em]">SADAR-PRI</span>
-                        <span class="mt-1 block text-xs font-medium uppercase tracking-[0.16em] text-red-200">Employee System</span>
+                        <span class="block text-xl font-extrabold uppercase tracking-[0.18em]">SADAR-SPKD</span>
+                        <span class="mt-1 block text-xs font-medium uppercase tracking-[0.16em] text-brand-200">Sistem Absensi dan Kerja</span>
                     </span>
                 </a>
 
                 <div class="relative max-w-xl">
-                    <span class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-semibold text-red-50 backdrop-blur-sm">
+                    <span class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-semibold text-brand-50 backdrop-blur-sm">
                         <span class="h-2 w-2 rounded-full bg-amber-300"></span>
                         Sistem Absensi Digital
                     </span>
                     <h1 class="mt-6 text-4xl font-bold leading-tight tracking-tight xl:text-5xl">
                         Kelola kehadiran dengan mudah dan terpercaya.
                     </h1>
-                    <p class="mt-5 max-w-lg text-base leading-relaxed text-red-100/90">
+                    <p class="mt-5 max-w-lg text-base leading-relaxed text-brand-100/90">
                         Akses absensi, pengajuan izin, riwayat kehadiran, dan slip gaji Anda dalam satu portal.
                     </p>
 
@@ -76,15 +78,15 @@
                     </div>
                 </div>
 
-                <p class="relative text-xs text-red-200/80">
-                    &copy; {{ date('Y') }} SADAR-PRI. Seluruh hak cipta dilindungi.
+                <p class="relative text-xs text-brand-200/80">
+                    &copy; {{ date('Y') }} SADAR-SPKD · PT Sistem Pelayanan Kesehatan dan Data
                 </p>
             </section>
 
             {{-- Authentication panel --}}
-            <section class="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-gray-50 via-white to-red-50/70 px-5 py-8 dark:from-gray-900 dark:via-gray-900 dark:to-red-950/20 sm:px-8 lg:px-12">
+            <section class="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-gray-50 via-white to-brand-50/70 px-5 py-8 dark:from-gray-900 dark:via-gray-900 dark:to-brand-950/20 sm:px-8 lg:px-12">
                 {{-- Pola dekoratif ringan tanpa file gambar tambahan. --}}
-                <svg class="pointer-events-none absolute inset-0 h-full w-full text-red-200 opacity-30 dark:text-red-900 dark:opacity-20" aria-hidden="true">
+                <svg class="pointer-events-none absolute inset-0 h-full w-full text-brand-200 opacity-30 dark:text-brand-900 dark:opacity-20" aria-hidden="true">
                     <defs>
                         <pattern id="login-panel-pattern" width="52" height="52" patternUnits="userSpaceOnUse">
                             <circle cx="4" cy="4" r="1.25" fill="currentColor" />
@@ -93,31 +95,31 @@
                     </defs>
                     <rect width="100%" height="100%" fill="url(#login-panel-pattern)" />
                 </svg>
-                <div class="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-red-200/50 blur-3xl dark:bg-red-900/10"></div>
+                <div class="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-brand-200/50 blur-3xl dark:bg-brand-900/10"></div>
                 <div class="pointer-events-none absolute -bottom-32 left-10 h-72 w-72 rounded-full bg-amber-100/50 blur-3xl dark:bg-amber-900/5"></div>
-                <div class="pointer-events-none absolute right-[8%] top-[12%] h-16 w-16 rotate-12 rounded-2xl border border-red-200/60 bg-white/30 backdrop-blur-sm dark:border-red-900/20 dark:bg-white/[0.02]"></div>
-                <div class="pointer-events-none absolute bottom-[12%] left-[8%] h-10 w-10 -rotate-12 rounded-xl border border-red-200/50 dark:border-red-900/20"></div>
+                <div class="pointer-events-none absolute right-[8%] top-[12%] h-16 w-16 rotate-12 rounded-2xl border border-brand-200/60 bg-white/30 backdrop-blur-sm dark:border-brand-900/20 dark:bg-white/[0.02]"></div>
+                <div class="pointer-events-none absolute bottom-[12%] left-[8%] h-10 w-10 -rotate-12 rounded-xl border border-brand-200/50 dark:border-brand-900/20"></div>
 
                 <div class="relative w-full max-w-md">
                     {{-- Mobile branding --}}
                     <a href="/" class="mx-auto mb-7 flex w-fit items-center justify-center gap-3 rounded-2xl border border-white/80 bg-white/70 px-4 py-2.5 shadow-sm backdrop-blur-sm lg:hidden dark:border-gray-700 dark:bg-gray-800/70">
-                        <img src="{{ asset('images/logo/logo_SADAR.png') }}" alt="Logo SADAR-PRI" class="h-14 w-14 object-contain">
+                        <img src="{{ asset('images/logo/logo_SPKD_mark.png') }}" alt="Logo SADAR-SPKD" class="h-14 w-14 object-contain">
                         <span>
-                            <span class="block text-lg font-extrabold uppercase tracking-[0.14em] text-red-700 dark:text-red-400">SADAR-PRI</span>
-                            <span class="block text-[10px] font-medium uppercase tracking-[0.13em] text-gray-400">Employee System</span>
+                            <span class="block text-lg font-extrabold uppercase tracking-[0.14em] text-brand-700 dark:text-brand-400">SADAR-SPKD</span>
+                            <span class="block text-[10px] font-medium uppercase tracking-[0.13em] text-gray-400">Sistem Absensi dan Kerja</span>
                         </span>
                     </a>
 
-                    <div class="relative overflow-hidden rounded-3xl border border-white bg-white/95 shadow-2xl shadow-red-950/10 backdrop-blur-sm dark:border-gray-700 dark:bg-gray-800/95 dark:shadow-black/20">
-                        <div class="h-1.5 w-full bg-gradient-to-r from-red-500 via-red-600 to-red-800"></div>
-                        <div class="pointer-events-none absolute -right-10 top-5 h-24 w-24 rounded-full border-[16px] border-red-50 dark:border-red-900/10"></div>
+                    <div class="relative overflow-hidden rounded-3xl border border-white bg-white/95 shadow-2xl shadow-brand-950/10 backdrop-blur-sm dark:border-gray-700 dark:bg-gray-800/95 dark:shadow-black/20">
+                        <div class="h-1.5 w-full bg-gradient-to-r from-brand-500 via-brand-600 to-brand-800"></div>
+                        <div class="pointer-events-none absolute -right-10 top-5 h-24 w-24 rounded-full border-[16px] border-brand-50 dark:border-brand-900/10"></div>
                         <div class="px-6 py-7 sm:px-8 sm:py-8">
                             {{ $slot }}
                         </div>
                     </div>
 
                     <p class="mt-6 text-center text-xs text-gray-400 dark:text-gray-500 lg:hidden">
-                        &copy; {{ date('Y') }} SADAR-PRI. Seluruh hak cipta dilindungi.
+                        &copy; {{ date('Y') }} SADAR-SPKD · PT Sistem Pelayanan Kesehatan dan Data
                     </p>
                 </div>
             </section>

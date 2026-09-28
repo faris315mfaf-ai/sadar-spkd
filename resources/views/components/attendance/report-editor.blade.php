@@ -6,7 +6,7 @@
     'placeholder' => '',
     'value' => '',
     'reportField' => false,
-    'textareaClass' => 'w-full rounded-xl border border-gray-200 px-4 py-3 text-sm shadow-sm focus:border-red-500 focus:ring-red-500 dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:placeholder-gray-500',
+    'textareaClass' => 'w-full rounded-xl border border-gray-200 px-4 py-3 text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:placeholder-gray-500',
 ])
 
 @php

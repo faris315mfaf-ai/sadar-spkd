@@ -12,10 +12,10 @@
             data-title="{{ $attendance->type === \App\Enums\AttendanceType::Sick ? 'Surat Dokter' : 'Bukti Izin' }}"
             data-is-image="{{ $attendance->doctorNoteIsImage() ? '1' : '0' }}"
             @click="openEvidence($event.currentTarget.dataset)"
-            {{ $attributes->merge(['class' => 'inline-flex items-center gap-2 text-sm font-medium text-red-600 hover:text-red-700']) }}>
+            {{ $attributes->merge(['class' => 'inline-flex items-center gap-2 text-sm font-medium text-brand-600 hover:text-brand-700']) }}>
     @else
         <a href="{{ $attendance->doctorNoteViewUrl() }}" target="_blank" rel="noopener noreferrer"
-            {{ $attributes->merge(['class' => 'inline-flex items-center gap-2 text-sm font-medium text-red-600 hover:text-red-700']) }}>
+            {{ $attributes->merge(['class' => 'inline-flex items-center gap-2 text-sm font-medium text-brand-600 hover:text-brand-700']) }}>
     @endif
         @if ($showIcon)
             <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">

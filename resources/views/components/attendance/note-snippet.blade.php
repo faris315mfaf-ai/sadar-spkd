@@ -18,7 +18,7 @@
             data-note-title="{{ $title }}"
             data-note-meta="{{ $meta }}"
             data-note-text="{{ $noteText }}"
-            class="mt-1 inline-flex items-center gap-1 text-xs font-semibold text-red-600 transition hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+            class="mt-1 inline-flex items-center gap-1 text-xs font-semibold text-brand-600 transition hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300"
         >
             Lihat
             <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">

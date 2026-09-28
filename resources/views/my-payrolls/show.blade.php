@@ -40,7 +40,7 @@
                     Semua slip
                 </a>
                 <a href="{{ route('my-payrolls.pdf', $payroll) }}"
-                    class="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-red-700">
+                    class="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700">
                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m4 6H5a2 2 0 01-2-2V7a2 2 0 012-2h4l2-2h2l2 2h4a2 2 0 012 2v10a2 2 0 01-2 2z" />
                     </svg>
@@ -49,7 +49,7 @@
             </div>
 
             {{-- Payroll hero --}}
-            <section class="relative overflow-hidden rounded-3xl border border-red-900/10 bg-gradient-to-br from-red-700 via-red-600 to-rose-700 px-5 py-6 text-white shadow-lg shadow-red-900/10 sm:px-7 sm:py-7">
+            <section class="relative overflow-hidden rounded-3xl border border-brand-900/10 bg-gradient-to-br from-brand-700 via-brand-600 to-navy-800 px-5 py-6 text-white shadow-lg shadow-brand-900/10 sm:px-7 sm:py-7">
                 <div class="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full border-[34px] border-white/10"></div>
                 <div class="pointer-events-none absolute -bottom-24 right-32 h-44 w-44 rounded-full bg-white/5"></div>
                 <div class="relative flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
@@ -58,30 +58,30 @@
                             <span class="rounded-full bg-white/15 px-3 py-1 text-xs font-semibold backdrop-blur">
                                 {{ $periodLabel }}
                             </span>
-                            <span class="rounded-full bg-white px-3 py-1 text-xs font-semibold text-red-700">
+                            <span class="rounded-full bg-white px-3 py-1 text-xs font-semibold text-brand-700">
                                 {{ $payroll->status === 'paid' ? 'Sudah Dibayar' : 'Dalam Proses' }}
                             </span>
                         </div>
-                        <p class="mt-5 text-sm font-medium text-red-100">Total gaji diterima</p>
+                        <p class="mt-5 text-sm font-medium text-brand-100">Total gaji diterima</p>
                         <p class="mt-1 break-words text-3xl font-bold tracking-tight sm:text-4xl">
                             Rp {{ number_format($payroll->roundedNetSalary(), 0, ',', '.') }}
                         </p>
-                        <p class="mt-3 text-sm text-red-100">
+                        <p class="mt-3 text-sm text-brand-100">
                             {{ $emp?->name ?? '-' }} · {{ $emp?->employee_code ?? '-' }}
                         </p>
                         @if ($payroll->status === 'paid' && $payroll->paid_at)
-                            <p class="mt-1 text-xs text-red-200">
+                            <p class="mt-1 text-xs text-brand-200">
                                 Dibayar pada {{ $payroll->paid_at->translatedFormat('d F Y, H:i') }}
                             </p>
                         @endif
                     </div>
                     <div class="grid grid-cols-2 gap-3 sm:flex">
                         <div class="rounded-xl bg-black/10 px-4 py-3 backdrop-blur-sm">
-                            <p class="text-xs text-red-100">Hari kerja</p>
+                            <p class="text-xs text-brand-100">Hari kerja</p>
                             <p class="mt-1 text-lg font-bold">{{ $payroll->formattedWorkDays() }}</p>
                         </div>
                         <div class="rounded-xl bg-black/10 px-4 py-3 backdrop-blur-sm">
-                            <p class="text-xs text-red-100">Kehadiran</p>
+                            <p class="text-xs text-brand-100">Kehadiran</p>
                             <p class="mt-1 text-lg font-bold">{{ $attendanceRate }}%</p>
                         </div>
                     </div>
@@ -97,7 +97,7 @@
                     <div
                         class="overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
                         <div class="flex items-center gap-3 border-b border-gray-100 bg-gray-50/70 px-5 py-4 dark:border-gray-700 dark:bg-gray-800">
-                            <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-red-50 text-red-600 dark:bg-red-950/30 dark:text-red-400">
+                            <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50 text-brand-600 dark:bg-brand-950/30 dark:text-brand-400">
                                 <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A9 9 0 1118.88 17.8M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                                 </svg>
@@ -176,7 +176,7 @@
                     <div
                         class="overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
                         <div class="flex items-center gap-3 border-b border-gray-100 bg-gray-50/70 px-6 py-4 dark:border-gray-700 dark:bg-gray-800">
-                            <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-red-50 text-red-600 dark:bg-red-950/30 dark:text-red-400">
+                            <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-50 text-brand-600 dark:bg-brand-950/30 dark:text-brand-400">
                                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8V6m0 10v2m9-6a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>

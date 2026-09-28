@@ -149,7 +149,10 @@ class Attendance extends Model
     public function scopeExcusedForAttendance(Builder $query): Builder
     {
         return $query->where(function (Builder $inner) {
-            $inner->where('type', AttendanceType::Regular)
+            // Alfa rows written by mark-alpha are regular too, but they are not "already present".
+            $inner->where(fn (Builder $regular) => $regular
+                ->where('type', AttendanceType::Regular)
+                ->where('status', '!=', AttendanceStatus::Alpha))
                 ->orWhere(function (Builder $leave) {
                     $leave->whereIn('type', [AttendanceType::Sick, AttendanceType::Permission])
                         ->where('verification_status', '!=', VerificationStatus::NoDone);

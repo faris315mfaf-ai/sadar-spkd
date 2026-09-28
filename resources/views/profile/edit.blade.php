@@ -27,7 +27,7 @@
                 </div>
                 <a href="{{ $user->homeUrl() }}"
                     class="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition hover:border-gray-300 hover:bg-gray-50 sm:w-auto dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700">
-                    <svg class="h-4 w-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="h-4 w-4 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M10 19l-7-7m0 0 7-7m-7 7h18" />
                     </svg>
@@ -41,7 +41,7 @@
 
                 {{-- Profile Header --}}
                 <div
-                    class="relative overflow-hidden border-b border-red-700 bg-gradient-to-br from-red-600 via-red-700 to-red-900 px-5 py-7 text-white sm:px-7 sm:py-8 dark:border-gray-700 dark:from-gray-800 dark:via-gray-800 dark:to-gray-900">
+                    class="relative overflow-hidden border-b border-brand-700 bg-gradient-to-br from-brand-600 via-brand-700 to-navy-900 px-5 py-7 text-white sm:px-7 sm:py-8 dark:border-gray-700 dark:from-gray-800 dark:via-gray-800 dark:to-gray-900">
                     <div class="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full border-[34px] border-white/[0.06]"></div>
                     <div class="pointer-events-none absolute -bottom-20 right-1/3 h-40 w-40 rounded-full bg-white/[0.04]"></div>
 
@@ -85,32 +85,32 @@
                                 @endif
                             </div>
                             @if ($employee)
-                                <p class="mt-3 flex items-center gap-1.5 text-sm font-medium text-red-100 dark:text-gray-300">
+                                <p class="mt-3 flex items-center gap-1.5 text-sm font-medium text-brand-100 dark:text-gray-300">
                                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3 3 0 00-3 3m3-3a3 3 0 013-3m-3 3h.01" />
                                     </svg>
                                     {{ $employee->employee_code }}
                                 </p>
-                                <p class="mt-1.5 text-sm text-red-100/90 dark:text-gray-400">
+                                <p class="mt-1.5 text-sm text-brand-100/90 dark:text-gray-400">
                                     {{ $employee->position ?: 'Jabatan belum tersedia' }}
                                     @if ($employee->staff)
-                                        <span class="mx-1 text-red-200/60">·</span>{{ $employee->staff }}
+                                        <span class="mx-1 text-brand-200/60">·</span>{{ $employee->staff }}
                                     @endif
                                 </p>
                             @else
-                                <p class="mt-2 text-sm text-red-100 dark:text-gray-400">{{ $user->email }}</p>
+                                <p class="mt-2 text-sm text-brand-100 dark:text-gray-400">{{ $user->email }}</p>
                             @endif
                         </div>
 
                         <div class="grid w-full grid-cols-1 gap-2 sm:w-auto sm:min-w-64">
                             <div class="rounded-xl border border-white/10 bg-black/10 px-4 py-3 backdrop-blur-sm">
-                                <p class="text-[11px] font-medium uppercase tracking-wider text-red-200 dark:text-gray-400">Email</p>
+                                <p class="text-[11px] font-medium uppercase tracking-wider text-brand-200 dark:text-gray-400">Email</p>
                                 <p class="mt-1 truncate text-sm font-semibold text-white">{{ $user->email }}</p>
                             </div>
                             @if ($employee?->join_date)
                                 <div class="rounded-xl border border-white/10 bg-black/10 px-4 py-3 backdrop-blur-sm">
-                                    <p class="text-[11px] font-medium uppercase tracking-wider text-red-200 dark:text-gray-400">Bergabung sejak</p>
+                                    <p class="text-[11px] font-medium uppercase tracking-wider text-brand-200 dark:text-gray-400">Bergabung sejak</p>
                                     <p class="mt-1 text-sm font-semibold text-white">{{ $employee->join_date->translatedFormat('d F Y') }}</p>
                                 </div>
                             @endif
@@ -236,7 +236,7 @@
             <div
                 class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
                 <div class="flex items-center gap-3 border-b border-gray-100 bg-gray-50/60 px-5 py-4 sm:px-6 dark:border-gray-700 dark:bg-gray-900/20">
-                    <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400">
+                    <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-600 dark:bg-brand-900/20 dark:text-brand-400">
                         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M12 11V7a4 4 0 118 0v4m-2 0H6a2 2 0 00-2 2v6a2 2 0 002 2h12a2 2 0 002-2v-6a2 2 0 00-2-2Z" />
@@ -258,7 +258,7 @@
                                 Ini</label>
                             <x-password-input id="current_password" name="current_password"
                                 autocomplete="current-password"
-                                class="block w-full rounded-xl border-gray-300 text-sm shadow-sm focus:border-red-500 focus:ring-red-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100" />
+                                class="block w-full rounded-xl border-gray-300 text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100" />
                             @if ($errors->updatePassword->get('current_password'))
                                 <p class="mt-1 text-xs text-red-600 dark:text-red-400">
                                     {{ $errors->updatePassword->first('current_password') }}</p>
@@ -270,7 +270,7 @@
                                 class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Password
                                 Baru</label>
                             <x-password-input id="password" name="password" autocomplete="new-password"
-                                class="block w-full rounded-xl border-gray-300 text-sm shadow-sm focus:border-red-500 focus:ring-red-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100" />
+                                class="block w-full rounded-xl border-gray-300 text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100" />
                             @if ($errors->updatePassword->get('password'))
                                 <p class="mt-1 text-xs text-red-600 dark:text-red-400">
                                     {{ $errors->updatePassword->first('password') }}</p>
@@ -283,7 +283,7 @@
                                 Password Baru</label>
                             <x-password-input id="password_confirmation" name="password_confirmation"
                                 autocomplete="new-password"
-                                class="block w-full rounded-xl border-gray-300 text-sm shadow-sm focus:border-red-500 focus:ring-red-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100" />
+                                class="block w-full rounded-xl border-gray-300 text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100" />
                             @if ($errors->updatePassword->get('password_confirmation'))
                                 <p class="mt-1 text-xs text-red-600 dark:text-red-400">
                                     {{ $errors->updatePassword->first('password_confirmation') }}</p>
@@ -292,7 +292,7 @@
 
                         <div class="flex items-center gap-4">
                             <button type="submit"
-                                class="inline-flex min-h-11 items-center gap-2 rounded-xl bg-red-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:bg-red-700 dark:hover:bg-red-600">
+                                class="inline-flex min-h-11 items-center gap-2 rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 dark:bg-brand-700 dark:hover:bg-brand-600">
                                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M5 13l4 4L19 7" />

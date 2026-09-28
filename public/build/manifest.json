@@ -1,14 +1,22 @@
 {
+  "_face-api-runtime-oMzAOSu4.js": {
+    "file": "assets/face-api-runtime-oMzAOSu4.js",
+    "name": "face-api-runtime"
+  },
   "_face-match-CkgyL20Q.js": {
     "file": "assets/face-match-CkgyL20Q.js",
     "name": "face-match"
+  },
+  "_geo-distance-Btq67aJd.js": {
+    "file": "assets/geo-distance-Btq67aJd.js",
+    "name": "geo-distance"
   },
   "_ui-modal-1bEgWikN.js": {
     "file": "assets/ui-modal-1bEgWikN.js",
     "name": "ui-modal"
   },
   "resources/css/app.css": {
-    "file": "assets/app-C5GDiZ7q.css",
+    "file": "assets/app-DvUw-Tha.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "name": "app",
@@ -17,11 +25,12 @@
     ]
   },
   "resources/js/admin-attendance-detail.js": {
-    "file": "assets/admin-attendance-detail-BwE3tnXy.js",
+    "file": "assets/admin-attendance-detail-tcABQZmI.js",
     "name": "admin-attendance-detail",
     "src": "resources/js/admin-attendance-detail.js",
     "isDynamicEntry": true,
     "imports": [
+      "_geo-distance-Btq67aJd.js",
       "_face-match-CkgyL20Q.js"
     ]
   },
@@ -32,7 +41,7 @@
     "isDynamicEntry": true
   },
   "resources/js/admin-manual-attendance.js": {
-    "file": "assets/admin-manual-attendance-DC0Uuh0K.js",
+    "file": "assets/admin-manual-attendance-CLX7tyAS.js",
     "name": "admin-manual-attendance",
     "src": "resources/js/admin-manual-attendance.js",
     "isDynamicEntry": true,
@@ -41,7 +50,7 @@
     ]
   },
   "resources/js/app.js": {
-    "file": "assets/app-Wb9Nt4IL.js",
+    "file": "assets/app-yry5fDx4.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
@@ -54,16 +63,19 @@
       "resources/js/admin-attendance-whatsapp-report.js",
       "resources/js/dashboard.js",
       "resources/js/attendance-page.js",
-      "resources/js/attendance-face-verification.js"
+      "resources/js/attendance-face-verification.js",
+      "resources/js/onboarding.js",
+      "resources/js/onboarding.js"
     ]
   },
   "resources/js/attendance-face-verification.js": {
-    "file": "assets/attendance-face-verification-BEJ6h-OJ.js",
+    "file": "assets/attendance-face-verification-CabdIoVq.js",
     "name": "attendance-face-verification",
     "src": "resources/js/attendance-face-verification.js",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.js",
+      "_face-api-runtime-oMzAOSu4.js",
       "_face-match-CkgyL20Q.js"
     ]
   },
@@ -80,7 +92,7 @@
     "isDynamicEntry": true
   },
   "resources/js/employees.js": {
-    "file": "assets/employees-DgjeCIPb.js",
+    "file": "assets/employees-Bx7vW_Fh.js",
     "name": "employees",
     "src": "resources/js/employees.js",
     "isDynamicEntry": true,
@@ -95,6 +107,17 @@
     "isDynamicEntry": true,
     "imports": [
       "_ui-modal-1bEgWikN.js"
+    ]
+  },
+  "resources/js/onboarding.js": {
+    "file": "assets/onboarding-CaSsvoAR.js",
+    "name": "onboarding",
+    "src": "resources/js/onboarding.js",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_face-api-runtime-oMzAOSu4.js",
+      "_geo-distance-Btq67aJd.js"
     ]
   },
   "resources/js/work-calendar.js": {

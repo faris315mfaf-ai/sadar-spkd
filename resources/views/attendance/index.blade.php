@@ -206,12 +206,12 @@
                 @endif
             </div>
 
-            <x-attendance.attendance-card class="border-t-2 border-t-red-500">
+            <x-attendance.attendance-card class="border-t-2 border-t-brand-500">
                 <div
-                    class="relative flex flex-col gap-4 overflow-hidden border-b border-gray-100 bg-gradient-to-r from-red-50/70 via-white to-white px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6 dark:border-gray-700 dark:from-red-950/15 dark:via-gray-800 dark:to-gray-800">
-                    <div class="pointer-events-none absolute -right-10 -top-14 h-28 w-28 rounded-full border-[18px] border-red-100/40 dark:border-red-900/10"></div>
+                    class="relative flex flex-col gap-4 overflow-hidden border-b border-gray-100 bg-gradient-to-r from-brand-50/70 via-white to-white px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6 dark:border-gray-700 dark:from-brand-950/15 dark:via-gray-800 dark:to-gray-800">
+                    <div class="pointer-events-none absolute -right-10 -top-14 h-28 w-28 rounded-full border-[18px] border-brand-100/40 dark:border-brand-900/10"></div>
                     <div class="relative flex min-w-0 items-center gap-3.5">
-                        <span class="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-red-100 text-red-600 ring-1 ring-inset ring-red-200/70 dark:bg-red-900/25 dark:text-red-400 dark:ring-red-800/50">
+                        <span class="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-brand-100 text-brand-600 ring-1 ring-inset ring-brand-200/70 dark:bg-brand-900/25 dark:text-brand-400 dark:ring-brand-800/50">
                             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M12 8v4l3 2m6-2a9 9 0 11-18 0 9 9 0 0118 0Z" />
@@ -230,7 +230,7 @@
                         </div>
                     </div>
                     <a href="{{ route('attendance.history') }}"
-                        class="group relative inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-xl border border-red-200 bg-white px-4 py-2 text-sm font-semibold text-red-600 shadow-sm transition hover:border-red-300 hover:bg-red-50 sm:w-auto dark:border-red-900 dark:bg-gray-800 dark:text-red-400 dark:hover:bg-red-950/20">
+                        class="group relative inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-xl border border-brand-200 bg-white px-4 py-2 text-sm font-semibold text-brand-600 shadow-sm transition hover:border-brand-300 hover:bg-brand-50 sm:w-auto dark:border-brand-900 dark:bg-gray-800 dark:text-brand-400 dark:hover:bg-brand-950/20">
                         Lihat semua riwayat
                         <svg class="h-4 w-4 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />

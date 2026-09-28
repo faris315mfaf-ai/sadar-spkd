@@ -37,37 +37,37 @@
 
             {{-- Header --}}
             <section
-                class="relative overflow-hidden rounded-3xl border border-red-900/10 bg-gradient-to-br from-red-700 via-red-600 to-rose-600 px-5 py-6 text-white shadow-lg shadow-red-900/10 sm:px-7 sm:py-7">
+                class="relative overflow-hidden rounded-3xl border border-brand-900/10 bg-gradient-to-br from-brand-700 via-brand-600 to-navy-700 px-5 py-6 text-white shadow-lg shadow-brand-900/10 sm:px-7 sm:py-7">
                 <div class="pointer-events-none absolute -right-16 -top-20 h-52 w-52 rounded-full border-[32px] border-white/10"></div>
                 <div class="pointer-events-none absolute -bottom-16 left-1/3 h-40 w-40 rounded-full bg-white/10 blur-3xl"></div>
 
                 <div class="relative flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
                     <div>
-                        <div class="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-red-50">
+                        <div class="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-brand-50">
                             <span class="h-1.5 w-1.5 rounded-full bg-emerald-300"></span>
                             Pengaturan Sistem
                         </div>
                         <h1 class="mt-3 text-2xl font-bold tracking-tight sm:text-3xl">Jadwal Security</h1>
-                        <p class="mt-1.5 max-w-2xl text-sm leading-relaxed text-red-50/90">
+                        <p class="mt-1.5 max-w-2xl text-sm leading-relaxed text-brand-50/90">
                             Atur penugasan mingguan petugas security. Gunakan L (Lobby), PG (Pos Gate), atau OFF.
                         </p>
                     </div>
 
                     <div class="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:min-w-[28rem]">
                         <div class="rounded-2xl border border-white/15 bg-white/10 px-3.5 py-3 backdrop-blur-sm">
-                            <p class="text-[10px] font-semibold uppercase tracking-wider text-red-100">Petugas</p>
+                            <p class="text-[10px] font-semibold uppercase tracking-wider text-brand-100">Petugas</p>
                             <p class="mt-0.5 text-xl font-bold tabular-nums">{{ $employeeCount }}</p>
                         </div>
                         <div class="rounded-2xl border border-white/15 bg-white/10 px-3.5 py-3 backdrop-blur-sm">
-                            <p class="text-[10px] font-semibold uppercase tracking-wider text-red-100">Lobby</p>
+                            <p class="text-[10px] font-semibold uppercase tracking-wider text-brand-100">Lobby</p>
                             <p class="mt-0.5 text-xl font-bold tabular-nums">{{ $counts['lobby'] }}</p>
                         </div>
                         <div class="rounded-2xl border border-white/15 bg-white/10 px-3.5 py-3 backdrop-blur-sm">
-                            <p class="text-[10px] font-semibold uppercase tracking-wider text-red-100">Pos Gate</p>
+                            <p class="text-[10px] font-semibold uppercase tracking-wider text-brand-100">Pos Gate</p>
                             <p class="mt-0.5 text-xl font-bold tabular-nums">{{ $counts['gate'] }}</p>
                         </div>
                         <div class="col-span-2 rounded-2xl border border-white/15 bg-white/10 px-3.5 py-3 backdrop-blur-sm sm:col-span-1">
-                            <p class="text-[10px] font-semibold uppercase tracking-wider text-red-100">OFF</p>
+                            <p class="text-[10px] font-semibold uppercase tracking-wider text-brand-100">OFF</p>
                             <p class="mt-0.5 text-xl font-bold tabular-nums">{{ $counts['off'] }}</p>
                         </div>
                     </div>
@@ -102,14 +102,14 @@
                             </div>
                             <div class="flex items-center gap-2">
                                 <a href="{{ route('settings.security-schedules.index', ['week_start' => $prevWeek]) }}"
-                                    class="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-500 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600 dark:border-gray-600 dark:bg-gray-900 dark:hover:border-red-800 dark:hover:bg-red-950/30 dark:hover:text-red-300"
+                                    class="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-500 transition hover:border-brand-200 hover:bg-brand-50 hover:text-brand-600 dark:border-gray-600 dark:bg-gray-900 dark:hover:border-brand-800 dark:hover:bg-brand-950/30 dark:hover:text-brand-300"
                                     aria-label="Minggu sebelumnya">
                                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                                     </svg>
                                 </a>
                                 <a href="{{ route('settings.security-schedules.index', ['week_start' => $nextWeek]) }}"
-                                    class="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-500 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600 dark:border-gray-600 dark:bg-gray-900 dark:hover:border-red-800 dark:hover:bg-red-950/30 dark:hover:text-red-300"
+                                    class="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-500 transition hover:border-brand-200 hover:bg-brand-50 hover:text-brand-600 dark:border-gray-600 dark:bg-gray-900 dark:hover:border-brand-800 dark:hover:bg-brand-950/30 dark:hover:text-brand-300"
                                     aria-label="Minggu berikutnya">
                                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
@@ -128,7 +128,7 @@
                                 </svg>
                                 <input id="week_start" type="date" name="week_start" value="{{ $weekStart->toDateString() }}"
                                     onchange="this.form.submit()"
-                                    class="block min-h-11 w-full rounded-2xl border-gray-200 bg-gray-50 pl-11 pr-3 text-sm text-gray-800 shadow-sm transition focus:border-red-500 focus:bg-white focus:ring-red-500 dark:border-gray-600 dark:bg-gray-900 dark:text-white">
+                                    class="block min-h-11 w-full rounded-2xl border-gray-200 bg-gray-50 pl-11 pr-3 text-sm text-gray-800 shadow-sm transition focus:border-brand-500 focus:bg-white focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-900 dark:text-white">
                             </div>
                         </form>
 
@@ -171,7 +171,7 @@
                                 File Excel
                             </label>
                             <input id="schedule-file" type="file" name="file" accept=".xlsx,.xls,.csv" required
-                                class="block w-full rounded-2xl border border-gray-200 bg-white text-sm text-gray-700 shadow-sm file:mr-4 file:rounded-xl file:border-0 file:bg-red-600 file:px-4 file:py-2.5 file:text-sm file:font-semibold file:text-white hover:file:bg-red-700 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:file:bg-red-700">
+                                class="block w-full rounded-2xl border border-gray-200 bg-white text-sm text-gray-700 shadow-sm file:mr-4 file:rounded-xl file:border-0 file:bg-brand-600 file:px-4 file:py-2.5 file:text-sm file:font-semibold file:text-white hover:file:bg-brand-700 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:file:bg-brand-700">
                             <div class="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                                 <p class="text-xs text-gray-500 dark:text-gray-400">Format: .xlsx, .xls, atau .csv</p>
                                 <button type="submit"
@@ -216,13 +216,13 @@
                                         <th scope="col" class="min-w-[108px] px-2 py-3.5 text-center">
                                             <div @class([
                                                 'mx-auto inline-flex min-w-[4.75rem] flex-col items-center rounded-xl px-2.5 py-1.5 shadow-sm ring-1',
-                                                'bg-red-600 text-white ring-red-500' => $isToday,
+                                                'bg-brand-600 text-white ring-brand-500' => $isToday,
                                                 'bg-white text-gray-700 ring-gray-100 dark:bg-gray-900 dark:text-gray-200 dark:ring-gray-700' => ! $isToday,
                                             ])>
                                                 <span @class([
                                                     'text-[10px] font-bold uppercase tracking-wide',
-                                                    'text-red-100' => $isToday,
-                                                    'text-red-600 dark:text-red-300' => ! $isToday,
+                                                    'text-brand-100' => $isToday,
+                                                    'text-brand-600 dark:text-brand-300' => ! $isToday,
                                                 ])>
                                                     {{ $day->translatedFormat('D') }}
                                                 </span>
@@ -238,14 +238,14 @@
                             <tbody class="divide-y divide-gray-100 bg-white dark:divide-gray-700 dark:bg-gray-800">
                                 @forelse ($employees as $employee)
                                     @php $photoUrl = $employee->profilePhotoUrl(); @endphp
-                                    <tr class="transition hover:bg-red-50/30 dark:hover:bg-red-950/10">
+                                    <tr class="transition hover:bg-brand-50/30 dark:hover:bg-brand-950/10">
                                         <td class="sticky left-0 z-10 border-r border-gray-200 bg-white px-4 py-3 dark:border-gray-700 dark:bg-gray-800">
                                             <div class="flex items-center gap-3">
                                                 @if ($photoUrl)
                                                     <img src="{{ $photoUrl }}" alt="{{ $employee->name }}"
                                                         class="h-9 w-9 flex-shrink-0 rounded-xl object-cover ring-1 ring-gray-200 dark:ring-gray-600">
                                                 @else
-                                                    <span class="inline-flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-red-500 to-rose-600 text-xs font-bold text-white shadow-sm">
+                                                    <span class="inline-flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-navy-700 text-xs font-bold text-white shadow-sm">
                                                         {{ strtoupper(substr($employee->name, 0, 1)) }}
                                                     </span>
                                                 @endif
@@ -265,7 +265,7 @@
                                                     x-data="{ value: '{{ $selected }}' }"
                                                     x-model="value"
                                                     :class="tone(value)"
-                                                    class="w-full cursor-pointer appearance-none rounded-xl px-2 py-2 text-center text-xs font-bold tracking-wide ring-1 ring-inset transition focus:outline-none focus:ring-2 focus:ring-red-500">
+                                                    class="w-full cursor-pointer appearance-none rounded-xl px-2 py-2 text-center text-xs font-bold tracking-wide ring-1 ring-inset transition focus:outline-none focus:ring-2 focus:ring-brand-500">
                                                     <option value="lobby">L</option>
                                                     <option value="gate">PG</option>
                                                     <option value="off">OFF</option>
@@ -300,7 +300,7 @@
                                 Perubahan baru tersimpan setelah tombol <span class="font-semibold text-gray-700 dark:text-gray-300">Simpan Jadwal</span> ditekan.
                             </p>
                             <button type="submit"
-                                class="inline-flex min-h-11 items-center justify-center gap-2 rounded-2xl bg-red-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm shadow-red-900/10 transition hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900">
+                                class="inline-flex min-h-11 items-center justify-center gap-2 rounded-2xl bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm shadow-brand-900/10 transition hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900">
                                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                 </svg>

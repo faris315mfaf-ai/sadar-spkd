@@ -5,13 +5,13 @@
 ])
 
 <div {{ $attributes->merge([
-    'class' => 'group relative flex min-h-[24rem] flex-col overflow-hidden rounded-3xl border border-gray-200/70 bg-gradient-to-br from-red-50/70 via-white to-white shadow-sm transition duration-200 hover:shadow-md dark:border-gray-700 dark:from-red-950/20 dark:via-gray-800 dark:to-gray-800',
+    'class' => 'group relative flex min-h-[24rem] flex-col overflow-hidden rounded-3xl border border-gray-200/70 bg-gradient-to-br from-brand-50/70 via-white to-white shadow-sm transition duration-200 hover:shadow-md dark:border-gray-700 dark:from-brand-950/20 dark:via-gray-800 dark:to-gray-800',
 ]) }}>
-    <div class="pointer-events-none absolute -right-10 -top-10 h-28 w-28 rounded-full bg-red-400/15 blur-2xl"></div>
+    <div class="pointer-events-none absolute -right-10 -top-10 h-28 w-28 rounded-full bg-brand-400/15 blur-2xl"></div>
 
     <div class="relative flex flex-shrink-0 items-start justify-between gap-3 px-5 pb-1 pt-5 sm:px-6 sm:pt-6">
         <div class="flex min-w-0 items-start gap-3">
-            <div class="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300">
+            <div class="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl bg-brand-100 text-brand-700 dark:bg-brand-900/50 dark:text-brand-300">
                 {{ $icon ?? '' }}
             </div>
             <div class="min-w-0 pt-0.5">
@@ -22,7 +22,7 @@
             </div>
         </div>
         @if ($badge !== null)
-            <span class="inline-flex flex-shrink-0 items-center rounded-full bg-red-50 px-2.5 py-1 text-[11px] font-semibold text-red-700 ring-1 ring-inset ring-red-100 dark:bg-red-950/40 dark:text-red-300 dark:ring-red-900/50">
+            <span class="inline-flex flex-shrink-0 items-center rounded-full bg-brand-50 px-2.5 py-1 text-[11px] font-semibold text-brand-700 ring-1 ring-inset ring-brand-100 dark:bg-brand-950/40 dark:text-brand-300 dark:ring-brand-900/50">
                 {{ $badge }}
             </span>
         @endif

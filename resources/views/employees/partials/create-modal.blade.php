@@ -3,7 +3,7 @@
     <div class="absolute inset-0 bg-gray-900/40 transition-opacity duration-300 opacity-0" data-backdrop data-action="close-modal" data-modal-id="create-modal"></div>
 
     <div class="relative mx-auto w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-[1.75rem] border border-gray-200/80 bg-white shadow-2xl shadow-gray-900/10 dark:border-gray-700 dark:bg-gray-800 transition-all duration-300 ease-out transform scale-95 opacity-0" data-modal-content>
-        <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-red-600 via-rose-500 to-amber-400"></div>
+        <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-brand-600 via-brand-400 to-navy-700"></div>
 
         <div class="flex items-start justify-between gap-3 border-b border-gray-100 px-5 py-4 sm:px-6 dark:border-gray-700">
             <div>
@@ -37,7 +37,7 @@
                     Batal
                 </button>
                 <button type="submit" id="create-submit-btn"
-                    class="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl bg-red-600 px-5 py-2 text-sm font-semibold text-white shadow-sm shadow-red-900/10 transition hover:bg-red-700 sm:w-auto">
+                    class="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl bg-brand-600 px-5 py-2 text-sm font-semibold text-white shadow-sm shadow-brand-900/10 transition hover:bg-brand-700 sm:w-auto">
                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                     </svg>

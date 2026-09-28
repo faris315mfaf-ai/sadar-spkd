@@ -2,54 +2,12 @@
 
 namespace App\Services;
 
+use App\Models\CompanyProfile;
 use App\Models\Employee;
 use Illuminate\Support\Carbon;
 
 class WhatsappAttendanceReportService
 {
-    private const DIVISIONS = [
-        'STAFF OFFICE' => [
-            'Office',
-            'Sekretaris Direktur',
-        ],
-
-        'LEADER' => [
-            'Leader',
-        ],
-
-        'STAFF IT' => [
-            'IT',
-        ],
-
-        'STAFF ADMIN MEDSOS' => [
-            'Admin Medsos',
-        ],
-
-        'STAFF LAINNYA' => [
-            null,
-            'Design',
-            'Editor',
-            'Engineering',
-            'Survey & Acara',
-            'Content Creator',
-            'TV Rakyat',
-        ],
-
-        'STAFF RESTO' => [
-            'Kitchen',
-        ],
-
-        'OB, SECURITY & RECEPTIONIST' => [
-            'OB',
-            'Security',
-            'Resepsionis',
-        ],
-    ];
-
-    private const HIDE_POSITION_DIVISIONS = [
-        'STAFF ADMIN MEDSOS',
-    ];
-
     public function generate(?Carbon $date = null, string $type = 'masuk'): string
     {
         $date ??= today();
@@ -59,23 +17,44 @@ class WhatsappAttendanceReportService
             'schedules.workSchedule' => fn ($query) => $query,
         ])
             ->where('employment_status', '!=', 'resigned')
-            ->orderByRaw('employee_code + 0 asc')
+            ->orderBy('employee_code')
             ->get();
 
         $titleType = $type === 'pulang' ? 'PULANG' : 'MASUK';
+        $companyName = CompanyProfile::getProfile()?->name ?: config('app.name');
 
         $message = "📋 *ABSENSI {$titleType} KARYAWAN*\n";
-        $message .= "*PT. AMAL BENCANA RAKYAT INDONESIA*\n";
+        $message .= '*'.mb_strtoupper($companyName)."*\n";
         $message .= 'Hari/Tanggal: '.$date->translatedFormat('l, d-m-Y')."\n\n";
         $message .= "*Keterangan:*\n";
         $message .= "H = Hadir | I = Izin | S = Sakit | A = Alpha | T = Telat\n\n";
 
         $counter = 1;
 
-        foreach (self::DIVISIONS as $title => $staffTypes) {
-            $divisionEmployees = $employees
-                ->filter(fn ($employee) => in_array($employee->staff, $staffTypes, true))
-                ->values();
+        // Staff is free text: match case-insensitively and put anything unknown in the catch-all group,
+        // so no employee is left out of the report.
+        $groups = config('divisions.groups', []);
+        $fallbackGroup = config('divisions.fallback_group', 'STAFF LAINNYA');
+        $hidePositionGroups = config('divisions.hide_position_groups', []);
+
+        $divisionByStaff = [];
+        foreach ($groups as $title => $staffTypes) {
+            foreach ($staffTypes as $staffType) {
+                $divisionByStaff[mb_strtolower(trim((string) $staffType))] = $title;
+            }
+        }
+
+        $employeesByDivision = $employees->groupBy(
+            fn ($employee) => $divisionByStaff[mb_strtolower(trim((string) $employee->staff))] ?? $fallbackGroup
+        );
+
+        $groupTitles = array_keys($groups);
+        if (! in_array($fallbackGroup, $groupTitles, true)) {
+            $groupTitles[] = $fallbackGroup;
+        }
+
+        foreach ($groupTitles as $title) {
+            $divisionEmployees = $employeesByDivision->get($title, collect())->values();
 
             if ($divisionEmployees->isEmpty()) {
                 continue;
@@ -91,7 +70,7 @@ class WhatsappAttendanceReportService
                 $message .= $counter.'. '.$employee->name;
 
                 if (
-                    ! in_array($title, self::HIDE_POSITION_DIVISIONS, true)
+                    ! in_array($title, $hidePositionGroups, true)
                     && filled($employee->position)
                 ) {
                     $message .= ' - '.$employee->position;

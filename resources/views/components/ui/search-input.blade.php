@@ -10,7 +10,7 @@
         name="{{ $name }}"
         value="{{ $value }}"
         placeholder="{{ $placeholder }}"
-        {{ $attributes->merge(['class' => 'w-full rounded-xl border-gray-300 py-2 pl-4 pr-10 text-sm shadow-sm focus:border-red-500 focus:ring-red-500 sm:w-64 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100 dark:placeholder-gray-500 dark:focus:border-gray-500 dark:focus:ring-gray-500']) }}
+        {{ $attributes->merge(['class' => 'w-full rounded-xl border-gray-300 py-2 pl-4 pr-10 text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:w-64 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100 dark:placeholder-gray-500 dark:focus:border-gray-500 dark:focus:ring-gray-500']) }}
     />
     <div class="pointer-events-none absolute inset-y-0 right-3 flex items-center">
         <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

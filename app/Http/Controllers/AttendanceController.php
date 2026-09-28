@@ -216,9 +216,7 @@ class AttendanceController extends Controller
 
 
 
-        if ($result->success) {
-
-            $attendance = $this->attendanceService->todayFor($request->user());
+        if ($result->success && ($attendance = $this->attendanceService->todayFor($request->user()))) {
 
             $clockInTime = Carbon::parse($attendance->clock_in_time)->format('H:i');
 
@@ -264,6 +262,9 @@ class AttendanceController extends Controller
 
     {
 
+        // Security shifts clock out the next morning, so "today" is not always the closed record.
+        $target = $this->attendanceService->clockOutTargetFor($request->user());
+
         $result = $this->attendanceService->clockOut(
 
             $request->user(),
@@ -292,9 +293,7 @@ class AttendanceController extends Controller
 
 
 
-        if ($result->success) {
-
-            $attendance = $this->attendanceService->todayFor($request->user());
+        if ($result->success && ($attendance = $target?->fresh())) {
 
             $clockOutTime = Carbon::parse($attendance->clock_out_time)->format('H:i');
 
@@ -348,9 +347,9 @@ class AttendanceController extends Controller
 
             $request->file('doctor_note'),
 
-            (float) $request->validated('latitude'),
+            $request->validated('latitude') !== null ? (float) $request->validated('latitude') : null,
 
-            (float) $request->validated('longitude'),
+            $request->validated('longitude') !== null ? (float) $request->validated('longitude') : null,
 
             $request->validated('accuracy') !== null ? (float) $request->validated('accuracy') : null,
 

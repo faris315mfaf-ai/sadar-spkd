@@ -13,8 +13,9 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
 
-        if ($user->employee !== null && ! $user->isAdmin()) {
-            return redirect()->route('attendance.index');
+        // Company-wide statistics are for admin/HR only; everyone else goes to their own home page.
+        if (! $user->isAdmin()) {
+            return redirect()->to($user->homeUrl());
         }
 
         // Statistics
@@ -62,7 +63,8 @@ class DashboardController extends Controller
         $monthlyData = [];
         $monthlyLabels = [];
         for ($i = 11; $i >= 0; $i--) {
-            $date = Carbon::today()->subMonths($i);
+            // startOfMonth first: on the 31st, subMonths() would overflow into the same month.
+            $date = Carbon::today()->startOfMonth()->subMonths($i);
             $monthlyLabels[] = $date->translatedFormat('F');
             $monthlyData[] = Attendance::whereYear('date', $date->year)
                 ->whereMonth('date', $date->month)
@@ -73,7 +75,8 @@ class DashboardController extends Controller
 
         // Attendance status distribution (keys harus cocok dengan blade)
         $statusDistribution = [
-            'present' => $presentToday,
+            // Late employees have their own slice; presentToday already includes them.
+            'present' => max($presentToday - $lateToday, 0),
             'late' => $lateToday,
             'absent' => $absentToday,
             'leave' => $leaveToday,

@@ -112,7 +112,12 @@ class AbsenceThresholdMonitoringService
             ->whereIn('user_id', $userIds)
             ->whereMonth('date', $month)
             ->whereYear('date', $year)
-            ->where('status', AttendanceStatus::Alpha)
+            // Rejected or expired izin is treated as alfa everywhere else in the app.
+            ->where(fn ($query) => $query
+                ->where('status', AttendanceStatus::Alpha)
+                ->orWhere(fn ($rejected) => $rejected
+                    ->where('type', AttendanceType::Permission)
+                    ->where('verification_status', VerificationStatus::NoDone)))
             ->orderBy('date')
             ->get(['user_id', 'date'])
             ->groupBy('user_id')

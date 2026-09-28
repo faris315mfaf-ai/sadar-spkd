@@ -4,11 +4,11 @@
 
             {{-- Header --}}
             <section class="relative overflow-hidden rounded-[1.75rem] border border-gray-200/80 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
-                <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-red-600 via-rose-500 to-amber-400"></div>
+                <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-brand-600 via-brand-400 to-navy-700"></div>
 
                 <div class="grid gap-5 px-5 py-5 sm:px-6 sm:py-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
                     <div>
-                        <div class="inline-flex items-center gap-2 rounded-full bg-red-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-red-700 ring-1 ring-inset ring-red-100 dark:bg-red-950/40 dark:text-red-300 dark:ring-red-900/50">
+                        <div class="inline-flex items-center gap-2 rounded-full bg-brand-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-brand-700 ring-1 ring-inset ring-brand-100 dark:bg-brand-950/40 dark:text-brand-300 dark:ring-brand-900/50">
                             <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
                             Monitoring SDM
                         </div>
@@ -24,7 +24,7 @@
                             <div>
                                 <label for="filter-month" class="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider text-gray-400">Bulan</label>
                                 <select id="filter-month" name="month" onchange="this.form.submit()"
-                                    class="min-h-11 rounded-2xl border-gray-200 bg-gray-50 text-sm font-semibold text-gray-800 shadow-sm focus:border-red-500 focus:bg-white focus:ring-red-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100">
+                                    class="min-h-11 rounded-2xl border-gray-200 bg-gray-50 text-sm font-semibold text-gray-800 shadow-sm focus:border-brand-500 focus:bg-white focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100">
                                     @foreach ($months as $num => $label)
                                         <option value="{{ $num }}" @selected((int) $num === (int) $month)>{{ $label }}</option>
                                     @endforeach
@@ -33,7 +33,7 @@
                             <div>
                                 <label for="filter-year" class="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider text-gray-400">Tahun</label>
                                 <select id="filter-year" name="year" onchange="this.form.submit()"
-                                    class="min-h-11 rounded-2xl border-gray-200 bg-gray-50 text-sm font-semibold text-gray-800 shadow-sm focus:border-red-500 focus:bg-white focus:ring-red-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100">
+                                    class="min-h-11 rounded-2xl border-gray-200 bg-gray-50 text-sm font-semibold text-gray-800 shadow-sm focus:border-brand-500 focus:bg-white focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100">
                                     @foreach ($years as $y)
                                         <option value="{{ $y }}" @selected((int) $y === (int) $year)>{{ $y }}</option>
                                     @endforeach

@@ -14,8 +14,10 @@ use App\Models\Setting;
 use App\Models\User;
 use App\Support\AppTime;
 use App\Support\GeoDistance;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class AttendanceService
 {
@@ -197,9 +199,12 @@ class AttendanceService
         ?string $deviceType = null,
         ?int $clientTime = null,
     ): ActionResult {
+        $rejectedLeave = null;
+
         if ($existing = $this->todayFor($user)) {
             if ($existing->isRejectedLeave()) {
-                $existing->delete();
+                // Removed only once clock-in succeeds, so a failed attempt keeps HR's rejection record.
+                $rejectedLeave = $existing;
             } elseif ($existing->status === AttendanceStatus::Alpha) {
                 return ActionResult::fail(
                     'Hari ini sudah tercatat alfa. Hubungi HR jika perlu koreksi.'
@@ -273,25 +278,39 @@ class AttendanceService
 
         $anomaly = $this->resolveAnomalyStatus($user, $settings, $latitude, $longitude, $accuracy, $deviceType, $clientTime);
 
-        Attendance::create([
-            'user_id' => $user->id,
-            'date' => $attendanceDate,
-            'type' => AttendanceType::Regular,
-            'shift' => $shift,
-            'work_schedule_id' => $workSchedule->id,
-            'clock_in_time' => AppTime::currentTimeForStorage(),
-            'clock_in_report' => $report,
-            'clock_in_latitude' => $latitude,
-            'clock_in_longitude' => $longitude,
-            'clock_in_location' => $resolvedLocation,
-            'clock_in_verification_photo' => $photoPath,
-            'clock_in_face_distance' => $faceResult['distance'] ?? null,
-            'status' => $status,
-            'accuracy' => $accuracy,
-            'device_type' => $deviceType,
-            'validation_status' => $anomaly['status'],
-            'suspicious_reason' => $anomaly['reason'],
-        ]);
+        try {
+            DB::transaction(function () use (
+                $rejectedLeave, $user, $attendanceDate, $shift, $workSchedule, $now, $report, $latitude,
+                $longitude, $resolvedLocation, $photoPath, $faceResult, $status, $accuracy, $deviceType, $anomaly,
+            ): void {
+                $rejectedLeave?->delete();
+
+                Attendance::create([
+                    'user_id' => $user->id,
+                    'date' => $attendanceDate,
+                    'type' => AttendanceType::Regular,
+                    'shift' => $shift,
+                    'work_schedule_id' => $workSchedule->id,
+                    'clock_in_time' => $now->format('H:i:s'),
+                    'clock_in_report' => $report,
+                    'clock_in_latitude' => $latitude,
+                    'clock_in_longitude' => $longitude,
+                    'clock_in_location' => $resolvedLocation,
+                    'clock_in_verification_photo' => $photoPath,
+                    'clock_in_face_distance' => $faceResult['distance'] ?? null,
+                    'status' => $status,
+                    'accuracy' => $accuracy,
+                    'device_type' => $deviceType,
+                    'validation_status' => $anomaly['status'],
+                    'suspicious_reason' => $anomaly['reason'],
+                ]);
+            });
+        } catch (UniqueConstraintViolationException) {
+            // A second tap submitted while the first request was still processing.
+            $this->verificationPhotos->deleteIfExists($photoPath);
+
+            return ActionResult::fail('Anda sudah melakukan absen masuk hari ini.');
+        }
 
         $shiftLabel = $shift->label();
         $statusNote = $status === AttendanceStatus::Late ? ' Status: Telat.' : '';
@@ -366,7 +385,7 @@ class AttendanceService
             );
         }
 
-        $status = $schedule->resolveClockOutStatus($now, $attendance->status);
+        $status = $schedule->resolveClockOutStatus($now, $attendance->status, $attendance->date);
 
         $overtimeHours = $this->overtimeHoursFor($attendance, $now);
         $resolvedLocation = $this->locations->resolveAddress($latitude, $longitude, $attendanceLocation);
@@ -376,8 +395,8 @@ class AttendanceService
             'clock-out-'.$user->id,
             new VerificationPhotoOverlay(
                 time: $now->format('H:i'),
-                dateLabel: $attendance->date->translatedFormat('d F Y'),
-                dayLabel: $attendance->date->translatedFormat('l'),
+                dateLabel: $now->translatedFormat('d F Y'),
+                dayLabel: $now->translatedFormat('l'),
                 address: $resolvedLocation ?? 'Lokasi tidak tersedia',
             ),
         );
@@ -385,7 +404,7 @@ class AttendanceService
         $anomaly = $this->resolveAnomalyStatus($user, $settings, $latitude, $longitude, $accuracy, $deviceType, $clientTime);
 
         $attendance->update([
-            'clock_out_time' => AppTime::currentTimeForStorage(),
+            'clock_out_time' => $now->format('H:i:s'),
             'overtime_hours' => $overtimeHours,
             'clock_out_report' => $report,
             'clock_out_latitude' => $latitude,
@@ -537,7 +556,7 @@ class AttendanceService
         $clockIn = $this->clockInMomentFor($attendance);
         $schedule = $this->clockOutScheduleFor($attendance);
 
-        if ($schedule->hasUnlimitedClockOut() || $schedule->isNextDayClockOutPattern()) {
+        if ($schedule->isNextDayClockOutPattern()) {
             return $clockOut->copy()->addDay();
         }
 

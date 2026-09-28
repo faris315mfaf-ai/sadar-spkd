@@ -113,7 +113,12 @@ class ImportEmployeeSalaryComponents extends Command
             return 0;
         }
 
-        $value = str_replace(',', '', $value);
+        // Indonesian format "1.500.000" / "1.500.000,00": dots are thousands separators.
+        if (preg_match('/^\d{1,3}(\.\d{3})+(,\d+)?$/', $value)) {
+            $value = str_replace(['.', ','], ['', '.'], $value);
+        } else {
+            $value = str_replace(',', '', $value);
+        }
 
         return (int) round((float) $value);
     }

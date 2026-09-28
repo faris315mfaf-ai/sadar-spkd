@@ -14,12 +14,13 @@ class EmployeeSetPasswordNotification extends ResetPassword
             'email' => $notifiable->getEmailForPasswordReset(),
         ], false));
 
+        // Sent by "Lupa kata sandi", so the wording must fit an existing account too.
         return (new MailMessage)
-            ->subject('Aktivasi Akun SADAR-PRI')
+            ->subject('Atur Password Akun '.config('app.name'))
             ->greeting('Halo, '.$notifiable->name.'!')
-            ->line('Akun SADAR-PRI Anda telah dibuat oleh HR.')
-            ->line('Silakan buat password Anda sendiri melalui tombol di bawah ini.')
-            ->action('Buat Password', $url)
+            ->line('Kami menerima permintaan untuk mengatur password akun '.config('app.name').' Anda.')
+            ->line('Silakan buat password baru melalui tombol di bawah ini.')
+            ->action('Atur Password', $url)
             ->line('Link ini akan kedaluwarsa dalam 60 menit.')
             ->line('Jika Anda merasa tidak seharusnya menerima email ini, abaikan email ini.');
     }

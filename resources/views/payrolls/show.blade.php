@@ -296,7 +296,7 @@
                                         Reset
                                     </button>
                                     <button type="button" onclick="openAdjModal()"
-                                        class="inline-flex items-center gap-2 rounded-xl bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-red-700 dark:bg-gray-800 dark:text-gray-100 dark:border dark:border-gray-700 dark:hover:bg-gray-700">
+                                        class="inline-flex items-center gap-2 rounded-xl bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700 dark:bg-gray-800 dark:text-gray-100 dark:border dark:border-gray-700 dark:hover:bg-gray-700">
                                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M12 4v16m8-8H4" />
@@ -519,26 +519,26 @@
                     <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Nama Item
                         <span class="text-red-500">*</span></label>
                     <input type="text" name="name" id="item-edit-name"
-                        class="block w-full rounded-xl border-gray-300 text-sm shadow-sm focus:border-red-500 focus:ring-red-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100 dark:focus:border-gray-500 dark:focus:ring-gray-500">
+                        class="block w-full rounded-xl border-gray-300 text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100 dark:focus:border-gray-500 dark:focus:ring-gray-500">
                 </div>
 
                 <div>
                     <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Jumlah (Rp)
                         <span class="text-red-500">*</span></label>
-                    <input type="text" name="amount" id="item-edit-amount" inputmode="numeric"
-                        oninput="this.value = this.value.replace(/[^0-9]/g, '')"
-                        class="block w-full rounded-xl border-gray-300 text-sm shadow-sm focus:border-red-500 focus:ring-red-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100 dark:focus:border-gray-500 dark:focus:ring-gray-500">
+                    <input type="text" name="amount" id="item-edit-amount" inputmode="decimal"
+                        oninput="this.value = this.value.replace(/[^0-9.]/g, '')"
+                        class="block w-full rounded-xl border-gray-300 text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100 dark:focus:border-gray-500 dark:focus:ring-gray-500">
                 </div>
 
                 <div>
                     <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Catatan</label>
                     <textarea name="notes" id="item-edit-notes" rows="2"
-                        class="block w-full rounded-xl border-gray-300 text-sm shadow-sm focus:border-red-500 focus:ring-red-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100 dark:placeholder-gray-500 dark:focus:border-gray-500 dark:focus:ring-gray-500"></textarea>
+                        class="block w-full rounded-xl border-gray-300 text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100 dark:placeholder-gray-500 dark:focus:border-gray-500 dark:focus:ring-gray-500"></textarea>
                 </div>
 
                 <div class="flex justify-end gap-3 border-t border-gray-100 pt-4 dark:border-gray-700">
                     <button type="submit"
-                        class="rounded-xl bg-red-600 px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-red-700 dark:bg-gray-800 dark:text-gray-100 dark:border dark:border-gray-700 dark:hover:bg-gray-700">
+                        class="rounded-xl bg-brand-600 px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700 dark:bg-gray-800 dark:text-gray-100 dark:border dark:border-gray-700 dark:hover:bg-gray-700">
                         Simpan
                     </button>
                     <button type="button" onclick="closeItemEditModal()"
@@ -579,7 +579,7 @@
                         <span class="text-red-500">*</span></label>
                     <input type="text" name="name" value="{{ old('name') }}"
                         placeholder="Contoh: Bonus Project, Potongan SP"
-                        class="block w-full rounded-xl border-gray-300 text-sm shadow-sm focus:border-red-500 focus:ring-red-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100 dark:placeholder-gray-500 dark:focus:border-gray-500 dark:focus:ring-gray-500">
+                        class="block w-full rounded-xl border-gray-300 text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100 dark:placeholder-gray-500 dark:focus:border-gray-500 dark:focus:ring-gray-500">
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
@@ -587,7 +587,7 @@
                         <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Tipe <span
                                 class="text-red-500">*</span></label>
                         <select name="type"
-                            class="block w-full rounded-xl border-gray-300 text-sm shadow-sm focus:border-red-500 focus:ring-red-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100 dark:focus:border-gray-500 dark:focus:ring-gray-500">
+                            class="block w-full rounded-xl border-gray-300 text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100 dark:focus:border-gray-500 dark:focus:ring-gray-500">
                             <option value="allowance" @selected(old('type') === 'allowance')>Tunjangan / Bonus</option>
                             <option value="deduction" @selected(old('type') === 'deduction')>Potongan</option>
                         </select>
@@ -597,19 +597,19 @@
                             <span class="text-red-500">*</span></label>
                         <input type="text" name="amount" value="{{ old('amount') }}" inputmode="numeric"
                             oninput="this.value = this.value.replace(/[^0-9]/g, '')"
-                            class="block w-full rounded-xl border-gray-300 text-sm shadow-sm focus:border-red-500 focus:ring-red-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100 dark:focus:border-gray-500 dark:focus:ring-gray-500">
+                            class="block w-full rounded-xl border-gray-300 text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100 dark:focus:border-gray-500 dark:focus:ring-gray-500">
                     </div>
                 </div>
 
                 <div>
                     <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Catatan</label>
                     <textarea name="notes" rows="2" placeholder="Opsional: keterangan adjustment..."
-                        class="block w-full rounded-xl border-gray-300 text-sm shadow-sm focus:border-red-500 focus:ring-red-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100 dark:placeholder-gray-500 dark:focus:border-gray-500 dark:focus:ring-gray-500">{{ old('notes') }}</textarea>
+                        class="block w-full rounded-xl border-gray-300 text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100 dark:placeholder-gray-500 dark:focus:border-gray-500 dark:focus:ring-gray-500">{{ old('notes') }}</textarea>
                 </div>
 
                 <div class="flex justify-end gap-3 border-t border-gray-100 pt-4 dark:border-gray-700">
                     <button type="submit"
-                        class="rounded-xl bg-red-600 px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-red-700 dark:bg-gray-800 dark:text-gray-100 dark:border dark:border-gray-700 dark:hover:bg-gray-700">
+                        class="rounded-xl bg-brand-600 px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700 dark:bg-gray-800 dark:text-gray-100 dark:border dark:border-gray-700 dark:hover:bg-gray-700">
                         Simpan
                     </button>
                     <button type="button" onclick="closeAdjModal()"

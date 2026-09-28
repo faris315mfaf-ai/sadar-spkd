@@ -49,7 +49,7 @@
                 placeholder="Cari karyawan... (kosong = semua)" />
 
             <input type="date" name="date" value="{{ $historyFilters['date'] ?? '' }}"
-                class="w-full rounded-xl border-gray-300 text-sm shadow-sm focus:border-red-500 focus:ring-red-500 sm:w-auto dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200"
+                class="w-full rounded-xl border-gray-300 text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:w-auto dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200"
                 title="Filter per tanggal (mengalahkan filter bulan)">
 
             <x-ui.select name="month">

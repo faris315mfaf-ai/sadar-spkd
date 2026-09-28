@@ -18,23 +18,23 @@
 
             {{-- Page header --}}
             <section
-                class="relative overflow-hidden rounded-3xl border border-red-900/10 bg-gradient-to-br from-red-700 via-red-600 to-rose-600 px-5 py-6 text-white shadow-lg shadow-red-900/10 sm:px-7 sm:py-7">
+                class="relative overflow-hidden rounded-3xl border border-brand-900/10 bg-gradient-to-br from-brand-700 via-brand-600 to-navy-800 px-5 py-6 text-white shadow-lg shadow-brand-900/10 sm:px-7 sm:py-7">
                 <div class="pointer-events-none absolute -right-16 -top-20 h-52 w-52 rounded-full border-[32px] border-white/10"></div>
                 <div class="pointer-events-none absolute -bottom-16 left-1/3 h-40 w-40 rounded-full bg-white/10 blur-3xl"></div>
                 <div class="relative flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
                     <div>
-                        <div class="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-red-50">
+                        <div class="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-brand-50">
                             <span class="h-1.5 w-1.5 rounded-full bg-amber-300"></span>
                             Payroll Karyawan
                         </div>
                         <h1 class="mt-3 text-2xl font-bold tracking-tight sm:text-3xl">Slip Gaji</h1>
-                        <p class="mt-1.5 max-w-xl text-sm leading-relaxed text-red-50/90">
+                        <p class="mt-1.5 max-w-xl text-sm leading-relaxed text-brand-50/90">
                             Lihat rincian pendapatan, potongan, status pembayaran, dan unduh slip gaji Anda.
                         </p>
                     </div>
                     <div class="rounded-2xl border border-white/15 bg-white/10 px-4 py-3 backdrop-blur-sm">
-                        <p class="text-[10px] font-semibold uppercase tracking-wider text-red-100">Slip tersedia</p>
-                        <p class="mt-0.5 text-xl font-bold">{{ $payrolls->total() }} <span class="text-xs font-medium text-red-100">dokumen</span></p>
+                        <p class="text-[10px] font-semibold uppercase tracking-wider text-brand-100">Slip tersedia</p>
+                        <p class="mt-0.5 text-xl font-bold">{{ $payrolls->total() }} <span class="text-xs font-medium text-brand-100">dokumen</span></p>
                     </div>
                 </div>
             </section>
@@ -64,7 +64,7 @@
                 {{-- Header + Filter --}}
                 <div class="border-b border-gray-100 bg-gray-50/70 px-4 py-5 sm:px-6 dark:border-gray-700 dark:bg-gray-800">
                     <div class="mb-4 flex items-center gap-3">
-                        <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-red-50 text-red-600 ring-1 ring-red-100 dark:bg-red-950/30 dark:text-red-400 dark:ring-red-900/50">
+                        <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50 text-brand-600 ring-1 ring-brand-100 dark:bg-brand-950/30 dark:text-brand-400 dark:ring-brand-900/50">
                             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707L14 14v5l-4 2v-7L3.293 7.293A1 1 0 013 6.586V4z" />
                             </svg>
@@ -79,7 +79,7 @@
                         <label class="block w-full sm:w-auto">
                             <span class="mb-1.5 block text-xs font-medium text-gray-500 dark:text-gray-400">Bulan</span>
                             <select name="period_month"
-                                class="w-full rounded-xl border-gray-300 text-sm shadow-sm focus:border-red-500 focus:ring-red-500 sm:w-44 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100 dark:focus:border-gray-500 dark:focus:ring-gray-500">
+                                class="w-full rounded-xl border-gray-300 text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:w-44 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100 dark:focus:border-gray-500 dark:focus:ring-gray-500">
                                 <option value="">Semua Bulan</option>
                                 @foreach ($months as $num => $label)
                                     @if ($num > 0)
@@ -94,7 +94,7 @@
                             <span class="mb-1.5 block text-xs font-medium text-gray-500 dark:text-gray-400">Tahun</span>
                             <input type="number" name="period_year" placeholder="Semua"
                                 value="{{ request('period_year') }}" min="2020"
-                                class="w-full rounded-xl border-gray-300 text-sm shadow-sm focus:border-red-500 focus:ring-red-500 sm:w-28 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100 dark:focus:border-gray-500 dark:focus:ring-gray-500">
+                                class="w-full rounded-xl border-gray-300 text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:w-28 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100 dark:focus:border-gray-500 dark:focus:ring-gray-500">
                         </label>
 
                         <x-ui.button type="submit" variant="primary" size="md" class="w-full min-h-11 sm:w-auto">
@@ -125,11 +125,11 @@
                         @endphp
                         <article class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
                             <div class="flex items-start gap-3 border-b border-gray-100 p-4 dark:border-gray-700">
-                                <div class="w-16 shrink-0 overflow-hidden rounded-xl border border-red-200 shadow-sm dark:border-red-800/60">
-                                    <span class="block bg-red-600 px-2 py-1 text-center text-[9px] font-bold uppercase tracking-wider text-white">
+                                <div class="w-16 shrink-0 overflow-hidden rounded-xl border border-brand-200 shadow-sm dark:border-brand-800/60">
+                                    <span class="block bg-brand-600 px-2 py-1 text-center text-[9px] font-bold uppercase tracking-wider text-white">
                                         {{ $payroll->period_year }}
                                     </span>
-                                    <span class="flex h-10 items-center justify-center bg-red-50 text-sm font-extrabold uppercase text-red-700 dark:bg-red-950/30 dark:text-red-300">
+                                    <span class="flex h-10 items-center justify-center bg-brand-50 text-sm font-extrabold uppercase text-brand-700 dark:bg-brand-950/30 dark:text-brand-300">
                                         {{ \Illuminate\Support\Str::limit($months[$payroll->period_month] ?? $payroll->period_month, 3, '') }}
                                     </span>
                                 </div>
@@ -173,7 +173,7 @@
                                     Detail
                                 </a>
                                 <a href="{{ route('my-payrolls.pdf', $payroll) }}"
-                                    class="inline-flex min-h-10 flex-1 items-center justify-center gap-2 rounded-xl bg-red-600 px-3 text-sm font-semibold text-white transition hover:bg-red-700">
+                                    class="inline-flex min-h-10 flex-1 items-center justify-center gap-2 rounded-xl bg-brand-600 px-3 text-sm font-semibold text-white transition hover:bg-brand-700">
                                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3M7 20h10a2 2 0 002-2V6a2 2 0 00-2-2H7a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                     </svg>
@@ -229,7 +229,7 @@
                                             : 'bg-yellow-50 text-yellow-700 ring-yellow-600/20 dark:bg-yellow-900/20 dark:text-yellow-400 dark:ring-yellow-500/30';
                                 @endphp
                                 <tr
-                                    class="bg-white transition-colors hover:bg-red-50/30 dark:bg-gray-800 dark:hover:bg-gray-700/40">
+                                    class="bg-white transition-colors hover:bg-brand-50/30 dark:bg-gray-800 dark:hover:bg-gray-700/40">
                                     <td class="px-6 py-4">
                                         <p class="font-bold text-gray-900 dark:text-gray-100">{{ $months[$payroll->period_month] ?? $payroll->period_month }}</p>
                                         <p class="mt-0.5 text-xs text-gray-400">{{ $payroll->period_year }}</p>
@@ -266,7 +266,7 @@
                                                 Detail
                                             </a>
                                             <a href="{{ route('my-payrolls.pdf', $payroll) }}"
-                                                class="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-lg bg-red-50 px-3 text-xs font-semibold text-red-600 transition hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/30">
+                                                class="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-lg bg-brand-50 px-3 text-xs font-semibold text-brand-600 transition hover:bg-brand-100 dark:bg-brand-900/20 dark:text-brand-400 dark:hover:bg-brand-900/30">
                                                 <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                                                 </svg>

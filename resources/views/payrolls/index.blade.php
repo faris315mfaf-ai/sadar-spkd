@@ -78,7 +78,7 @@
                 </x-ui.card>
 
                 <x-ui.card variant="primary" class="col-span-2 min-w-0 md:col-span-1">
-                    <p class="text-xs font-medium uppercase tracking-wider text-red-100 dark:text-gray-400">Total THP
+                    <p class="text-xs font-medium uppercase tracking-wider text-brand-100 dark:text-gray-400">Total THP
                         Aktual
                     </p>
                     <p class="mt-2 break-words text-lg font-bold text-white dark:text-gray-100">Rp
@@ -101,7 +101,7 @@
                         <div>
                             <label class="mb-1 block text-xs font-medium text-gray-600 dark:text-gray-400">Bulan</label>
                             <select name="period_month"
-                                class="rounded-xl border-gray-300 text-sm shadow-sm focus:border-red-500 focus:ring-red-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100 dark:focus:border-gray-500 dark:focus:ring-gray-500">
+                                class="rounded-xl border-gray-300 text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100 dark:focus:border-gray-500 dark:focus:ring-gray-500">
                                 @foreach ($months as $num => $label)
                                     @if ($num > 0)
                                         <option value="{{ $num }}" @selected(old('period_month', now()->month) == $num)>
@@ -116,11 +116,11 @@
                             <label class="mb-1 block text-xs font-medium text-gray-600 dark:text-gray-400">Tahun</label>
                             <input type="number" name="period_year" value="{{ old('period_year', now()->year) }}"
                                 min="2020"
-                                class="w-28 rounded-xl border-gray-300 text-sm shadow-sm focus:border-red-500 focus:ring-red-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100 dark:focus:border-gray-500 dark:focus:ring-gray-500">
+                                class="w-28 rounded-xl border-gray-300 text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100 dark:focus:border-gray-500 dark:focus:ring-gray-500">
                         </div>
 
                         <button type="submit"
-                            class="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-red-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-red-700 sm:w-auto dark:border dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700">
+                            class="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700 sm:w-auto dark:border dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700">
                             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -185,9 +185,10 @@
                         @endif
 
                         @php
-                            $waMonth = request('period_month');
-                            $waYear = request('period_year');
-                            $waDisabled = empty($waMonth) || empty($waYear);
+                            // Cast: these values are printed inside an onclick handler.
+                            $waMonth = (int) request('period_month');
+                            $waYear = (int) request('period_year');
+                            $waDisabled = $waMonth < 1 || $waMonth > 12 || $waYear < 2020;
                             $exportUrl = route('payrolls.export', request()->only(['period_month', 'period_year', 'status', 'search']));
                         @endphp
                         @if ($waDisabled)
@@ -261,7 +262,7 @@
                                 </a>
                                 @if ($payroll->status === 'paid')
                                     <a href="{{ route('payrolls.pdf', $payroll) }}"
-                                        class="inline-flex h-11 min-w-11 items-center justify-center rounded-xl bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400">
+                                        class="inline-flex h-11 min-w-11 items-center justify-center rounded-xl bg-brand-50 text-brand-600 dark:bg-brand-900/20 dark:text-brand-400">
                                         <span class="sr-only">Download PDF</span>
                                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -404,7 +405,7 @@
                                             @if ($payroll->status === 'paid')
                                                 <div class="group relative inline-flex">
                                                     <a href="{{ route('payrolls.pdf', $payroll) }}"
-                                                        class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 transition hover:bg-red-50 hover:text-red-600 dark:hover:bg-gray-800 dark:hover:text-gray-300">
+                                                        class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 transition hover:bg-brand-50 hover:text-brand-600 dark:hover:bg-gray-800 dark:hover:text-gray-300">
                                                         <svg class="h-4 w-4" fill="none" stroke="currentColor"
                                                             viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round"

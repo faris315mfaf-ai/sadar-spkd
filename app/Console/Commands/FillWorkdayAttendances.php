@@ -40,10 +40,11 @@ class FillWorkdayAttendances extends Command
                 : $workDays;
 
             foreach ($employeeWorkDays as $day) {
-                Attendance::updateOrCreate(
+                // Only fill empty days: never overwrite real sick, izin or alfa records.
+                Attendance::firstOrCreate(
                     [
                         'user_id' => $employee->user_id,
-                        'date' => Carbon::parse($day->date)->toDateString(),
+                        'date' => Carbon::parse($day->date)->startOfDay(),
                     ],
                     [
                         'type' => AttendanceType::Regular,
@@ -52,9 +53,6 @@ class FillWorkdayAttendances extends Command
                             ? '14:00:00'
                             : '18:00:00',
                         'status' => AttendanceStatus::OnTime,
-                        'notes' => $isSecurity
-                            ? 'Auto-filled as present for security 15 workdays.'
-                            : 'Auto-filled as present for workday.',
                     ]
                 );
             }

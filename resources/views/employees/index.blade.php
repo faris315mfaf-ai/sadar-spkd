@@ -10,11 +10,11 @@
 
             {{-- Header --}}
             <section class="relative overflow-hidden rounded-[1.75rem] border border-gray-200/80 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
-                <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-red-600 via-rose-500 to-amber-400"></div>
+                <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-brand-600 via-brand-400 to-navy-700"></div>
 
                 <div class="grid gap-5 px-5 py-5 sm:px-6 sm:py-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
                     <div>
-                        <div class="inline-flex items-center gap-2 rounded-full bg-red-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-red-700 ring-1 ring-inset ring-red-100 dark:bg-red-950/40 dark:text-red-300 dark:ring-red-900/50">
+                        <div class="inline-flex items-center gap-2 rounded-full bg-brand-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-brand-700 ring-1 ring-inset ring-brand-100 dark:bg-brand-950/40 dark:text-brand-300 dark:ring-brand-900/50">
                             <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
                             Manajemen SDM
                         </div>
@@ -25,7 +25,7 @@
                     </div>
 
                     <button type="button" data-action="create-employee"
-                        class="inline-flex min-h-11 items-center justify-center gap-2 rounded-2xl bg-red-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm shadow-red-900/10 transition hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900">
+                        class="inline-flex min-h-11 items-center justify-center gap-2 rounded-2xl bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm shadow-brand-900/10 transition hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900">
                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                         </svg>
@@ -97,11 +97,11 @@
                     </div>
                 </div>
 
-                <div class="relative col-span-2 overflow-hidden rounded-[1.5rem] border border-red-100 bg-gradient-to-br from-red-600 to-rose-600 px-4 py-4 shadow-sm md:col-span-1 dark:border-red-900/40">
+                <div class="relative col-span-2 overflow-hidden rounded-[1.5rem] border border-brand-100 bg-gradient-to-br from-brand-600 to-navy-700 px-4 py-4 shadow-sm md:col-span-1 dark:border-brand-900/40">
                     <div class="absolute inset-y-0 left-0 w-1 bg-white/40"></div>
                     <div class="flex items-start justify-between gap-2 pl-2">
                         <div class="min-w-0">
-                            <p class="text-[10px] font-semibold uppercase tracking-wider text-red-100/90">Total gaji gross</p>
+                            <p class="text-[10px] font-semibold uppercase tracking-wider text-brand-100/90">Total gaji gross</p>
                             <p class="mt-2 break-words text-lg font-bold tabular-nums tracking-tight text-white">
                                 Rp {{ number_format($summary['total_gross_salary'], 0, ',', '.') }}
                             </p>
@@ -141,7 +141,7 @@
                         </x-ui.select>
 
                         <button type="submit"
-                            class="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-red-700 sm:w-auto">
+                            class="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700 sm:w-auto">
                             Filter
                         </button>
 
@@ -168,7 +168,7 @@
                                             alt="{{ $employee->name }}"
                                             class="h-12 w-12 rounded-2xl border border-white object-cover shadow-sm dark:border-gray-600">
                                     @else
-                                        <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-red-500 to-rose-600 text-sm font-semibold text-white shadow-sm">
+                                        <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-500 to-navy-700 text-sm font-semibold text-white shadow-sm">
                                             {{ substr($employee->name, 0, 1) }}
                                         </div>
                                     @endif
@@ -227,7 +227,7 @@
                                                     alt="{{ $employee->name }}"
                                                     class="h-10 w-10 rounded-xl border border-gray-100 object-cover shadow-sm dark:border-gray-600">
                                             @else
-                                                <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-red-500 to-rose-600 text-sm font-semibold text-white">
+                                                <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-navy-700 text-sm font-semibold text-white">
                                                     {{ substr($employee->name, 0, 1) }}
                                                 </div>
                                             @endif

@@ -161,7 +161,7 @@
                         <x-ui.search-input name="search" value="{{ $search ?? '' }}" placeholder="Cari karyawan..." />
 
                         <input type="date" name="date" value="{{ $date->toDateString() }}"
-                            class="w-full rounded-xl border-gray-300 text-sm shadow-sm focus:border-red-500 focus:ring-red-500 sm:w-auto dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200">
+                            class="w-full rounded-xl border-gray-300 text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:w-auto dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200">
 
                         @if (!$isHoliday)
                             <x-ui.select name="status">

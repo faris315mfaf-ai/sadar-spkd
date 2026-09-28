@@ -46,7 +46,9 @@ final class ShiftSchedule
         $start = $this->formattedClockOutStart();
 
         if ($this->hasUnlimitedClockOut()) {
-            return "{$start} hari berikutnya (tanpa batas)";
+            return $this->isNextDayClockOutPattern()
+                ? "{$start} hari berikutnya (tanpa batas)"
+                : "mulai {$start} (tanpa batas)";
         }
 
         $limit = $this->formattedClockOutLimit();
@@ -63,9 +65,10 @@ final class ShiftSchedule
         return $this->isLate($clockIn) ? AttendanceStatus::Late : AttendanceStatus::OnTime;
     }
 
-    public function resolveClockOutStatus(Carbon $time, AttendanceStatus $current): AttendanceStatus
+    public function resolveClockOutStatus(Carbon $time, AttendanceStatus $current, ?Carbon $dutyDate = null): AttendanceStatus
     {
-        if ($this->isLateClockOut($time)) {
+        // A late clock-in must stay "late": payroll and statistics count only that status.
+        if ($current === AttendanceStatus::OnTime && $this->isLateClockOut($time, $dutyDate)) {
             return AttendanceStatus::LateOut;
         }
 
@@ -84,15 +87,25 @@ final class ShiftSchedule
 
     public function isEarlyClockOut(Carbon $time, ?Carbon $dutyDate = null): bool
     {
-        if ($dutyDate !== null && ($this->hasUnlimitedClockOut() || $this->isNextDayClockOutPattern())) {
+        if ($dutyDate !== null && $this->isNextDayClockOutPattern()) {
             return $time->lessThan($this->nextDayClockOutOpensAt($dutyDate));
+        }
+
+        // Overnight window (e.g. 22:00–07:00): only "early" before the start on the duty date,
+        // otherwise the morning after the limit would be treated as too early.
+        if ($dutyDate !== null && $this->isOvernightClockOut()) {
+            return $time->lessThan($this->normalClockOutCarbon($dutyDate));
         }
 
         return $this->clockOutWindow()->isTooEarly($time);
     }
 
-    public function isLateClockOut(Carbon $time): bool
+    public function isLateClockOut(Carbon $time, ?Carbon $dutyDate = null): bool
     {
+        if ($dutyDate !== null && $this->isOvernightClockOut()) {
+            return $time->greaterThan($this->clockOutLimitCarbon($dutyDate)->addDay());
+        }
+
         return $this->clockOutWindow()->isTooLate($time);
     }
 
@@ -120,7 +133,9 @@ final class ShiftSchedule
     public function clockOutLimitCarbon(Carbon $date): Carbon
     {
         if ($this->clockOutLimit === null) {
-            return $this->nextDayClockOutOpensAt($date);
+            return $this->isNextDayClockOutPattern()
+                ? $this->nextDayClockOutOpensAt($date)
+                : $this->normalClockOutCarbon($date);
         }
 
         [$h, $m, $s] = explode(':', TimeFormat::normalized($this->clockOutLimit));
@@ -139,7 +154,7 @@ final class ShiftSchedule
      */
     public function isNextDayClockOutPattern(): bool
     {
-        if ($this->hasUnlimitedClockOut() || $this->isOvernightClockOut()) {
+        if ($this->isOvernightClockOut()) {
             return false;
         }
 
@@ -148,9 +163,7 @@ final class ShiftSchedule
 
     public function opensClockOutOnNextDutyDay(): bool
     {
-        return $this->hasUnlimitedClockOut()
-            || $this->isOvernightClockOut()
-            || $this->isNextDayClockOutPattern();
+        return $this->isOvernightClockOut() || $this->isNextDayClockOutPattern();
     }
 
     /**
@@ -193,10 +206,6 @@ final class ShiftSchedule
      */
     public function effectiveNormalClockOutCarbon(Carbon $dutyDate): Carbon
     {
-        if ($this->hasUnlimitedClockOut()) {
-            return $this->nextDayClockOutOpensAt($dutyDate);
-        }
-
         if ($this->isOvernightClockOut() || $this->isNextDayClockOutPattern()) {
             $reference = $this->clockOutLimit ?? $this->clockOutStart;
             [$h, $m, $s] = explode(':', TimeFormat::normalized($reference));

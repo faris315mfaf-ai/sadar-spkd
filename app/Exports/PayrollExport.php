@@ -13,6 +13,10 @@ use Maatwebsite\Excel\Concerns\WithCustomStartCell;
 use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithEvents;
+use Maatwebsite\Excel\Concerns\WithCustomValueBinder;
+use PhpOffice\PhpSpreadsheet\Cell\Cell;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
+use PhpOffice\PhpSpreadsheet\Cell\DefaultValueBinder;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
@@ -20,8 +24,22 @@ use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use Maatwebsite\Excel\Events\AfterSheet;
 
-class PayrollExport implements FromQuery, WithHeadings, WithMapping, ShouldAutoSize, WithStrictNullComparison, WithTitle, WithCustomStartCell, WithColumnFormatting, WithStyles, WithEvents
+class PayrollExport extends DefaultValueBinder implements FromQuery, WithHeadings, WithMapping, ShouldAutoSize, WithStrictNullComparison, WithTitle, WithCustomStartCell, WithColumnFormatting, WithStyles, WithEvents, WithCustomValueBinder
 {
+    /**
+     * Bank account numbers (column G) stay text, otherwise Excel shows 1.23E+12 and drops digits.
+     */
+    public function bindValue(Cell $cell, $value): bool
+    {
+        if ($cell->getColumn() === 'G' && is_string($value)) {
+            $cell->setValueExplicit($value, DataType::TYPE_STRING);
+
+            return true;
+        }
+
+        return parent::bindValue($cell, $value);
+    }
+
     private const MONTHS = [
         1 => 'Januari',
         2 => 'Februari',

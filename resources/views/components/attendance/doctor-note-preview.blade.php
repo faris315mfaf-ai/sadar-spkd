@@ -15,7 +15,7 @@
             </a>
         @else
             <a href="{{ $attendance->doctorNoteViewUrl() }}" target="_blank" rel="noopener noreferrer"
-                class="group relative inline-flex h-10 w-10 items-center justify-center rounded-lg border border-gray-200 bg-red-50 text-red-600 transition hover:bg-red-100 dark:border-gray-600 dark:bg-red-950/40 dark:text-red-400 dark:hover:bg-red-950/60"
+                class="group relative inline-flex h-10 w-10 items-center justify-center rounded-lg border border-gray-200 bg-brand-50 text-brand-600 transition hover:bg-brand-100 dark:border-gray-600 dark:bg-brand-950/40 dark:text-brand-400 dark:hover:bg-brand-950/60"
                 title="Buka PDF bukti {{ $attendance->type->label() }}">
                 <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

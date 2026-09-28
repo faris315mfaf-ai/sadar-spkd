@@ -18,6 +18,7 @@ class DoctorNoteController extends Controller
     public function show(Attendance $attendance): StreamedResponse
     {
         $this->authorize('viewDoctorNote', $attendance);
+        abort_unless($attendance->hasDoctorNote(), 404);
 
         return $this->doctorNotes->stream($attendance->doctor_note_path);
     }

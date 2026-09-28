@@ -65,7 +65,7 @@ class EmployeeController extends Controller
 
         $workSchedules = WorkSchedule::query()
             ->whereIn('code', ['regular', 'ob', 'security', 'engineering'])
-            ->orderByRaw("FIELD(code, 'regular', 'ob', 'security', 'engineering')")
+            ->orderByRaw("CASE code WHEN 'regular' THEN 1 WHEN 'ob' THEN 2 WHEN 'security' THEN 3 WHEN 'engineering' THEN 4 ELSE 5 END")
             ->get(['id', 'code', 'name']);
 
         $nextCode = Employee::generateCode();
@@ -302,6 +302,12 @@ class EmployeeController extends Controller
                     'email' => $validated['email'] ?? $employee->user->email,
                 ]);
                 $roleNames = array_unique(array_merge(['employee'], $selectedRoles));
+
+                // The form cannot grant admin, so it must not take it away either.
+                if ($employee->user->hasRole('admin')) {
+                    $roleNames[] = 'admin';
+                }
+
                 $roleIds = Role::whereIn('name', $roleNames)->pluck('id');
                 $employee->user->roles()->sync($roleIds);
             } elseif (! empty($validated['email'])) {
@@ -361,22 +367,24 @@ class EmployeeController extends Controller
 
     public function destroy(Employee $employee)
     {
+        $photoPath = $employee->profile_photo;
+
         DB::transaction(function () use ($employee) {
             $userId = $employee->user_id;
-            $photoPath = $employee->profile_photo;
 
             EmployeeSalaryComponent::where('employee_id', $employee->id)->delete();
 
             $employee->delete();
 
-            if ($photoPath) {
-                Storage::disk('public')->delete($photoPath);
-            }
-
             if ($userId) {
                 User::where('id', $userId)->delete();
             }
         });
+
+        // Only after the commit, so a failed delete does not leave the employee without a photo.
+        if ($photoPath) {
+            Storage::disk('public')->delete($photoPath);
+        }
 
         ActivityLogService::log(auth()->user(), 'delete', "Menghapus data karyawan: {$employee->name}", $employee);
 
@@ -400,26 +408,11 @@ class EmployeeController extends Controller
 
     private function resolveDefaultWorkScheduleId(array $data): ?int
     {
-        $staff = strtoupper(trim((string) ($data['staff'] ?? '')));
-        $position = strtoupper(trim((string) ($data['position'] ?? '')));
-
-        if ($staff === 'OB' || $position === 'OB') {
-            return WorkSchedule::query()->where('code', 'ob')->value('id');
-        }
-
-        if ($staff === 'SECURITY' || $position === 'SECURITY') {
-            return WorkSchedule::query()->where('code', 'security')->value('id');
-        }
-
-        if ($staff === 'ENGINEERING' || str_contains($position, 'ENGINEERING')) {
-            return WorkSchedule::query()->where('code', 'engineering')->value('id');
-        }
-
-        if (! empty($data['default_work_schedule_id'])) {
-            return (int) $data['default_work_schedule_id'];
-        }
-
-        return WorkSchedule::query()->where('code', 'regular')->value('id');
+        return WorkSchedule::defaultIdFor(
+            $data['staff'] ?? null,
+            $data['position'] ?? null,
+            ! empty($data['default_work_schedule_id']) ? (int) $data['default_work_schedule_id'] : null,
+        );
     }
 
     private function formatEmployeeResponse(Employee $employee): array
