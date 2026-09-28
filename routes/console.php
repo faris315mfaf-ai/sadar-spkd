@@ -8,19 +8,20 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
-// Schedule Laravel tidak diandalkan di Hostinger — pakai cron langsung ke artisan.
-// Contoh auto-alpha (jam 23:00 WIB / 16:00 UTC):
-//   /usr/bin/php /path/to/absensi-app/artisan attendance:mark-alpha
-// Jangan masukkan --from/--to ke cron harian.
+// Jadwal otomatis. Di Docker dijalankan oleh container sadar-scheduler (php artisan schedule:work).
+// Tanpa Docker: jalankan "php artisan schedule:run" tiap menit lewat cron.
 
+Schedule::command('attendance:mark-alpha')
+    ->dailyAt('23:00')
+    ->timezone('Asia/Jakarta')
+    ->withoutOverlapping();
+
+Schedule::command('attendance:expire-pending-leaves')
+    ->dailyAt('00:00')
+    ->timezone('Asia/Jakarta')
+    ->withoutOverlapping();
+
+// Rekap absen masuk ke grup WhatsApp (aktifkan kalau diperlukan).
 // Schedule::command('attendance:send-whatsapp-report masuk')
 //     ->cron('0 11 * * 1-6')
-//     ->timezone('Asia/Jakarta');
-
-// Schedule::command('attendance:expire-pending-leaves')
-//     ->dailyAt('00:00')
-//     ->timezone('Asia/Jakarta');
-
-// Schedule::command('attendance:mark-alpha')
-//     ->dailyAt('23:00')
 //     ->timezone('Asia/Jakarta');

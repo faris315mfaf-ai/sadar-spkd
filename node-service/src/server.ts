@@ -28,14 +28,14 @@ process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
 
 // Start server
-app.listen(config.port, '127.0.0.1', () => {
-  console.log(`Unified Service running on http://127.0.0.1:${config.port}`);
+app.listen(config.port, config.host, () => {
+  console.log(`Unified Service running on http://${config.host}:${config.port}`);
   console.log(`WA Bot endpoints:`);
-  console.log(`  - Health: http://127.0.0.1:${config.port}/wa/health`);
-  console.log(`  - Groups: http://127.0.0.1:${config.port}/wa/groups`);
-  console.log(`  - Send Group: http://127.0.0.1:${config.port}/wa/send-group`);
-  console.log(`  - Send Group Image: http://127.0.0.1:${config.port}/wa/send-group-image`);
+  console.log(`  - Health: http://${config.host}:${config.port}/wa/health`);
+  console.log(`  - Groups: http://${config.host}:${config.port}/wa/groups`);
+  console.log(`  - Send Group: http://${config.host}:${config.port}/wa/send-group`);
+  console.log(`  - Send Group Image: http://${config.host}:${config.port}/wa/send-group-image`);
   console.log(`PDF Service endpoints:`);
-  console.log(`  - Health: http://127.0.0.1:${config.port}/pdf/health`);
-  console.log(`  - Generate PDF: http://127.0.0.1:${config.port}/pdf/generate-pdf`);
+  console.log(`  - Health: http://${config.host}:${config.port}/pdf/health`);
+  console.log(`  - Generate PDF: http://${config.host}:${config.port}/pdf/generate-pdf`);
 });

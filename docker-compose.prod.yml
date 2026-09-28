@@ -1,0 +1,110 @@
+# Production stack for SADAR-SPKD on a shared Docker host.
+#
+# Isolation: every service is prefixed "sadar-", uses its own network, database and volumes,
+# and has CPU/memory limits. Only sadar-web joins the shared Caddy network (caddy_default),
+# so the proxy can reach it; nothing publishes a host port.
+#
+#   docker compose -f docker-compose.prod.yml up -d --build
+#   docker compose -f docker-compose.prod.yml down -v   # removes the whole stack and its data
+#
+# Values such as DB_PASSWORD are read from the Laravel .env next to this file.
+
+name: sadar-spkd
+
+x-php: &php
+  build: ./docker/php
+  image: sadar-spkd-php:latest
+  restart: unless-stopped
+  working_dir: /var/www/html
+  volumes:
+    - ./:/var/www/html
+  networks: [sadar]
+
+services:
+  sadar-app:
+    <<: *php
+    container_name: sadar-app
+    depends_on:
+      sadar-db:
+        condition: service_healthy
+    mem_limit: 1g
+    cpus: 1.5
+
+  sadar-scheduler:
+    <<: *php
+    container_name: sadar-scheduler
+    # Runs routes/console.php schedules (auto-alfa at 23:00, expire pending leave at 00:00).
+    command: ["php", "artisan", "schedule:work"]
+    user: "33:33"
+    depends_on:
+      sadar-db:
+        condition: service_healthy
+    mem_limit: 256m
+    cpus: 0.5
+
+  sadar-web:
+    image: nginx:1.27-alpine
+    container_name: sadar-web
+    restart: unless-stopped
+    volumes:
+      - ./:/var/www/html:ro
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on: [sadar-app]
+    networks: [sadar, caddy]
+    mem_limit: 128m
+    cpus: 0.5
+
+  sadar-db:
+    image: mysql:8.4
+    container_name: sadar-db
+    restart: unless-stopped
+    command:
+      - --innodb-buffer-pool-size=256M
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      TZ: Asia/Jakarta
+    volumes:
+      - mysql:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p\"$$MYSQL_ROOT_PASSWORD\" --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    networks: [sadar]
+    mem_limit: 1g
+    cpus: 1.0
+
+  sadar-bot:
+    build: ./node-service
+    image: sadar-spkd-bot:latest
+    container_name: sadar-bot
+    restart: unless-stopped
+    environment:
+      HOST: 0.0.0.0
+      PORT: 3000
+      BOT_TOKEN: ${WA_BOT_TOKEN}
+      AUTH_TOKEN: ${PDF_SERVICE_TOKEN}
+      TZ: Asia/Jakarta
+    volumes:
+      - wa_auth:/app/auth
+    networks: [sadar]
+    mem_limit: 1536m
+    cpus: 1.0
+
+networks:
+  sadar:
+    name: sadar-spkd
+  caddy:
+    name: caddy_default
+    external: true
+
+volumes:
+  mysql:
+    name: sadar-spkd-mysql
+  wa_auth:
+    name: sadar-spkd-wa-auth

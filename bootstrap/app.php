@@ -13,6 +13,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // HTTPS ends at the reverse proxy (Caddy); trust its X-Forwarded-* headers so URLs stay https.
+        // The app's web server is only reachable through that proxy.
+        $middleware->trustProxies(at: '*');
+
         $middleware->alias([
             'role' => RoleMiddleware::class,
             'attendance.api' => \App\Http\Middleware\ValidateAttendanceApiToken::class,
