@@ -79,13 +79,29 @@ class SelfRegistrationTest extends TestCase
     }
 
     #[Test]
+    public function biodata_accepts_any_typed_division(): void
+    {
+        $user = $this->signUp();
+
+        $this->actingAs($user)->post(route('onboarding.biodata.store'), [
+            'name' => 'Siti Aminah',
+            'staff' => 'Keuangan',
+            'nik' => '3174012345678902',
+        ])->assertRedirect(route('onboarding.face'));
+
+        $employee = $user->fresh()->employee;
+        $this->assertSame('Keuangan', $employee->staff);
+        $this->assertSame(WorkSchedule::where('code', 'regular')->value('id'), $employee->default_work_schedule_id);
+    }
+
+    #[Test]
     public function biodata_validates_nik_and_division(): void
     {
         $user = $this->signUp();
 
         $this->actingAs($user)->post(route('onboarding.biodata.store'), [
             'name' => 'Budi',
-            'staff' => 'Divisi Karangan',
+            'staff' => '',
             'nik' => '12345',
         ])->assertSessionHasErrors(['staff', 'nik']);
 

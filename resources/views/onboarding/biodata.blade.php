@@ -34,13 +34,13 @@
 
         <div>
             <x-input-label for="staff" value="Divisi" class="font-semibold" />
-            <select id="staff" name="staff" required
-                class="mt-2 block min-h-12 w-full rounded-xl border-gray-200 bg-gray-50/60 text-sm shadow-sm focus:border-brand-500 focus:bg-white focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-300">
-                <option value="" disabled @selected(! old('staff'))>Pilih divisi</option>
-                @foreach ($divisions as $division)
-                    <option value="{{ $division }}" @selected(old('staff') === $division)>{{ $division }}</option>
-                @endforeach
-            </select>
+            <x-text-input id="staff"
+                class="mt-2 block min-h-12 w-full rounded-xl border-gray-200 bg-gray-50/60 text-sm focus:border-brand-500 focus:bg-white focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-900"
+                type="text" name="staff" :value="old('staff')" required maxlength="100" autocomplete="organization-title"
+                placeholder="Contoh: IT, Keuangan, Security" />
+            <p class="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+                Tulis <strong>Security</strong>, <strong>OB</strong>, atau <strong>Engineering</strong> jika Anda bekerja dengan jadwal shift khusus.
+            </p>
             <x-input-error :messages="$errors->get('staff')" class="mt-2" />
         </div>
 

@@ -34,7 +34,7 @@ class WhatsappAttendanceReportService
         // Staff is free text: match case-insensitively and put anything unknown in the catch-all group,
         // so no employee is left out of the report.
         $groups = config('divisions.groups', []);
-        $fallbackGroup = config('divisions.fallback_group', 'STAFF LAINNYA');
+        $fallbackGroup = config('divisions.fallback_group', 'LAINNYA');
         $hidePositionGroups = config('divisions.hide_position_groups', []);
 
         $divisionByStaff = [];
@@ -44,11 +44,21 @@ class WhatsappAttendanceReportService
             }
         }
 
-        $employeesByDivision = $employees->groupBy(
-            fn ($employee) => $divisionByStaff[mb_strtolower(trim((string) $employee->staff))] ?? $fallbackGroup
-        );
+        $employeesByDivision = $employees->groupBy(function ($employee) use ($groups, $divisionByStaff, $fallbackGroup) {
+            $staff = trim((string) $employee->staff);
 
-        $groupTitles = array_keys($groups);
+            // No groups configured: each division, as typed on the biodata form, is its own group.
+            if ($groups === []) {
+                return $staff !== '' ? mb_strtoupper($staff) : $fallbackGroup;
+            }
+
+            return $divisionByStaff[mb_strtolower($staff)] ?? $fallbackGroup;
+        });
+
+        $groupTitles = $groups === []
+            ? $employeesByDivision->keys()->reject(fn ($title) => $title === $fallbackGroup)->sort()->values()->all()
+            : array_keys($groups);
+
         if (! in_array($fallbackGroup, $groupTitles, true)) {
             $groupTitles[] = $fallbackGroup;
         }

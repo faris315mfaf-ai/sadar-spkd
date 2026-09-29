@@ -14,7 +14,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 /**
@@ -34,9 +33,7 @@ class OnboardingController extends Controller
             return redirect()->route('onboarding.face');
         }
 
-        return view('onboarding.biodata', [
-            'divisions' => $this->divisions(),
-        ]);
+        return view('onboarding.biodata');
     }
 
     public function storeBiodata(Request $request): RedirectResponse
@@ -49,12 +46,12 @@ class OnboardingController extends Controller
 
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'staff' => ['required', 'string', Rule::in($this->divisions())],
+            // Typed by hand for now; there is no fixed division list.
+            'staff' => ['required', 'string', 'max:100'],
             'nik' => ['required', 'digits:16', 'unique:employees,nik'],
         ], [
             'name.required' => 'Nama lengkap wajib diisi.',
-            'staff.required' => 'Pilih divisi Anda.',
-            'staff.in' => 'Pilih divisi dari daftar.',
+            'staff.required' => 'Divisi wajib diisi.',
             'nik.required' => 'NIK wajib diisi.',
             'nik.digits' => 'NIK harus 16 digit angka sesuai KTP.',
             'nik.unique' => 'NIK ini sudah terdaftar. Hubungi HR jika ini data Anda.',
@@ -170,13 +167,5 @@ class OnboardingController extends Controller
             'radiusMeters' => (int) $settings->attendance_radius_meters,
             'hasGeofence' => $settings->hasGeofence(),
         ]);
-    }
-
-    /**
-     * @return list<string>
-     */
-    private function divisions(): array
-    {
-        return collect(config('divisions.groups', []))->flatten()->filter()->values()->all();
     }
 }
