@@ -14,17 +14,18 @@
 
     <x-onboarding.steps :current="4" />
 
-    <div id="onboarding-location"
-        data-office-lat="{{ $hasGeofence ? $officeLatitude : '' }}"
-        data-office-lng="{{ $hasGeofence ? $officeLongitude : '' }}"
-        data-radius="{{ $hasGeofence ? $radiusMeters : '' }}"
-        class="space-y-4">
+    <div id="onboarding-location" data-places="{{ json_encode($places) }}" class="space-y-4">
         <div class="rounded-2xl border border-gray-100 bg-gray-50/80 p-4 text-xs leading-relaxed text-gray-600 dark:border-gray-700 dark:bg-gray-900/40 dark:text-gray-300">
-            @if ($hasGeofence)
-                Radius absensi kantor: <strong>{{ $radiusMeters >= 1000 ? rtrim(rtrim(number_format($radiusMeters / 1000, 2, ',', '.'), '0'), ',').' KM' : $radiusMeters.' meter' }}</strong>.
-                Aktifkan GPS di HP dan pilih <strong>Izinkan</strong> saat browser meminta akses lokasi.
+            @if ($locations->isNotEmpty())
+                <p>Anda bisa absen di:</p>
+                <ul class="mt-1.5 space-y-0.5">
+                    @foreach ($locations as $location)
+                        <li>• <strong>{{ $location->name }}</strong> (radius {{ $location->formattedRadius() }})</li>
+                    @endforeach
+                </ul>
+                <p class="mt-2">Aktifkan GPS di HP dan pilih <strong>Izinkan</strong> saat browser meminta akses lokasi.</p>
             @else
-                Kantor belum mengatur radius absensi. Tetap izinkan akses lokasi karena lokasi dicatat saat absen.
+                Kantor belum mengatur lokasi absensi. Tetap izinkan akses lokasi karena lokasi dicatat saat absen.
             @endif
         </div>
 

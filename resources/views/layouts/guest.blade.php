@@ -63,7 +63,7 @@
                         Kelola kehadiran dengan mudah dan terpercaya.
                     </h1>
                     <p class="mt-5 max-w-lg text-base leading-relaxed text-brand-100/90">
-                        Akses absensi, pengajuan izin, riwayat kehadiran, dan slip gaji Anda dalam satu portal.
+                        {{ config('features.payroll') ? 'Akses absensi, pengajuan izin, riwayat kehadiran, dan slip gaji Anda dalam satu portal.' : 'Akses absensi, pengajuan izin, dan riwayat kehadiran Anda dalam satu portal.' }}
                     </p>
 
                     <div class="mt-8 grid max-w-lg grid-cols-3 gap-3">

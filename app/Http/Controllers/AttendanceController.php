@@ -232,7 +232,9 @@ class AttendanceController extends Controller
 
 
 
-                ."Jam: {$clockInTime}\n\n"
+                ."Jam: {$clockInTime}\n"
+                .($attendance->clockInWorkLocation ? "Lokasi: {$attendance->clockInWorkLocation->name}\n" : '')
+                ."\n"
 
                 ."📝 Rencana Kerja:\n"
 
@@ -307,7 +309,9 @@ class AttendanceController extends Controller
 
                 .'Tanggal: '.$attendance->date->translatedFormat('l, d F Y')."\n"
 
-                ."Jam: {$clockOutTime}\n\n"
+                ."Jam: {$clockOutTime}\n"
+                .($attendance->clockOutWorkLocation ? "Lokasi: {$attendance->clockOutWorkLocation->name}\n" : '')
+                ."\n"
 
                 ."📝 Laporan Kerja:\n"
 

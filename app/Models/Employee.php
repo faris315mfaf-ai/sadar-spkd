@@ -57,6 +57,14 @@ class Employee extends Model
         return ($this->basic_salary ?? 0) + $allowance;
     }
 
+    /**
+     * Extra attendance locations assigned to this employee (on top of those for everyone).
+     */
+    public function workLocations()
+    {
+        return $this->belongsToMany(WorkLocation::class);
+    }
+
     public function payrolls()
     {
         return $this->hasMany(Payroll::class);

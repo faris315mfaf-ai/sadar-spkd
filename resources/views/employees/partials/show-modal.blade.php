@@ -125,6 +125,7 @@
                     </div>
                 </div>
 
+                @if (config('features.payroll'))
                 <div class="space-y-3 md:col-span-2">
                     <h4 class="text-[11px] font-semibold uppercase tracking-[0.14em] text-gray-400 dark:text-gray-500">Informasi Penggajian</h4>
                     <div class="rounded-2xl border border-gray-100 bg-gray-50/70 p-4 dark:border-gray-700 dark:bg-gray-900/40">
@@ -171,6 +172,7 @@
                         </div>
                     </div>
                 </div>
+                @endif
 
             </div>
 

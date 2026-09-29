@@ -21,6 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => RoleMiddleware::class,
             'attendance.api' => \App\Http\Middleware\ValidateAttendanceApiToken::class,
             'onboarded' => \App\Http\Middleware\EnsureOnboardingComplete::class,
+            'feature' => \App\Http\Middleware\EnsureFeatureEnabled::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

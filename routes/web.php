@@ -13,7 +13,7 @@ use App\Http\Controllers\MyPayrollController;
 use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\PayrollController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\Settings\LocationSettingController;
+use App\Http\Controllers\Settings\WorkLocationController;
 use App\Http\Controllers\Settings\SecurityScheduleController;
 use App\Http\Controllers\Settings\WorkHourSettingController;
 use App\Http\Controllers\WorkCalendarController;
@@ -36,9 +36,9 @@ Route::middleware(['auth', 'verified', 'role:employee,hr,admin'])->group(functio
     Route::post('/attendance/leave', [AttendanceController::class, 'submitLeave'])->name('attendance.leave');
     Route::post('/attendance/face/verify', [FaceVerificationController::class, 'verify'])->name('attendance.face.verify');
     Route::post('/attendance/face/sync-descriptor', [FaceVerificationController::class, 'syncDescriptor'])->name('attendance.face.sync-descriptor');
-    Route::get('/my-payrolls', [MyPayrollController::class, 'index'])->middleware('onboarded')->name('my-payrolls.index');
-    Route::get('/my-payrolls/{payroll}', [MyPayrollController::class, 'show'])->name('my-payrolls.show');
-    Route::get('/my-payrolls/{payroll}/pdf', [MyPayrollController::class, 'downloadPdf'])->name('my-payrolls.pdf');
+    Route::get('/my-payrolls', [MyPayrollController::class, 'index'])->middleware('onboarded')->middleware('feature:payroll')->name('my-payrolls.index');
+    Route::get('/my-payrolls/{payroll}', [MyPayrollController::class, 'show'])->middleware('feature:payroll')->name('my-payrolls.show');
+    Route::get('/my-payrolls/{payroll}/pdf', [MyPayrollController::class, 'downloadPdf'])->middleware('feature:payroll')->name('my-payrolls.pdf');
 });
 
 Route::middleware(['auth', 'verified', 'role:admin,hr'])->group(function () {
@@ -70,8 +70,14 @@ Route::middleware(['auth', 'verified', 'role:admin,hr'])->group(function () {
         Route::get('/work-hours', [WorkHourSettingController::class, 'edit'])->name('work-hours.edit');
         Route::patch('/work-hours', [WorkHourSettingController::class, 'update'])->name('work-hours.update');
 
-        Route::get('/location', [LocationSettingController::class, 'edit'])->name('location.edit');
-        Route::patch('/location', [LocationSettingController::class, 'update'])->name('location.update');
+        // Attendance locations (office, hospital, ...). The old single-office page redirects here.
+        Route::redirect('/location', '/settings/locations')->name('location.edit');
+        Route::get('/locations', [WorkLocationController::class, 'index'])->name('locations.index');
+        Route::get('/locations/create', [WorkLocationController::class, 'create'])->name('locations.create');
+        Route::post('/locations', [WorkLocationController::class, 'store'])->name('locations.store');
+        Route::get('/locations/{workLocation}/edit', [WorkLocationController::class, 'edit'])->name('locations.edit');
+        Route::patch('/locations/{workLocation}', [WorkLocationController::class, 'update'])->name('locations.update');
+        Route::delete('/locations/{workLocation}', [WorkLocationController::class, 'destroy'])->name('locations.destroy');
 
         Route::get('/security-schedules', [SecurityScheduleController::class, 'index'])
             ->name('security-schedules.index');
@@ -84,18 +90,18 @@ Route::middleware(['auth', 'verified', 'role:admin,hr'])->group(function () {
     });
 
     Route::get('/settings/attendance', fn () => redirect()->route('settings.work-hours.edit'))->name('settings.attendance.edit');
-    Route::get('/payrolls', [PayrollController::class, 'index'])->name('payrolls.index');
-    Route::post('/payrolls/generate', [PayrollController::class, 'generate'])->name('payrolls.generate');
-    Route::get('/payrolls/export', [PayrollController::class, 'export'])->name('payrolls.export');
-    Route::post('/payrolls/send-wa-report', [PayrollController::class, 'sendWaReport'])->name('payrolls.send-wa-report');
-    Route::get('/payrolls/{payroll}', [PayrollController::class, 'show'])->name('payrolls.show');
-    Route::get('/payrolls/{payroll}/pdf', [PayrollController::class, 'downloadPdf'])->name('payrolls.pdf');
-    Route::patch('/payrolls/{payroll}/mark-paid', [PayrollController::class, 'markAsPaid'])->name('payrolls.mark-paid');
-    Route::post('/payrolls/{payroll}/adjustments', [PayrollController::class, 'addAdjustment'])->name('payrolls.adjustments.store');
-    Route::patch('/payroll-details/{detail}', [PayrollController::class, 'updatePayrollDetail'])->name('payroll-details.update');
-    Route::delete('/payroll-details/{detail}', [PayrollController::class, 'deletePayrollDetail'])->name('payroll-details.destroy');
-    Route::post('/payrolls/{payroll}/undo', [PayrollController::class, 'undoLastChange'])->name('payrolls.undo');
-    Route::post('/payrolls/{payroll}/reset-to-system', [PayrollController::class, 'resetToSystem'])->name('payrolls.reset-to-system');
+    Route::get('/payrolls', [PayrollController::class, 'index'])->middleware('feature:payroll')->name('payrolls.index');
+    Route::post('/payrolls/generate', [PayrollController::class, 'generate'])->middleware('feature:payroll')->name('payrolls.generate');
+    Route::get('/payrolls/export', [PayrollController::class, 'export'])->middleware('feature:payroll')->name('payrolls.export');
+    Route::post('/payrolls/send-wa-report', [PayrollController::class, 'sendWaReport'])->middleware('feature:payroll')->name('payrolls.send-wa-report');
+    Route::get('/payrolls/{payroll}', [PayrollController::class, 'show'])->middleware('feature:payroll')->name('payrolls.show');
+    Route::get('/payrolls/{payroll}/pdf', [PayrollController::class, 'downloadPdf'])->middleware('feature:payroll')->name('payrolls.pdf');
+    Route::patch('/payrolls/{payroll}/mark-paid', [PayrollController::class, 'markAsPaid'])->middleware('feature:payroll')->name('payrolls.mark-paid');
+    Route::post('/payrolls/{payroll}/adjustments', [PayrollController::class, 'addAdjustment'])->middleware('feature:payroll')->name('payrolls.adjustments.store');
+    Route::patch('/payroll-details/{detail}', [PayrollController::class, 'updatePayrollDetail'])->middleware('feature:payroll')->name('payroll-details.update');
+    Route::delete('/payroll-details/{detail}', [PayrollController::class, 'deletePayrollDetail'])->middleware('feature:payroll')->name('payroll-details.destroy');
+    Route::post('/payrolls/{payroll}/undo', [PayrollController::class, 'undoLastChange'])->middleware('feature:payroll')->name('payrolls.undo');
+    Route::post('/payrolls/{payroll}/reset-to-system', [PayrollController::class, 'resetToSystem'])->middleware('feature:payroll')->name('payrolls.reset-to-system');
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {

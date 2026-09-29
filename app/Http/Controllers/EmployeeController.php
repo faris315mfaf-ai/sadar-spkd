@@ -274,7 +274,10 @@ class EmployeeController extends Controller
 
         unset($validated['profile_photo']);
 
-        $validated['basic_salary'] = $validated['basic_salary'] ?? 0;
+        // With payroll hidden the form has no salary fields: keep the stored salary untouched.
+        if (config('features.payroll')) {
+            $validated['basic_salary'] = $validated['basic_salary'] ?? 0;
+        }
         $validated['employment_status'] = $validated['employment_status'] ?? 'active';
         $validated['default_work_schedule_id'] = $this->resolveDefaultWorkScheduleId($validated);
 
@@ -323,16 +326,19 @@ class EmployeeController extends Controller
                 $employee->update(['user_id' => $user->id]);
             }
 
-            EmployeeSalaryComponent::where('employee_id', $employee->id)->delete();
+            // Salary components are only on the form while payroll is enabled; otherwise keep them.
+            if (config('features.payroll')) {
+                EmployeeSalaryComponent::where('employee_id', $employee->id)->delete();
 
-            foreach ($salaryComponents as $componentId => $amount) {
-                if ((int) $amount > 0) {
-                    EmployeeSalaryComponent::create([
-                        'employee_id' => $employee->id,
-                        'salary_component_id' => $componentId,
-                        'amount' => $amount,
-                        'is_active' => true,
-                    ]);
+                foreach ($salaryComponents as $componentId => $amount) {
+                    if ((int) $amount > 0) {
+                        EmployeeSalaryComponent::create([
+                            'employee_id' => $employee->id,
+                            'salary_component_id' => $componentId,
+                            'amount' => $amount,
+                            'is_active' => true,
+                        ]);
+                    }
                 }
             }
         });

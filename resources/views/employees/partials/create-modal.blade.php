@@ -9,7 +9,7 @@
             <div>
                 <p class="text-[11px] font-semibold uppercase tracking-[0.14em] text-gray-400 dark:text-gray-500">Manajemen SDM</p>
                 <h3 class="mt-1 text-lg font-bold tracking-tight text-gray-900 dark:text-white">Tambah Karyawan Baru</h3>
-                <p class="mt-0.5 text-sm text-gray-500 dark:text-gray-400">Lengkapi data profil, kepegawaian, dan komponen gaji.</p>
+                <p class="mt-0.5 text-sm text-gray-500 dark:text-gray-400">{{ config('features.payroll') ? 'Lengkapi data profil, kepegawaian, dan komponen gaji.' : 'Lengkapi data profil dan kepegawaian.' }}</p>
             </div>
             <button type="button"
                 class="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-gray-200 text-gray-400 transition hover:border-gray-300 hover:bg-gray-50 hover:text-gray-600 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:text-gray-200"

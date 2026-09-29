@@ -3,12 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Employee;
-use App\Models\Setting;
 use App\Models\WorkSchedule;
 use App\Services\ActivityLogService;
 use App\Services\AttendanceVerificationPhotoService;
 use App\Services\EmployeeFaceDescriptorService;
 use App\Services\FaceVerificationService;
+use App\Services\WorkLocationService;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -25,6 +25,7 @@ class OnboardingController extends Controller
         private readonly AttendanceVerificationPhotoService $photos,
         private readonly EmployeeFaceDescriptorService $faceDescriptors,
         private readonly FaceVerificationService $faceVerification,
+        private readonly WorkLocationService $workLocations,
     ) {}
 
     public function biodata(Request $request): View|RedirectResponse
@@ -159,13 +160,11 @@ class OnboardingController extends Controller
             return redirect()->route('onboarding.face');
         }
 
-        $settings = Setting::current();
+        $locations = $this->workLocations->availableTo($employee);
 
         return view('onboarding.location', [
-            'officeLatitude' => $settings->office_latitude,
-            'officeLongitude' => $settings->office_longitude,
-            'radiusMeters' => (int) $settings->attendance_radius_meters,
-            'hasGeofence' => $settings->hasGeofence(),
+            'locations' => $locations,
+            'places' => $this->workLocations->mapPoints($locations),
         ]);
     }
 }

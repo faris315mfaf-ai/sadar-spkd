@@ -255,24 +255,35 @@ function locationErrorMessage(error) {
 export function initLocationCheck(root) {
     const button = root.querySelector('#onboarding-location-check');
     const result = root.querySelector('#onboarding-location-result');
-    const officeLat = parseFloat(root.dataset.officeLat);
-    const officeLng = parseFloat(root.dataset.officeLng);
-    const radius = parseFloat(root.dataset.radius);
-    const hasGeofence = Number.isFinite(officeLat) && Number.isFinite(officeLng) && radius > 0;
+    let places = [];
+    try {
+        places = JSON.parse(root.dataset.places || '[]');
+    } catch {
+        places = [];
+    }
 
-    const show = (html, tone) => {
+    // Text only: location names are typed by admins, so never render them as HTML.
+    const show = (title, message, tone) => {
         const tones = {
             success: 'border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-900/50 dark:bg-emerald-950/30 dark:text-emerald-200',
             warning: 'border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-900/50 dark:bg-amber-950/30 dark:text-amber-200',
             error: 'border-red-200 bg-red-50 text-red-700 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-300',
         };
         result.className = `rounded-2xl border p-4 text-sm leading-relaxed ${tones[tone]}`;
-        result.innerHTML = html;
+        result.replaceChildren();
+
+        if (title) {
+            const strong = document.createElement('strong');
+            strong.textContent = title;
+            result.append(strong, ' ');
+        }
+
+        result.append(message);
     };
 
     button.addEventListener('click', () => {
         if (!navigator.geolocation?.getCurrentPosition || !window.isSecureContext) {
-            show(locationErrorMessage(null), 'error');
+            show(null, locationErrorMessage(null), 'error');
             return;
         }
 
@@ -286,23 +297,30 @@ export function initLocationCheck(root) {
 
                 const accuracy = `akurasi ±${Math.round(coords.accuracy)} meter`;
 
-                if (!hasGeofence) {
-                    show(`<strong>Lokasi terbaca</strong> (${accuracy}). Akses lokasi sudah siap untuk absensi.`, 'success');
+                if (places.length === 0) {
+                    show('Lokasi terbaca', `(${accuracy}). Akses lokasi sudah siap untuk absensi.`, 'success');
                     return;
                 }
 
-                const distance = distanceMeters(coords.latitude, coords.longitude, officeLat, officeLng);
+                const ranked = places
+                    .map((place) => ({
+                        place,
+                        distance: distanceMeters(coords.latitude, coords.longitude, Number(place.lat), Number(place.lng)),
+                    }))
+                    .sort((a, b) => a.distance - b.distance);
+                const match = ranked.find((row) => row.distance <= Number(row.place.radius));
 
-                if (distance <= radius) {
-                    show(`<strong>Anda berada di area kantor.</strong> Jarak ${formatDistance(distance)} dari titik kantor (${accuracy}). Siap absen.`, 'success');
+                if (match) {
+                    show(`Anda berada di area ${match.place.name}.`, `Jarak ${formatDistance(match.distance)} dari titik lokasi (${accuracy}). Siap absen.`, 'success');
                 } else {
-                    show(`<strong>Akses lokasi berhasil</strong>, tetapi Anda berada ${formatDistance(distance)} dari kantor, di luar radius ${formatDistance(radius)} (${accuracy}). Absen hanya bisa dilakukan di area kantor.`, 'warning');
+                    const nearest = ranked[0];
+                    show('Akses lokasi berhasil,', `tetapi Anda berada di luar area absensi. Lokasi terdekat: ${nearest.place.name}, ${formatDistance(nearest.distance)} dari titik lokasi (radius ${formatDistance(Number(nearest.place.radius))}, ${accuracy}). Absen hanya bisa dilakukan di area tersebut.`, 'warning');
                 }
             },
             (error) => {
                 button.disabled = false;
                 button.textContent = 'Coba Lagi';
-                show(locationErrorMessage(error), 'error');
+                show(null, locationErrorMessage(error), 'error');
             },
             { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 },
         );

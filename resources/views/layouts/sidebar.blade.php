@@ -15,7 +15,7 @@
     $isSettingsActive =
         request()->routeIs('settings.work-hours.*') ||
         request()->routeIs('settings.security-schedules.*') ||
-        request()->routeIs('settings.location.*') ||
+        request()->routeIs('settings.locations.*') ||
         request()->routeIs('work-calendars.*');
 
     $adminLink = function (bool $active): string {
@@ -131,6 +131,7 @@
                 @endif
             </a>
 
+            @if (config('features.payroll'))
             <a href="{{ route('payrolls.index') }}"
                 class="flex w-full items-center rounded-2xl px-3.5 py-2.5 text-sm font-semibold transition-all duration-200 {{ $adminLink(request()->routeIs('payrolls.*')) }}">
                 <svg class="mr-3 h-5 w-5 flex-shrink-0 opacity-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -142,6 +143,7 @@
                     <span class="ml-auto h-1.5 w-1.5 rounded-full bg-brand-500"></span>
                 @endif
             </a>
+            @endif
 
             <a href="{{ route('activity-log.index') }}"
                 class="flex w-full items-center rounded-2xl px-3.5 py-2.5 text-sm font-semibold transition-all duration-200 {{ $adminLink(request()->routeIs('activity-log.*')) }}">
@@ -197,11 +199,11 @@
                         <span class="mr-3 h-1.5 w-1.5 flex-shrink-0 rounded-full {{ request()->routeIs('settings.security-schedules.*') ? 'bg-white' : 'bg-brand-300/60 dark:bg-slate-500' }}"></span>
                         Jadwal Security
                     </a>
-                    <a href="{{ route('settings.location.edit') }}"
+                    <a href="{{ route('settings.locations.index') }}"
                         class="flex w-full items-center rounded-xl px-3.5 py-2 text-sm font-medium transition-colors duration-150
-                            {{ request()->routeIs('settings.location.*') ? 'bg-white/20 text-white' : 'text-brand-100/90 hover:bg-white/10 hover:text-white dark:text-slate-400 dark:hover:text-slate-200' }}">
-                        <span class="mr-3 h-1.5 w-1.5 flex-shrink-0 rounded-full {{ request()->routeIs('settings.location.*') ? 'bg-white' : 'bg-brand-300/60 dark:bg-slate-500' }}"></span>
-                        Lokasi GPS
+                            {{ request()->routeIs('settings.locations.*') ? 'bg-white/20 text-white' : 'text-brand-100/90 hover:bg-white/10 hover:text-white dark:text-slate-400 dark:hover:text-slate-200' }}">
+                        <span class="mr-3 h-1.5 w-1.5 flex-shrink-0 rounded-full {{ request()->routeIs('settings.locations.*') ? 'bg-white' : 'bg-brand-300/60 dark:bg-slate-500' }}"></span>
+                        Lokasi Absensi
                     </a>
                     <a href="{{ route('work-calendars.index') }}"
                         class="flex w-full items-center rounded-xl px-3.5 py-2 text-sm font-medium transition-colors duration-150
@@ -252,6 +254,7 @@
                 @endif
             </a>
 
+            @if (config('features.payroll'))
             <a href="{{ route('my-payrolls.index') }}"
                 class="flex w-full items-center rounded-2xl px-3.5 py-2.5 text-sm font-semibold transition-all duration-200 {{ $employeeLink(request()->routeIs('my-payrolls.*')) }}">
                 <svg class="mr-3 h-5 w-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -263,6 +266,7 @@
                     <span class="ml-auto h-1.5 w-1.5 rounded-full bg-brand-500 dark:bg-white"></span>
                 @endif
             </a>
+            @endif
         @endif
 
     </nav>

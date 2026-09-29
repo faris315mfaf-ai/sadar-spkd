@@ -20,7 +20,9 @@
                         </div>
                         <h1 class="mt-3 text-2xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-3xl">Karyawan</h1>
                         <p class="mt-1.5 max-w-2xl text-sm leading-relaxed text-gray-500 dark:text-gray-400">
-                            Kelola data karyawan, status kepegawaian, dan komponen gaji dalam satu tempat.
+                            {{ config('features.payroll')
+                                ? 'Kelola data karyawan, status kepegawaian, dan komponen gaji dalam satu tempat.'
+                                : 'Kelola data karyawan dan status kepegawaian dalam satu tempat.' }}
                         </p>
                     </div>
 
@@ -35,7 +37,7 @@
             </section>
 
             {{-- Summary --}}
-            <div class="grid grid-cols-2 gap-3 md:grid-cols-5">
+            <div class="grid grid-cols-2 gap-3 {{ config('features.payroll') ? 'md:grid-cols-5' : 'md:grid-cols-4' }}">
                 <div class="relative overflow-hidden rounded-[1.5rem] border border-gray-200/80 bg-white px-4 py-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
                     <div class="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-slate-400 to-slate-600"></div>
                     <div class="flex items-start justify-between gap-2 pl-2">
@@ -97,6 +99,7 @@
                     </div>
                 </div>
 
+                @if (config('features.payroll'))
                 <div class="relative col-span-2 overflow-hidden rounded-[1.5rem] border border-brand-100 bg-gradient-to-br from-brand-600 to-navy-700 px-4 py-4 shadow-sm md:col-span-1 dark:border-brand-900/40">
                     <div class="absolute inset-y-0 left-0 w-1 bg-white/40"></div>
                     <div class="flex items-start justify-between gap-2 pl-2">
@@ -113,6 +116,7 @@
                         </div>
                     </div>
                 </div>
+                @endif
             </div>
 
             {{-- Table Card --}}
@@ -185,9 +189,11 @@
                                     </div>
                                     <div class="mt-2.5 flex flex-wrap items-center gap-2">
                                         <x-ui.badge :type="$employee->employment_status">{{ ucfirst($employee->employment_status) }}</x-ui.badge>
-                                        <span class="text-sm font-semibold tabular-nums text-gray-900 dark:text-gray-100">
-                                            Rp {{ number_format($employee->gross_salary, 0, ',', '.') }}
-                                        </span>
+                                        @if (config('features.payroll'))
+                                            <span class="text-sm font-semibold tabular-nums text-gray-900 dark:text-gray-100">
+                                                Rp {{ number_format($employee->gross_salary, 0, ',', '.') }}
+                                            </span>
+                                        @endif
                                     </div>
                                     <p class="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
                                         Masuk {{ $employee->join_date?->format('d M Y') ?? '-' }}
@@ -213,7 +219,9 @@
                                 <th class="px-5 py-3.5 text-left text-[10px] font-bold uppercase tracking-wider text-gray-400">Jabatan</th>
                                 <th class="px-5 py-3.5 text-left text-[10px] font-bold uppercase tracking-wider text-gray-400">Tanggal masuk</th>
                                 <th class="px-5 py-3.5 text-left text-[10px] font-bold uppercase tracking-wider text-gray-400">Status</th>
-                                <th class="px-5 py-3.5 text-left text-[10px] font-bold uppercase tracking-wider text-gray-400">Gaji gross</th>
+                                @if (config('features.payroll'))
+                                    <th class="px-5 py-3.5 text-left text-[10px] font-bold uppercase tracking-wider text-gray-400">Gaji gross</th>
+                                @endif
                                 <th class="px-5 py-3.5 text-left text-[10px] font-bold uppercase tracking-wider text-gray-400">Aksi</th>
                             </tr>
                         </thead>
@@ -251,11 +259,13 @@
                                     <td class="px-5 py-4">
                                         <x-ui.badge :type="$employee->employment_status">{{ ucfirst($employee->employment_status) }}</x-ui.badge>
                                     </td>
-                                    <td class="px-5 py-4">
-                                        <span class="font-semibold tabular-nums text-gray-900 dark:text-gray-100">
-                                            Rp {{ number_format($employee->gross_salary, 0, ',', '.') }}
-                                        </span>
-                                    </td>
+                                    @if (config('features.payroll'))
+                                        <td class="px-5 py-4">
+                                            <span class="font-semibold tabular-nums text-gray-900 dark:text-gray-100">
+                                                Rp {{ number_format($employee->gross_salary, 0, ',', '.') }}
+                                            </span>
+                                        </td>
+                                    @endif
                                     <td class="px-5 py-4">
                                         <form id="delete-form-{{ $employee->id }}" method="POST"
                                             action="{{ route('employees.destroy', $employee) }}">

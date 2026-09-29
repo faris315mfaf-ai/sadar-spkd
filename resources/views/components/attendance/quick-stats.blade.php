@@ -46,12 +46,28 @@
                     <circle cx="12" cy="9" r="2.5" stroke-width="2" />
                 </svg>
             </span>
+            @php
+                $myWorkLocations = app(\App\Services\WorkLocationService::class)->availableTo(auth()->user()?->employee);
+            @endphp
             <p class="mt-5 text-xs font-semibold uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500">Lokasi GPS</p>
             <p class="mt-1 text-lg font-bold text-gray-900 dark:text-white">
-                {{ $settings->hasGeofence() ? $settings->formattedAttendanceRadius() : 'Tercatat' }}
+                @if ($myWorkLocations->count() === 1)
+                    {{ $myWorkLocations->first()->formattedRadius() }}
+                @elseif ($myWorkLocations->isNotEmpty())
+                    {{ $myWorkLocations->count() }} lokasi
+                @else
+                    Tercatat
+                @endif
             </p>
-            <p class="mt-1 text-xs leading-relaxed text-gray-500 dark:text-gray-400">
-                {{ $settings->hasGeofence() ? 'Radius dari lokasi kantor' : 'GPS digunakan saat absensi' }}
+            <p class="mt-1 truncate text-xs leading-relaxed text-gray-500 dark:text-gray-400"
+                title="{{ $myWorkLocations->pluck('name')->join(', ') }}">
+                @if ($myWorkLocations->count() === 1)
+                    Radius dari {{ $myWorkLocations->first()->name }}
+                @elseif ($myWorkLocations->isNotEmpty())
+                    {{ $myWorkLocations->pluck('name')->join(', ') }}
+                @else
+                    GPS digunakan saat absensi
+                @endif
             </p>
         </div>
     </x-attendance.attendance-card>

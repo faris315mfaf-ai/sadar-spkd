@@ -9,13 +9,14 @@ use App\Http\Requests\Admin\StoreAttendanceRequest;
 use App\Http\Requests\Admin\UpdateAttendanceRequest;
 use App\Models\Attendance;
 use App\Models\Employee;
-use App\Models\Setting;
 use App\Models\User;
+use App\Models\WorkLocation;
 use App\Services\AdminAttendanceService;
 use App\Services\AttendanceReportService;
 use App\Services\AttendanceVerificationPhotoService;
 use App\Services\WhatsappService;
 use App\Services\WorkCalendarService;
+use App\Services\WorkLocationService;
 use App\Support\AppTime;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -43,7 +44,7 @@ class AdminAttendanceController extends Controller
     public function index(Request $request): View
     {
         $view = $request->input('view') === 'history' ? 'history' : 'monitoring';
-        $settings = Setting::current();
+        $activeLocations = WorkLocation::query()->active()->orderBy('name')->get();
         $manualContext = $this->manualAttendanceFormContext();
 
         $validationErrors = session('errors');
@@ -64,12 +65,10 @@ class AdminAttendanceController extends Controller
 
         $shared = [
             'view' => $view,
+            // Every active location: the map checks each attendance point against the nearest one.
             'geofence' => [
-                'enabled' => $settings->hasGeofence(),
-                'officeLatitude' => $settings->office_latitude,
-                'officeLongitude' => $settings->office_longitude,
-                'radiusMeters' => (int) $settings->attendance_radius_meters,
-                'radiusLabel' => $settings->formattedAttendanceRadius(),
+                'enabled' => $activeLocations->isNotEmpty(),
+                'places' => app(WorkLocationService::class)->mapPoints($activeLocations),
             ],
             ...$manualContext,
             'openManualAttendanceModal' => $request->boolean('manual')

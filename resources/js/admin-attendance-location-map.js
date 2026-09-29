@@ -80,28 +80,34 @@ const AdminAttendanceLocationMap = {
         });
     },
 
+    /**
+     * Distance to the attendance location that contains the point (nearest one if several do),
+     * otherwise to the nearest location.
+     */
     enrichPoint(point, geofence) {
-        if (!geofence?.enabled) {
-            return { ...point, withinRadius: null, distanceMeters: null };
+        const places = geofence?.enabled ? (geofence.places || []) : [];
+
+        if (places.length === 0) {
+            return { ...point, withinRadius: null, distanceMeters: null, placeName: null };
         }
 
-        const dist = distanceMeters(
+        const ranked = places
+            .map((place) => ({ place, distance: distanceMeters(point.lat, point.lng, Number(place.lat), Number(place.lng)) }))
+            .sort((a, b) => a.distance - b.distance);
+        const match = ranked.find((row) => isWithinRadius(
             point.lat,
             point.lng,
-            geofence.officeLatitude,
-            geofence.officeLongitude,
-        );
+            Number(row.place.lat),
+            Number(row.place.lng),
+            Number(row.place.radius),
+        ));
+        const pick = match ?? ranked[0];
 
         return {
             ...point,
-            distanceMeters: dist,
-            withinRadius: isWithinRadius(
-                point.lat,
-                point.lng,
-                geofence.officeLatitude,
-                geofence.officeLongitude,
-                geofence.radiusMeters,
-            ),
+            distanceMeters: pick.distance,
+            withinRadius: Boolean(match),
+            placeName: pick.place.name,
         };
     },
 
@@ -258,9 +264,14 @@ const AdminAttendanceLocationMap = {
         });
 
         if (geofence?.enabled) {
+            const places = geofence.places || [];
+            const placeLabel = places.length === 1
+                ? `${places[0].name} · ${places[0].radiusLabel}`
+                : `${places.length} lokasi absensi`;
+
             chips.push(`<span class="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1 font-medium text-blue-800 dark:bg-blue-900/40 dark:text-blue-200">
-                <span class="flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 text-[10px] font-bold text-white">K</span>
-                Radius ${this.escapeHtml(geofence.radiusLabel || '')}
+                <span class="flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 text-[10px] font-bold text-white">L</span>
+                ${this.escapeHtml(placeLabel)}
             </span>`);
             chips.push(`<span class="${RADIUS_STATUS.inside.badge}">${RADIUS_STATUS.inside.text}</span>`);
             chips.push(`<span class="${RADIUS_STATUS.outside.badge}">${RADIUS_STATUS.outside.text}</span>`);
@@ -285,7 +296,7 @@ const AdminAttendanceLocationMap = {
 
             const radiusInfo = geofence?.enabled && point.distanceMeters != null
                 ? `<p class="mt-1.5"><span class="${status.badge}">${status.text}</span>
-                    <span class="ml-2 text-gray-500">Jarak dari kantor: ${formatDistance(point.distanceMeters)}</span></p>`
+                    <span class="ml-2 text-gray-500">Jarak dari ${this.escapeHtml(point.placeName)}: ${formatDistance(point.distanceMeters)}</span></p>`
                 : '';
 
             return `<div class="mb-2 last:mb-0">
@@ -316,7 +327,7 @@ const AdminAttendanceLocationMap = {
         }).addTo(this.map);
 
         if (geofence?.enabled) {
-            this.radiusLayers = addAttendanceRadiusLayer(this.map, geofence);
+            this.radiusLayers = addAttendanceRadiusLayer(this.map, geofence.places || []);
         }
 
         const bounds = [];
@@ -338,7 +349,7 @@ const AdminAttendanceLocationMap = {
             if (geofence?.enabled && point.distanceMeters != null) {
                 popupLines.push(
                     `<p class="mt-2"><span class="${status.badge}">${status.text}</span></p>`,
-                    `<p class="mt-1 text-xs text-gray-500">Jarak kantor: ${formatDistance(point.distanceMeters)}</p>`,
+                    `<p class="mt-1 text-xs text-gray-500">Jarak dari ${this.escapeHtml(point.placeName)}: ${formatDistance(point.distanceMeters)}</p>`,
                 );
             }
 
@@ -347,16 +358,18 @@ const AdminAttendanceLocationMap = {
             bounds.push([point.lat, point.lng]);
         });
 
-        const fitTargets = [...this.markers];
-        if (this.radiusLayers?.radiusCircle) {
-            fitTargets.push(this.radiusLayers.radiusCircle);
-        }
+        // Frame the attendance points together with the location they were checked against.
+        const nearestCircles = (this.radiusLayers?.circles || []).filter((circle, index) => {
+            const place = geofence?.places?.[index];
+            return place && points.some((point) => point.placeName === place.name);
+        });
+        const fitTargets = [...this.markers, ...nearestCircles];
 
         if (fitTargets.length > 1) {
             const group = L.featureGroup(fitTargets);
             this.map.fitBounds(group.getBounds().pad(0.12), { maxZoom: 17 });
-        } else if (this.radiusLayers?.radiusCircle) {
-            this.map.fitBounds(this.radiusLayers.radiusCircle.getBounds().pad(0.08), { maxZoom: 16 });
+        } else if (nearestCircles.length === 1) {
+            this.map.fitBounds(nearestCircles[0].getBounds().pad(0.08), { maxZoom: 16 });
         }
 
         loading?.classList.add('hidden');

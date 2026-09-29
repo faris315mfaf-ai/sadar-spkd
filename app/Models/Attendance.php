@@ -37,6 +37,8 @@ class Attendance extends Model
         'clock_out_location',
         'clock_out_verification_photo',
         'clock_out_face_distance',
+        'clock_in_work_location_id',
+        'clock_out_work_location_id',
         'leave_note',
         'doctor_note_path',
         'status',
@@ -78,6 +80,16 @@ class Attendance extends Model
     public function workSchedule()
     {
         return $this->belongsTo(WorkSchedule::class);
+    }
+
+    public function clockInWorkLocation()
+    {
+        return $this->belongsTo(WorkLocation::class, 'clock_in_work_location_id');
+    }
+
+    public function clockOutWorkLocation()
+    {
+        return $this->belongsTo(WorkLocation::class, 'clock_out_work_location_id');
     }
 
     public function verifiedBy()

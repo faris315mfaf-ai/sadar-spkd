@@ -115,6 +115,7 @@
             class="{{ $fieldClass }}">
     </div>
 
+    @if (config('features.payroll'))
     <div>
         <label class="{{ $labelClass }}">Gaji Pokok</label>
         <div class="flex rounded-2xl shadow-sm">
@@ -125,6 +126,7 @@
                 class="block min-h-11 w-full rounded-none rounded-r-2xl border-gray-200 bg-gray-50 text-sm focus:border-brand-500 focus:bg-white focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100">
         </div>
     </div>
+    @endif
 
     <div>
         <label class="{{ $labelClass }}">Status</label>
@@ -136,6 +138,7 @@
         </select>
     </div>
 
+    @if (config('features.payroll'))
     <div class="md:col-span-2 mt-1 border-t border-gray-100 pt-4 dark:border-gray-700">
         <p class="text-[11px] font-semibold uppercase tracking-[0.14em] text-gray-400 dark:text-gray-500">Informasi Bank</p>
     </div>
@@ -160,6 +163,7 @@
             id="{{ $mode === 'edit' ? 'edit_bank_account_name' : 'bank_account_name' }}"
             placeholder="Nama pemilik rekening" class="{{ $fieldClass }}">
     </div>
+    @endif
 
     <div class="md:col-span-2">
         <label class="{{ $labelClass }}">Pengalaman Kerja</label>
@@ -190,6 +194,7 @@
         </div>
     </div>
 
+    @if (config('features.payroll'))
     <div class="md:col-span-2 mt-1 rounded-2xl border border-gray-100 bg-gray-50/60 p-4 dark:border-gray-700 dark:bg-gray-900/40">
         <p class="text-[11px] font-semibold uppercase tracking-[0.14em] text-gray-400 dark:text-gray-500">Komponen Gaji</p>
         <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Tunjangan default karyawan.</p>
@@ -238,5 +243,6 @@
             @endforeach
         </div>
     </div>
+    @endif
 
 </div>

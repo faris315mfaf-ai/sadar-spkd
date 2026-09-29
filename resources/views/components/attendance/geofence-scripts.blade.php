@@ -9,6 +9,42 @@
             window.GeofenceMap = {
                 instances: {},
 
+                formatDistance(meters) {
+                    return meters >= 1000 ? (meters / 1000).toFixed(2) + ' KM' : Math.round(meters) + ' meter';
+                },
+
+                /**
+                 * Attendance locations for a map container: a JSON list in data-places (several
+                 * locations), or one point in data-office-lat/lng + data-radius (the location editor).
+                 */
+                readPlaces(container) {
+                    let places;
+
+                    if (container.dataset.places !== undefined) {
+                        try {
+                            places = JSON.parse(container.dataset.places) || [];
+                        } catch {
+                            places = [];
+                        }
+                    } else {
+                        places = [{
+                            name: container.dataset.placeName || 'Lokasi absensi',
+                            lat: container.dataset.officeLat,
+                            lng: container.dataset.officeLng,
+                            radius: container.dataset.radius,
+                        }];
+                    }
+
+                    return places
+                        .map((place) => ({
+                            name: String(place.name ?? 'Lokasi absensi'),
+                            lat: Number(place.lat),
+                            lng: Number(place.lng),
+                            radius: Number(place.radius) || 0,
+                        }))
+                        .filter((place) => Number.isFinite(place.lat) && Number.isFinite(place.lng));
+                },
+
                 init(container) {
                     if (typeof L === 'undefined' || container.dataset.initialized === '1') {
                         return;
@@ -16,81 +52,111 @@
 
                     container.dataset.initialized = '1';
 
-                    const officeLat = parseFloat(container.dataset.officeLat);
-                    const officeLng = parseFloat(container.dataset.officeLng);
-                    let radius = parseInt(container.dataset.radius, 10);
                     const editable = container.dataset.editable === '1';
                     const trackUser = container.dataset.trackUser === '1';
                     const statusTarget = container.dataset.statusTarget
                         ? document.getElementById(container.dataset.statusTarget)
                         : null;
+                    const places = this.readPlaces(container);
+                    const primary = places[0] ?? null;
 
-                    const map = L.map(container).setView([officeLat, officeLng], 16);
+                    const map = L.map(container).setView(primary ? [primary.lat, primary.lng] : [-6.2, 106.816666], 16);
 
                     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
                         attribution: '&copy; OpenStreetMap',
                         maxZoom: 19,
                     }).addTo(map);
 
-                    const officeMarker = L.marker([officeLat, officeLng], {
-                        draggable: editable,
-                    })
-                        .addTo(map)
-                        .bindPopup('Lokasi Kantor');
+                    places.forEach((place) => {
+                        // Names come from admin input: build the popup as text, never as HTML.
+                        const popup = document.createElement('div');
+                        popup.textContent = `${place.name} · radius ${this.formatDistance(place.radius)}`;
 
-                    const radiusCircle = L.circle([officeLat, officeLng], {
-                        color: '#2563eb',
-                        fillColor: '#3b82f6',
-                        fillOpacity: 0.2,
-                        radius,
-                    }).addTo(map);
+                        place.marker = L.marker([place.lat, place.lng], { draggable: editable })
+                            .addTo(map)
+                            .bindPopup(popup);
 
-                    let userMarker = null;
-                    let userAccuracyCircle = null;
+                        place.circle = L.circle([place.lat, place.lng], {
+                            color: '#2563eb',
+                            fillColor: '#3b82f6',
+                            fillOpacity: 0.2,
+                            radius: place.radius,
+                        }).addTo(map);
+                    });
+
+                    if (places.length > 1) {
+                        map.fitBounds(L.featureGroup(places.map((place) => place.circle)).getBounds(), { padding: [24, 24] });
+                    }
+
+                    const self = this;
 
                     const instance = {
                         map,
-                        officeMarker,
-                        radiusCircle,
-                        userMarker,
-                        officeLat,
-                        officeLng,
-                        radius,
+                        places,
                         statusTarget,
+                        userMarker: null,
+                        userAccuracyCircle: null,
+                        get officeMarker() {
+                            return primary?.marker ?? null;
+                        },
+                        get radius() {
+                            return primary?.radius ?? 0;
+                        },
                         setRadius(newRadius) {
-                            this.radius = newRadius;
-                            this.radiusCircle.setRadius(newRadius);
+                            if (!primary) {
+                                return;
+                            }
+                            primary.radius = newRadius;
+                            primary.circle.setRadius(newRadius);
                         },
                         setOffice(lat, lng) {
-                            this.officeLat = lat;
-                            this.officeLng = lng;
-                            this.officeMarker.setLatLng([lat, lng]);
-                            this.radiusCircle.setLatLng([lat, lng]);
+                            if (!primary) {
+                                return;
+                            }
+                            primary.lat = lat;
+                            primary.lng = lng;
+                            primary.marker.setLatLng([lat, lng]);
+                            primary.circle.setLatLng([lat, lng]);
                             this.map.panTo([lat, lng]);
                         },
-                        updateStatus(distance, withinRadius, accuracy = null) {
+                        /**
+                         * The location containing the point (nearest when several overlap), else the
+                         * nearest one. With no locations configured every point is allowed.
+                         */
+                        locate(lat, lng) {
+                            if (this.places.length === 0) {
+                                return { withinRadius: true, distance: null, place: null };
+                            }
+
+                            const ranked = this.places
+                                .map((place) => ({ place, distance: this.map.distance([lat, lng], [place.lat, place.lng]) }))
+                                .sort((a, b) => a.distance - b.distance);
+                            const match = ranked.find((row) => row.distance <= row.place.radius);
+                            const pick = match ?? ranked[0];
+
+                            return { withinRadius: Boolean(match), distance: pick.distance, place: pick.place };
+                        },
+                        updateStatus(result, accuracy = null) {
                             if (!this.statusTarget) {
                                 return;
                             }
 
-                            const formatted = distance >= 1000
-                                ? (distance / 1000).toFixed(2) + ' KM'
-                                : Math.round(distance) + ' meter';
+                            const accuracyText = accuracy !== null ? ` (Akurasi GPS: ${self.formatDistance(accuracy)})` : '';
 
-                            let accuracyText = '';
-                            if (accuracy !== null) {
-                                const accuracyFormatted = accuracy >= 1000
-                                    ? (accuracy / 1000).toFixed(2) + ' KM'
-                                    : Math.round(accuracy) + ' meter';
-                                accuracyText = ` (Akurasi GPS: ${accuracyFormatted})`;
+                            if (!result.place) {
+                                this.statusTarget.className = 'mt-3 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-700';
+                                this.statusTarget.textContent = 'Lokasi terbaca. Belum ada area absensi yang diatur.' + accuracyText;
+                                return;
                             }
 
-                            if (withinRadius) {
+                            const distance = self.formatDistance(result.distance);
+
+                            if (result.withinRadius) {
                                 this.statusTarget.className = 'mt-3 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-700';
-                                this.statusTarget.textContent = 'Anda berada dalam radius absensi (' + formatted + ' dari kantor).' + accuracyText;
+                                this.statusTarget.textContent = `Anda berada di area ${result.place.name} (${distance} dari titik).` + accuracyText;
                             } else {
                                 this.statusTarget.className = 'mt-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700';
-                                this.statusTarget.textContent = 'Anda berada di luar radius absensi (' + formatted + ' dari kantor).' + accuracyText;
+                                this.statusTarget.textContent = `Anda berada di luar area absensi. Terdekat: ${result.place.name}, ${distance}.` + accuracyText;
                             }
                         },
                         trackUserLocation(maxRetries = 2) {
@@ -130,7 +196,6 @@
                                                 .bindPopup('Lokasi Anda');
                                         }
 
-                                        // Update or create accuracy circle
                                         if (this.userAccuracyCircle) {
                                             this.userAccuracyCircle.setLatLng([userLat, userLng]);
                                             this.userAccuracyCircle.setRadius(accuracy);
@@ -144,18 +209,19 @@
                                             }).addTo(this.map);
                                         }
 
-                                        // Pan map to user location
                                         this.map.panTo([userLat, userLng]);
 
-                                        const distance = this.map.distance(
-                                            [userLat, userLng],
-                                            [this.officeLat, this.officeLng],
-                                        );
+                                        const result = this.locate(userLat, userLng);
+                                        this.updateStatus(result, accuracy);
 
-                                        const withinRadius = distance <= this.radius;
-                                        this.updateStatus(distance, withinRadius, accuracy);
-
-                                        resolve({ latitude: userLat, longitude: userLng, accuracy, distance, withinRadius });
+                                        resolve({
+                                            latitude: userLat,
+                                            longitude: userLng,
+                                            accuracy,
+                                            distance: result.distance,
+                                            withinRadius: result.withinRadius,
+                                            placeName: result.place?.name ?? null,
+                                        });
                                     },
                                     (error) => {
                                         if (this.statusTarget) {
@@ -176,9 +242,9 @@
 
                     this.instances[container.id] = instance;
 
-                    if (editable) {
-                        officeMarker.on('dragend', () => {
-                            const { lat, lng } = officeMarker.getLatLng();
+                    if (editable && primary) {
+                        primary.marker.on('dragend', () => {
+                            const { lat, lng } = primary.marker.getLatLng();
                             instance.setOffice(lat, lng);
 
                             const latInput = document.getElementById('office_latitude');
@@ -219,20 +285,27 @@
                         return;
                     }
 
-                    const updateRadius = () => {
-                        const instance = this.getInstance(mapContainer.id);
-                        if (!instance) {
-                            return;
-                        }
+                    const instance = () => this.getInstance(mapContainer.id);
 
+                    const updateRadius = () => {
                         const value = parseInt(radiusInput.value, 10);
                         if (value > 0) {
-                            instance.setRadius(value);
+                            instance()?.setRadius(value);
+                        }
+                    };
+
+                    const updatePoint = () => {
+                        const lat = parseFloat(document.getElementById('office_latitude')?.value);
+                        const lng = parseFloat(document.getElementById('office_longitude')?.value);
+                        if (Number.isFinite(lat) && Number.isFinite(lng)) {
+                            instance()?.setOffice(lat, lng);
                         }
                     };
 
                     radiusInput.addEventListener('input', updateRadius);
                     radiusInput.addEventListener('change', updateRadius);
+                    document.getElementById('office_latitude')?.addEventListener('change', updatePoint);
+                    document.getElementById('office_longitude')?.addEventListener('change', updatePoint);
 
                     document.querySelectorAll('[data-radius-preset]').forEach((button) => {
                         button.addEventListener('click', () => {

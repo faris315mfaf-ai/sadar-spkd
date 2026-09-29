@@ -62,7 +62,14 @@
 
     $formId = $type . '-attendance-form';
 
-    $requiresGeofence = $settings->hasGeofence();
+    // Locations this employee may clock in at: those for everyone plus those assigned to them.
+    $workLocationService = app(\App\Services\WorkLocationService::class);
+    $workLocations = $workLocationService->availableTo(auth()->user()?->employee);
+    $workLocationPoints = $workLocationService->mapPoints($workLocations);
+    $requiresGeofence = $workLocations->isNotEmpty();
+    $geofenceBadge = $workLocations->count() === 1
+        ? $workLocations->first()->formattedRadius()
+        : $workLocations->count().' lokasi';
 
     $faceReady = $profilePhotoUrl && ($hasFaceRegistered || $needsFaceDescriptorSync);
 
@@ -507,7 +514,7 @@
 
                                     class="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-700 dark:bg-blue-900/50 dark:text-blue-300">
 
-                                    {{ $settings->formattedAttendanceRadius() }}
+                                    {{ $geofenceBadge }}
 
                                 </span>
 
@@ -537,9 +544,8 @@
 
                         <div x-show="open" x-transition class="border-t border-gray-100 p-3 dark:border-gray-700">
 
-                            <x-attendance.geofence-map :map-id="$mapId" :office-lat="$settings->office_latitude" :office-lng="$settings->office_longitude"
-
-                                :radius-meters="$settings->attendance_radius_meters" :track-user="true" :status-target="$statusId" />
+                            <x-attendance.geofence-map :map-id="$mapId" :places="$workLocationPoints"
+                                :track-user="true" :status-target="$statusId" />
 
                         </div>
 

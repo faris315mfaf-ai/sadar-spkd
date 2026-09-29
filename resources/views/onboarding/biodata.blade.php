@@ -8,7 +8,7 @@
         </span>
         <h2 class="mt-4 text-2xl font-bold tracking-tight text-gray-900 dark:text-gray-100">Lengkapi biodata</h2>
         <p class="mt-2 text-sm leading-relaxed text-gray-500 dark:text-gray-400">
-            Data ini dipakai HR untuk absensi dan penggajian. Pastikan sesuai KTP.
+            Data ini dipakai HR untuk administrasi absensi. Pastikan sesuai KTP.
         </p>
     </div>
 

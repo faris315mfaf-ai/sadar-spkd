@@ -1,8 +1,11 @@
 <x-app-layout>
     @php
-        $latitude = old('office_latitude', $settings->office_latitude ?? -6.200000);
-        $longitude = old('office_longitude', $settings->office_longitude ?? 106.816666);
-        $radius = (int) old('attendance_radius_meters', $settings->attendance_radius_meters ?? 1000);
+        $latitude = (float) old('latitude', $location->latitude);
+        $longitude = (float) old('longitude', $location->longitude);
+        $radius = (int) old('radius_meters', $location->radius_meters);
+        $appliesToAll = (bool) old('applies_to_all', $location->applies_to_all);
+        $isActive = (bool) old('is_active', $location->is_active);
+        $selectedIds = array_map('intval', (array) old('employee_ids', $assignedIds));
         $presets = [100, 250, 500, 1000, 2000, 3000];
     @endphp
 
@@ -10,9 +13,14 @@
         <div
             class="mx-auto space-y-5 px-4 sm:px-6 lg:px-8"
             x-data="{
-                lat: '{{ $latitude }}',
-                lng: '{{ $longitude }}',
+                lat: {{ Js::from($latitude) }},
+                lng: {{ Js::from($longitude) }},
                 radius: {{ $radius }},
+                appliesToAll: {{ $appliesToAll ? 'true' : 'false' }},
+                search: '',
+                matches(label) {
+                    return label.toLowerCase().includes(this.search.trim().toLowerCase());
+                },
                 radiusLabel() {
                     const value = Number(this.radius) || 0;
                     if (value >= 1000 && value % 1000 === 0) {
@@ -52,9 +60,11 @@
                             <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
                             Geofence Absensi
                         </div>
-                        <h1 class="mt-3 text-2xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-3xl">Lokasi GPS Kantor</h1>
+                        <h1 class="mt-3 text-2xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-3xl">
+                            {{ $location->exists ? 'Ubah Lokasi Absensi' : 'Tambah Lokasi Absensi' }}
+                        </h1>
                         <p class="mt-1.5 max-w-2xl text-sm leading-relaxed text-gray-500 dark:text-gray-400">
-                            Tentukan titik pusat kantor dan radius absensi. Geser pin di peta atau isi koordinat secara manual.
+                            Tentukan titik pusat dan radius, lalu pilih siapa yang boleh absen di lokasi ini. Geser pin di peta atau isi koordinat secara manual.
                         </p>
                     </div>
 
@@ -75,9 +85,13 @@
                 </div>
             </section>
 
-            <form method="POST" action="{{ route('settings.location.update') }}" class="space-y-5">
+            <form method="POST"
+                action="{{ $location->exists ? route('settings.locations.update', $location) : route('settings.locations.store') }}"
+                class="space-y-5">
                 @csrf
-                @method('PATCH')
+                @if ($location->exists)
+                    @method('PATCH')
+                @endif
 
                 @if (session('success'))
                     <div class="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-200">
@@ -106,14 +120,26 @@
                             </div>
 
                             <div class="space-y-4 p-5">
+                                <label for="name" class="block">
+                                    <span class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                                        Nama Lokasi <span class="text-red-500">*</span>
+                                    </span>
+                                    <input id="name" type="text" name="name" required maxlength="100"
+                                        value="{{ old('name', $location->name) }}" placeholder="Contoh: Kantor Pusat, RS Harapan"
+                                        class="block min-h-11 w-full rounded-2xl border-gray-200 bg-gray-50 text-sm font-semibold text-gray-900 shadow-sm transition focus:border-brand-500 focus:bg-white focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-900 dark:text-white">
+                                    @error('name')
+                                        <span class="mt-1.5 block text-sm text-red-600 dark:text-red-400">{{ $message }}</span>
+                                    @enderror
+                                </label>
+
                                 <label for="office_latitude" class="block">
                                     <span class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
                                         Latitude <span class="text-red-500">*</span>
                                     </span>
-                                    <input id="office_latitude" type="number" step="any" name="office_latitude" required
+                                    <input id="office_latitude" type="number" step="any" name="latitude" required
                                         value="{{ $latitude }}"
                                         class="block min-h-11 w-full rounded-2xl border-gray-200 bg-gray-50 text-sm font-semibold tabular-nums text-gray-900 shadow-sm transition focus:border-brand-500 focus:bg-white focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-900 dark:text-white">
-                                    @error('office_latitude')
+                                    @error('latitude')
                                         <span class="mt-1.5 block text-sm text-red-600 dark:text-red-400">{{ $message }}</span>
                                     @enderror
                                 </label>
@@ -122,10 +148,10 @@
                                     <span class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
                                         Longitude <span class="text-red-500">*</span>
                                     </span>
-                                    <input id="office_longitude" type="number" step="any" name="office_longitude" required
+                                    <input id="office_longitude" type="number" step="any" name="longitude" required
                                         value="{{ $longitude }}"
                                         class="block min-h-11 w-full rounded-2xl border-gray-200 bg-gray-50 text-sm font-semibold tabular-nums text-gray-900 shadow-sm transition focus:border-brand-500 focus:bg-white focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-900 dark:text-white">
-                                    @error('office_longitude')
+                                    @error('longitude')
                                         <span class="mt-1.5 block text-sm text-red-600 dark:text-red-400">{{ $message }}</span>
                                     @enderror
                                 </label>
@@ -134,11 +160,11 @@
                                     <label for="attendance_radius_meters" class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
                                         Radius Absensi (meter) <span class="text-red-500">*</span>
                                     </label>
-                                    <input id="attendance_radius_meters" type="number" min="1" max="50000" step="1" name="attendance_radius_meters" required
+                                    <input id="attendance_radius_meters" type="number" min="10" max="50000" step="1" name="radius_meters" required
                                         value="{{ $radius }}"
                                         class="block min-h-11 w-full rounded-2xl border-gray-200 bg-gray-50 text-sm font-semibold tabular-nums text-gray-900 shadow-sm transition focus:border-brand-500 focus:bg-white focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-900 dark:text-white">
                                     <p class="mt-1.5 text-xs text-gray-500 dark:text-gray-400">Lingkaran di peta mengikuti nilai ini.</p>
-                                    @error('attendance_radius_meters')
+                                    @error('radius_meters')
                                         <p class="mt-1.5 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                                     @enderror
                                 </div>
@@ -163,22 +189,69 @@
                             </div>
                         </section>
 
-                        <section class="rounded-[1.75rem] border border-gray-200/80 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-                            <h3 class="text-sm font-bold text-gray-900 dark:text-white">Panduan singkat</h3>
-                            <ul class="mt-3 space-y-2.5 text-xs leading-relaxed text-gray-500 dark:text-gray-400">
-                                <li class="flex gap-2">
-                                    <span class="mt-0.5 inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-brand-50 text-[10px] font-bold text-brand-600 dark:bg-brand-950/40 dark:text-brand-300">1</span>
-                                    <span>Geser pin di peta untuk memindahkan titik pusat kantor.</span>
-                                </li>
-                                <li class="flex gap-2">
-                                    <span class="mt-0.5 inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-brand-50 text-[10px] font-bold text-brand-600 dark:bg-brand-950/40 dark:text-brand-300">2</span>
-                                    <span>Pilih preset radius atau isi manual sesuai area absensi.</span>
-                                </li>
-                                <li class="flex gap-2">
-                                    <span class="mt-0.5 inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-brand-50 text-[10px] font-bold text-brand-600 dark:bg-brand-950/40 dark:text-brand-300">3</span>
-                                    <span>Tekan Simpan Lokasi agar aturan baru aktif untuk karyawan.</span>
-                                </li>
-                            </ul>
+                        <section class="overflow-hidden rounded-[1.75rem] border border-gray-200/80 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
+                            <div class="border-b border-gray-100 px-5 py-4 dark:border-gray-700">
+                                <h2 class="text-base font-bold tracking-tight text-gray-900 dark:text-white">Berlaku untuk</h2>
+                                <p class="mt-0.5 text-sm text-gray-500 dark:text-gray-400">Siapa yang boleh absen di lokasi ini.</p>
+                            </div>
+
+                            <div class="space-y-3 p-5">
+                                <label class="flex cursor-pointer items-start gap-3 rounded-2xl border p-3 transition"
+                                    :class="appliesToAll ? 'border-brand-500 bg-brand-50/60 dark:bg-brand-950/30' : 'border-gray-200 dark:border-gray-600'">
+                                    <input type="radio" name="applies_to_all" value="1"
+                                        @change="appliesToAll = true" @checked($appliesToAll)
+                                        class="mt-0.5 border-gray-300 text-brand-600 focus:ring-brand-500">
+                                    <span>
+                                        <span class="block text-sm font-semibold text-gray-900 dark:text-white">Semua karyawan</span>
+                                        <span class="block text-xs text-gray-500 dark:text-gray-400">Contoh: kantor utama.</span>
+                                    </span>
+                                </label>
+
+                                <label class="flex cursor-pointer items-start gap-3 rounded-2xl border p-3 transition"
+                                    :class="! appliesToAll ? 'border-brand-500 bg-brand-50/60 dark:bg-brand-950/30' : 'border-gray-200 dark:border-gray-600'">
+                                    <input type="radio" name="applies_to_all" value="0"
+                                        @change="appliesToAll = false" @checked(! $appliesToAll)
+                                        class="mt-0.5 border-gray-300 text-brand-600 focus:ring-brand-500">
+                                    <span>
+                                        <span class="block text-sm font-semibold text-gray-900 dark:text-white">Karyawan tertentu</span>
+                                        <span class="block text-xs text-gray-500 dark:text-gray-400">Contoh: rumah sakit, hanya untuk staf yang bertugas di sana.</span>
+                                    </span>
+                                </label>
+
+                                <div x-show="! appliesToAll" x-cloak class="space-y-2">
+                                    <input type="search" x-model="search" placeholder="Cari nama, kode, atau divisi"
+                                        class="block min-h-10 w-full rounded-xl border-gray-200 bg-gray-50 text-sm focus:border-brand-500 focus:bg-white focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-900 dark:text-white">
+
+                                    <div class="max-h-72 space-y-1 overflow-y-auto rounded-xl border border-gray-100 p-2 dark:border-gray-700">
+                                        @forelse ($employees as $employee)
+                                            @php($label = trim($employee->name.' '.$employee->employee_code.' '.$employee->staff))
+                                            <label x-show="matches({{ Js::from($label) }})"
+                                                class="flex cursor-pointer items-center gap-3 rounded-lg px-2 py-1.5 hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                                                <input type="checkbox" name="employee_ids[]" value="{{ $employee->id }}"
+                                                    @checked(in_array($employee->id, $selectedIds, true))
+                                                    :disabled="appliesToAll"
+                                                    class="rounded border-gray-300 text-brand-600 focus:ring-brand-500">
+                                                <span class="min-w-0">
+                                                    <span class="block truncate text-sm font-medium text-gray-900 dark:text-white">{{ $employee->name }}</span>
+                                                    <span class="block truncate text-xs text-gray-500 dark:text-gray-400">{{ $employee->employee_code }}{{ $employee->staff ? ' · '.$employee->staff : '' }}</span>
+                                                </span>
+                                            </label>
+                                        @empty
+                                            <p class="px-2 py-3 text-sm text-gray-500 dark:text-gray-400">Belum ada karyawan aktif.</p>
+                                        @endforelse
+                                    </div>
+                                    @error('employee_ids')
+                                        <p class="text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
+                                <label class="flex cursor-pointer items-center gap-3 border-t border-gray-100 pt-3 dark:border-gray-700">
+                                    <input type="hidden" name="is_active" value="0">
+                                    <input type="checkbox" name="is_active" value="1" @checked($isActive)
+                                        class="rounded border-gray-300 text-brand-600 focus:ring-brand-500">
+                                    <span class="text-sm font-medium text-gray-900 dark:text-white">Lokasi aktif</span>
+                                </label>
+                            </div>
                         </section>
                     </aside>
 
@@ -186,9 +259,9 @@
                     <section class="overflow-hidden rounded-[1.75rem] border border-gray-200/80 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
                         <div class="flex flex-col gap-3 border-b border-gray-100 px-5 py-4 dark:border-gray-700 sm:flex-row sm:items-center sm:justify-between sm:px-6">
                             <div>
-                                <h2 class="text-base font-bold tracking-tight text-gray-900 dark:text-white">Peta Kantor</h2>
+                                <h2 class="text-base font-bold tracking-tight text-gray-900 dark:text-white">Peta Lokasi</h2>
                                 <p class="mt-0.5 text-sm text-gray-500 dark:text-gray-400">
-                                    Marker = pusat kantor · Lingkaran = radius absensi
+                                    Marker = titik pusat · Lingkaran = radius absensi
                                 </p>
                             </div>
                             <div class="flex flex-wrap items-center gap-2">
@@ -222,15 +295,21 @@
                 <div class="sticky bottom-4 z-30">
                     <div class="flex flex-col-reverse gap-3 rounded-2xl border border-gray-200/80 bg-white/95 px-4 py-3 shadow-lg shadow-gray-900/5 backdrop-blur-xl dark:border-gray-700 dark:bg-gray-900/95 sm:flex-row sm:items-center sm:justify-between sm:px-5">
                         <p class="text-xs leading-relaxed text-gray-500 dark:text-gray-400">
-                            Perubahan baru aktif setelah lokasi disimpan.
+                            Perubahan langsung berlaku untuk absen berikutnya setelah disimpan.
                         </p>
-                        <button type="submit"
-                            class="inline-flex min-h-11 items-center justify-center gap-2 rounded-2xl bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm shadow-brand-900/10 transition hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900">
-                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                            </svg>
-                            Simpan Lokasi
-                        </button>
+                        <div class="flex flex-col-reverse gap-2 sm:flex-row">
+                            <a href="{{ route('settings.locations.index') }}"
+                                class="inline-flex min-h-11 items-center justify-center rounded-2xl border border-gray-200 px-5 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-800">
+                                Batal
+                            </a>
+                            <button type="submit"
+                                class="inline-flex min-h-11 items-center justify-center gap-2 rounded-2xl bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm shadow-brand-900/10 transition hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900">
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                Simpan Lokasi
+                            </button>
+                        </div>
                     </div>
                 </div>
             </form>

@@ -116,7 +116,7 @@
                     <span class="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700 ring-1 ring-inset ring-emerald-100 dark:bg-emerald-950/40 dark:text-emerald-300 dark:ring-emerald-900/50">
                         <span class="h-2.5 w-2.5 rounded-sm bg-emerald-500"></span> Full Day
                     </span>
-                    <span class="inline-flex items-center gap-2 rounded-full bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-700 ring-1 ring-inset ring-amber-100 dark:bg-amber-950/40 dark:text-amber-300 dark:ring-amber-900/50" title="Half Day = 1 hari kerja payroll, dengan jam kerja lebih pendek">
+                    <span class="inline-flex items-center gap-2 rounded-full bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-700 ring-1 ring-inset ring-amber-100 dark:bg-amber-950/40 dark:text-amber-300 dark:ring-amber-900/50" title="Half Day = 1 hari kerja, dengan jam kerja lebih pendek">
                         <span class="h-2.5 w-2.5 rounded-sm bg-amber-500"></span> Half Day <span class="font-medium text-amber-600/70 dark:text-amber-300/70">(1 HK)</span>
                     </span>
                     <span class="inline-flex items-center gap-2 rounded-full bg-rose-50 px-3 py-1.5 text-xs font-semibold text-rose-700 ring-1 ring-inset ring-rose-100 dark:bg-rose-950/40 dark:text-rose-300 dark:ring-rose-900/50">

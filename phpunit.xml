@@ -36,5 +36,7 @@
         <env name="WA_BOT_TOKEN" value="test-token"/>
         <env name="WA_GROUP_ID" value="group@test"/>
         <env name="ATTENDANCE_API_TOKEN" value="test-attendance-api-token"/>
+        <!-- Payroll is hidden in production by default; keep its tests running. -->
+        <env name="FEATURE_PAYROLL" value="true"/>
     </php>
 </phpunit>

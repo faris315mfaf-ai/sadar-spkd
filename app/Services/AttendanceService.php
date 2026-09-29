@@ -10,13 +10,13 @@ use App\Enums\AttendanceType;
 use App\Enums\VerificationStatus;
 use App\Enums\WorkCalendarType;
 use App\Models\Attendance;
-use App\Models\Setting;
 use App\Models\User;
+use App\Models\WorkLocation;
 use App\Support\AppTime;
-use App\Support\GeoDistance;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class AttendanceService
@@ -29,6 +29,7 @@ class AttendanceService
         private readonly WorkCalendarService $workCalendar,
         private readonly EmployeeScheduleService $employeeSchedules,
         private readonly MarkAbsentAlphaService $markAbsentAlpha,
+        private readonly WorkLocationService $workLocations,
     ) {}
 
     public function todayFor(User $user): ?Attendance
@@ -243,13 +244,13 @@ class AttendanceService
             return ActionResult::fail($faceError);
         }
 
-        $settings = Setting::current();
-
         if ($locationError = $this->validateLocation($latitude, $longitude)) {
             return ActionResult::fail($locationError);
         }
 
-        if ($geofenceError = $this->validateGeofence($settings, $latitude, $longitude)) {
+        $place = $this->locateWorkplace($user, $latitude, $longitude);
+
+        if ($geofenceError = $this->geofenceError($place)) {
             return ActionResult::fail($geofenceError);
         }
 
@@ -276,11 +277,11 @@ class AttendanceService
             ),
         );
 
-        $anomaly = $this->resolveAnomalyStatus($user, $settings, $latitude, $longitude, $accuracy, $deviceType, $clientTime);
+        $anomaly = $this->resolveAnomalyStatus($place, $accuracy, $deviceType, $clientTime);
 
         try {
             DB::transaction(function () use (
-                $rejectedLeave, $user, $attendanceDate, $shift, $workSchedule, $now, $report, $latitude,
+                $rejectedLeave, $user, $attendanceDate, $shift, $workSchedule, $now, $report, $latitude, $place,
                 $longitude, $resolvedLocation, $photoPath, $faceResult, $status, $accuracy, $deviceType, $anomaly,
             ): void {
                 $rejectedLeave?->delete();
@@ -298,6 +299,7 @@ class AttendanceService
                     'clock_in_location' => $resolvedLocation,
                     'clock_in_verification_photo' => $photoPath,
                     'clock_in_face_distance' => $faceResult['distance'] ?? null,
+                    'clock_in_work_location_id' => $place['match']?->id,
                     'status' => $status,
                     'accuracy' => $accuracy,
                     'device_type' => $deviceType,
@@ -359,13 +361,13 @@ class AttendanceService
             return ActionResult::fail($faceError);
         }
 
-        $settings = Setting::current();
-
         if ($locationError = $this->validateLocation($latitude, $longitude)) {
             return ActionResult::fail($locationError);
         }
 
-        if ($geofenceError = $this->validateGeofence($settings, $latitude, $longitude)) {
+        $place = $this->locateWorkplace($user, $latitude, $longitude);
+
+        if ($geofenceError = $this->geofenceError($place)) {
             return ActionResult::fail($geofenceError);
         }
 
@@ -401,7 +403,7 @@ class AttendanceService
             ),
         );
 
-        $anomaly = $this->resolveAnomalyStatus($user, $settings, $latitude, $longitude, $accuracy, $deviceType, $clientTime);
+        $anomaly = $this->resolveAnomalyStatus($place, $accuracy, $deviceType, $clientTime);
 
         $attendance->update([
             'clock_out_time' => $now->format('H:i:s'),
@@ -412,6 +414,7 @@ class AttendanceService
             'clock_out_location' => $resolvedLocation,
             'clock_out_verification_photo' => $photoPath,
             'clock_out_face_distance' => $faceResult['distance'] ?? null,
+            'clock_out_work_location_id' => $place['match']?->id,
             'status' => $status,
             'accuracy' => $accuracy,
             'device_type' => $deviceType,
@@ -652,24 +655,41 @@ class AttendanceService
         return null;
     }
 
-    private function validateGeofence(Setting $settings, ?float $latitude, ?float $longitude): ?string
+    /**
+     * Attendance locations open to this employee (for everyone + assigned) and where the point is.
+     *
+     * @return array{locations: Collection<int, WorkLocation>, point: array{float, float}, match: ?WorkLocation, nearest: ?WorkLocation, distance: ?float}
+     */
+    private function locateWorkplace(User $user, float $latitude, float $longitude): array
     {
-        if (! $settings->hasGeofence()) {
+        $locations = $this->workLocations->availableTo($user->employee);
+
+        return [
+            'locations' => $locations,
+            'point' => [$latitude, $longitude],
+            ...$this->workLocations->locate($locations, $latitude, $longitude),
+        ];
+    }
+
+    /**
+     * No configured location means no geofence, as before; otherwise the point must be inside one.
+     */
+    private function geofenceError(array $place): ?string
+    {
+        if ($place['locations']->isEmpty() || $place['match'] !== null) {
             return null;
         }
 
-        if (! $settings->isWithinAttendanceRadius($latitude, $longitude)) {
-            return 'Anda berada di luar radius absensi kantor ('.$settings->formattedAttendanceRadius().').';
-        }
+        $nearest = $place['nearest'];
+        $distance = $place['distance'] >= 1000
+            ? number_format($place['distance'] / 1000, 2, ',', '.').' KM'
+            : round($place['distance']).' meter';
 
-        return null;
+        return "Anda berada di luar area absensi. Lokasi terdekat: {$nearest->name}, {$distance} dari titik lokasi (radius {$nearest->formattedRadius()}).";
     }
 
     private function resolveAnomalyStatus(
-        User $user,
-        Setting $settings,
-        ?float $latitude,
-        ?float $longitude,
+        array $place,
         ?float $accuracy,
         ?string $deviceType,
         ?int $clientTime = null
@@ -689,17 +709,13 @@ class AttendanceService
         }
 
         if ($accuracy !== null && $accuracy > 100) {
-            $distance = 0;
-            if ($settings->office_latitude !== null && $settings->office_longitude !== null && $latitude !== null && $longitude !== null) {
-                $distance = GeoDistance::distanceMeters(
-                    $latitude, $longitude,
-                    $settings->office_latitude, $settings->office_longitude
-                );
-            }
+            // Poor accuracy right at the edge of the nearest location's radius is the riskiest case.
+            $boundary = $place['match'] ?? $place['nearest'];
+            $distanceToBoundary = $boundary
+                ? abs($boundary->radius_meters - $boundary->distanceTo(...$place['point']))
+                : null;
 
-            $distanceToBoundary = abs($settings->attendance_radius_meters - $distance);
-
-            if ($distanceToBoundary <= 10) {
+            if ($distanceToBoundary !== null && $distanceToBoundary <= 10) {
                 return ['status' => 'high_risk', 'reason' => 'accuracy buruk + borderline radius'];
             }
 

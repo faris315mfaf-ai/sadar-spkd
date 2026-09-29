@@ -1,8 +1,8 @@
 /**
- * Leaflet attendance radius layer — office circle + marker (rules: modular).
+ * Leaflet attendance radius layer — one marker + circle per attendance location (rules: modular).
  */
 
-const OFFICE_MARKER_HTML = `<span class="flex h-9 w-9 items-center justify-center rounded-full bg-blue-600 text-xs font-bold text-white shadow-lg ring-2 ring-white">K</span>`;
+const OFFICE_MARKER_HTML = `<span class="flex h-9 w-9 items-center justify-center rounded-full bg-blue-600 text-xs font-bold text-white shadow-lg ring-2 ring-white">L</span>`;
 
 export function createOfficeMarkerIcon() {
     return L.divIcon({
@@ -16,32 +16,39 @@ export function createOfficeMarkerIcon() {
 
 /**
  * @param {L.Map} map
- * @param {{ officeLatitude: number, officeLongitude: number, radiusMeters: number, radiusLabel?: string }} geofence
+ * @param {Array<{ name: string, lat: number, lng: number, radius: number, radiusLabel?: string }>} places
+ * @returns {{ markers: L.Marker[], circles: L.Circle[] }}
  */
-export function addAttendanceRadiusLayer(map, geofence) {
-    const lat = Number(geofence.officeLatitude);
-    const lng = Number(geofence.officeLongitude);
-    const radius = Number(geofence.radiusMeters);
+export function addAttendanceRadiusLayer(map, places) {
+    const markers = [];
+    const circles = [];
 
-    const officeMarker = L.marker([lat, lng], {
-        icon: createOfficeMarkerIcon(),
-    }).addTo(map);
+    places.forEach((place) => {
+        const lat = Number(place.lat);
+        const lng = Number(place.lng);
+        const radius = Number(place.radius);
 
-    const label = geofence.radiusLabel || `${radius} meter`;
-    officeMarker.bindPopup(
-        `<div class="text-sm">
-            <p class="font-semibold text-gray-900">Lokasi Kantor</p>
-            <p class="mt-1 text-gray-600">Radius absensi: ${label}</p>
-        </div>`,
-    );
+        // Location names are typed by admins: build the popup with text nodes, not HTML.
+        const popup = document.createElement('div');
+        popup.className = 'text-sm';
+        const title = document.createElement('p');
+        title.className = 'font-semibold text-gray-900';
+        title.textContent = place.name;
+        const detail = document.createElement('p');
+        detail.className = 'mt-1 text-gray-600';
+        detail.textContent = `Radius absensi: ${place.radiusLabel || `${radius} meter`}`;
+        popup.append(title, detail);
 
-    const radiusCircle = L.circle([lat, lng], {
-        color: '#2563eb',
-        fillColor: '#3b82f6',
-        fillOpacity: 0.18,
-        weight: 2,
-        radius,
-    }).addTo(map);
+        markers.push(L.marker([lat, lng], { icon: createOfficeMarkerIcon() }).addTo(map).bindPopup(popup));
 
-    return { officeMarker, radiusCircle };
+        circles.push(L.circle([lat, lng], {
+            color: '#2563eb',
+            fillColor: '#3b82f6',
+            fillOpacity: 0.18,
+            weight: 2,
+            radius,
+        }).addTo(map));
+    });
+
+    return { markers, circles };
 }
