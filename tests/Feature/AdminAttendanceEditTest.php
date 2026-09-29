@@ -103,7 +103,7 @@ class AdminAttendanceEditTest extends TestCase
         ])->assertRedirect();
 
         $attendance->refresh();
-        $this->assertSame(1.5, $attendance->overtime_hours);
+        $this->assertSame(2.5, $attendance->overtime_hours);
     }
 
     public function test_paid_payroll_blocks_attendance_edit(): void

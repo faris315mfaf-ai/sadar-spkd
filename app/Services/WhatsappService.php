@@ -47,13 +47,22 @@ class WhatsappService
         }
 
         try {
-            Http::timeout(20)
+            // Runs after the response is sent, so it can wait longer (stays under PHP's 60 s limit).
+            $response = Http::timeout(45)
                 ->withToken(config('services.wa_bot.token'))
                 ->post(config('services.wa_bot.url').'/send-group-image', [
                     'groupId' => config('services.wa_bot.group_id'),
                     'imageUrl' => $imageUrl,
                     'caption' => $caption,
                 ]);
+
+            if (! $response->successful()) {
+                Log::error('Gagal kirim foto WhatsApp absensi', [
+                    'status' => $response->status(),
+                    'body' => $response->body(),
+                    'imageUrl' => $imageUrl,
+                ]);
+            }
         } catch (\Throwable $e) {
             Log::error('Gagal kirim foto WhatsApp absensi', [
                 'error' => $e->getMessage(),

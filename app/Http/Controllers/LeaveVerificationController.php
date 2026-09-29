@@ -117,7 +117,9 @@ class LeaveVerificationController extends Controller
         $attendance->loadMissing(['user', 'verifiedBy']);
 
         if ($verificationStatus === VerificationStatus::Done) {
-            $this->whatsappService->sendLeaveNotification($attendance);
+            // After the response, so a slow WhatsApp bot does not keep HR waiting.
+            $whatsapp = $this->whatsappService;
+            dispatch(fn () => $whatsapp->sendLeaveNotification($attendance))->afterResponse();
         }
 
         if ($verificationStatus === VerificationStatus::NoDone && $attendance->user?->email) {

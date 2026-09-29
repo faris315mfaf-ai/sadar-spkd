@@ -51,13 +51,13 @@ class AttendanceOvertimeTest extends TestCase
     public static function fullDayOvertimeProvider(): array
     {
         return [
-            '18:30 zero grace' => ['18:30:00', 0.0],
-            '18:59 zero grace' => ['18:59:00', 0.0],
-            '19:00 end of grace' => ['19:00:00', 0.0],
-            '19:30 half hour ot' => ['19:30:00', 0.5],
-            '20:00 one hour ot' => ['20:00:00', 1.0],
-            '20:30 one and half ot' => ['20:30:00', 1.5],
-            '21:00 two hours ot' => ['21:00:00', 2.0],
+            '17:30 zero grace' => ['17:30:00', 0.0],
+            '17:59 zero grace' => ['17:59:00', 0.0],
+            '18:00 end of grace' => ['18:00:00', 0.0],
+            '18:30 half hour ot' => ['18:30:00', 0.5],
+            '19:00 one hour ot' => ['19:00:00', 1.0],
+            '19:30 one and half ot' => ['19:30:00', 1.5],
+            '20:00 two hours ot' => ['20:00:00', 2.0],
         ];
     }
 
@@ -217,7 +217,7 @@ class AttendanceOvertimeTest extends TestCase
 
         $duringShift = Carbon::parse('2026-06-02 20:00:00', AppTime::timezone());
         $this->assertSame(0.0, $this->service->overtimeHoursFor($nightAttendance, $duringShift));
-        $this->assertSame(1.0, $this->service->overtimeHoursFor($dayAttendance, $duringShift));
+        $this->assertSame(2.0, $this->service->overtimeHoursFor($dayAttendance, $duringShift));
 
         $nextMorning = Carbon::parse('2026-06-03 09:30:00', AppTime::timezone());
         $this->assertSame(1.5, $this->service->overtimeHoursFor($nightAttendance, $nextMorning));
@@ -237,8 +237,8 @@ class AttendanceOvertimeTest extends TestCase
         $halfSchedule = $this->service->clockOutScheduleFor($halfAttendance);
 
         $at = Carbon::parse('2026-06-02 19:30:00', AppTime::timezone());
-        $this->assertSame(0.5, $fullSchedule->overtimeHoursFromClockOutOpen($fullDate, $at));
-        $this->assertSame(0.5, $this->service->overtimeHoursFor($fullAttendance, $at));
+        $this->assertSame(1.5, $fullSchedule->overtimeHoursFromClockOutOpen($fullDate, $at));
+        $this->assertSame(1.5, $this->service->overtimeHoursFor($fullAttendance, $at));
 
         $atHalf = Carbon::parse('2026-06-06 15:30:00', AppTime::timezone());
         $this->assertSame(0.5, $halfSchedule->overtimeHoursFromClockOutOpen($halfDate, $atHalf));

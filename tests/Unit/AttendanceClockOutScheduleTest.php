@@ -48,7 +48,7 @@ class AttendanceClockOutScheduleTest extends TestCase
         $daySchedule = $this->service->clockOutScheduleFor($dayAttendance);
         $nightSchedule = $this->service->clockOutScheduleFor($nightAttendance);
 
-        $this->assertSame('18:00:00', $daySchedule->clockOutStart);
+        $this->assertSame('17:00:00', $daySchedule->clockOutStart);
         $this->assertSame('22:00:00', $nightSchedule->clockOutStart);
     }
 
@@ -60,14 +60,14 @@ class AttendanceClockOutScheduleTest extends TestCase
         $attendance = $this->createAttendance($date, AttendanceShift::Day);
 
         $this->assertClockOutEligibilityAt($attendance, $date, $time, $canClockOut);
-        $this->assertSame('18:00', $this->service->clockOutScheduleFor($attendance)->formattedClockOutStart());
+        $this->assertSame('17:00', $this->service->clockOutScheduleFor($attendance)->formattedClockOutStart());
     }
 
     public static function fullDayDayShiftClockOutProvider(): array
     {
         return [
-            '17:59 blocked' => ['17:59:00', false],
-            '18:00 allowed' => ['18:00:00', true],
+            '16:59 blocked' => ['16:59:00', false],
+            '17:00 allowed' => ['17:00:00', true],
         ];
     }
 

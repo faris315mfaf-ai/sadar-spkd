@@ -10,7 +10,8 @@ use Illuminate\Support\Carbon;
 
 class WorkCalendarService
 {
-    public const DAY_SHIFT_FULL_DAY_CLOCK_OUT = '18:00:00';
+    // Earliest clock-out on a full work day for day shifts (SPKD: 17:00).
+    public const DAY_SHIFT_FULL_DAY_CLOCK_OUT = '17:00:00';
 
     public const DAY_SHIFT_HALF_DAY_CLOCK_OUT = '14:00:00';
 

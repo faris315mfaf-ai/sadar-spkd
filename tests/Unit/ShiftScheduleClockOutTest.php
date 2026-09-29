@@ -38,7 +38,7 @@ class ShiftScheduleClockOutTest extends TestCase
     {
         $effective = $this->effectiveFullDaySchedule();
 
-        $this->assertSame('18:00:00', $effective->clockOutStart);
+        $this->assertSame('17:00:00', $effective->clockOutStart);
         $this->assertSame('19:00:00', $effective->clockOutLimit);
     }
 
@@ -55,8 +55,8 @@ class ShiftScheduleClockOutTest extends TestCase
     public static function fullDayClockOutBoundaryProvider(): array
     {
         return [
-            '17:59 blocked' => ['17:59:00', false],
-            '18:00 allowed' => ['18:00:00', true],
+            '16:59 blocked' => ['16:59:00', false],
+            '17:00 allowed' => ['17:00:00', true],
             '18:01 allowed' => ['18:01:00', true],
         ];
     }
@@ -107,13 +107,13 @@ class ShiftScheduleClockOutTest extends TestCase
     public static function fullDayOvertimeFromOpenProvider(): array
     {
         return [
-            '18:30 zero grace' => ['18:30:00', 0.0],
-            '18:59 zero grace' => ['18:59:00', 0.0],
-            '19:00 end of grace' => ['19:00:00', 0.0],
-            '19:30 half hour ot' => ['19:30:00', 0.5],
-            '20:00 one hour ot' => ['20:00:00', 1.0],
-            '20:30 one and half ot' => ['20:30:00', 1.5],
-            '21:00 two hours ot' => ['21:00:00', 2.0],
+            '17:30 zero grace' => ['17:30:00', 0.0],
+            '17:59 zero grace' => ['17:59:00', 0.0],
+            '18:00 end of grace' => ['18:00:00', 0.0],
+            '18:30 half hour ot' => ['18:30:00', 0.5],
+            '19:00 one hour ot' => ['19:00:00', 1.0],
+            '19:30 one and half ot' => ['19:30:00', 1.5],
+            '20:00 two hours ot' => ['20:00:00', 2.0],
         ];
     }
 

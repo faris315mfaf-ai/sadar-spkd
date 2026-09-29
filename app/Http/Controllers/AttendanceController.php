@@ -242,13 +242,7 @@ class AttendanceController extends Controller
 
 
 
-            app(WhatsappService::class)->sendGroupImage(
-
-                $attendance->clockInVerificationPhotoUrl(),
-
-                $caption
-
-            );
+            $this->sendToWhatsappGroupLater($attendance->clockInVerificationPhotoUrl(), $caption);
 
         }
 
@@ -319,13 +313,7 @@ class AttendanceController extends Controller
 
 
 
-            app(WhatsappService::class)->sendGroupImage(
-
-                $attendance->clockOutVerificationPhotoUrl(),
-
-                $caption
-
-            );
+            $this->sendToWhatsappGroupLater($attendance->clockOutVerificationPhotoUrl(), $caption);
 
         }
 
@@ -424,6 +412,15 @@ class AttendanceController extends Controller
     }
 
 
+
+    /**
+     * WhatsApp can take many seconds (e.g. while it renegotiates group encryption), so send after
+     * the response: the employee sees the result immediately and a slow bot never blocks them.
+     */
+    private function sendToWhatsappGroupLater(?string $photoUrl, string $caption): void
+    {
+        dispatch(fn () => app(WhatsappService::class)->sendGroupImage($photoUrl, $caption))->afterResponse();
+    }
 
     private function reportToWhatsapp(?string $html): string
 
