@@ -1,6 +1,6 @@
 {
-  "_face-api-runtime-oMzAOSu4.js": {
-    "file": "assets/face-api-runtime-oMzAOSu4.js",
+  "_face-api-runtime-DCbXerrL.js": {
+    "file": "assets/face-api-runtime-DCbXerrL.js",
     "name": "face-api-runtime"
   },
   "_face-match-CkgyL20Q.js": {
@@ -50,7 +50,7 @@
     ]
   },
   "resources/js/app.js": {
-    "file": "assets/app-Ds56k2L7.js",
+    "file": "assets/app-Cid4JQ7B.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
@@ -69,13 +69,13 @@
     ]
   },
   "resources/js/attendance-face-verification.js": {
-    "file": "assets/attendance-face-verification-CMj9kubv.js",
+    "file": "assets/attendance-face-verification-C6OSDkAv.js",
     "name": "attendance-face-verification",
     "src": "resources/js/attendance-face-verification.js",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.js",
-      "_face-api-runtime-oMzAOSu4.js",
+      "_face-api-runtime-DCbXerrL.js",
       "_face-match-CkgyL20Q.js"
     ]
   },
@@ -92,11 +92,12 @@
     "isDynamicEntry": true
   },
   "resources/js/employees.js": {
-    "file": "assets/employees-Bx7vW_Fh.js",
+    "file": "assets/employees-9hYSIhQt.js",
     "name": "employees",
     "src": "resources/js/employees.js",
     "isDynamicEntry": true,
     "imports": [
+      "_face-api-runtime-DCbXerrL.js",
       "_ui-modal-1bEgWikN.js"
     ]
   },
@@ -110,13 +111,13 @@
     ]
   },
   "resources/js/onboarding.js": {
-    "file": "assets/onboarding-BFNn41BL.js",
+    "file": "assets/onboarding-BXggIMbo.js",
     "name": "onboarding",
     "src": "resources/js/onboarding.js",
     "isDynamicEntry": true,
     "imports": [
+      "_face-api-runtime-DCbXerrL.js",
       "resources/js/app.js",
-      "_face-api-runtime-oMzAOSu4.js",
       "_geo-distance-Btq67aJd.js"
     ]
   },

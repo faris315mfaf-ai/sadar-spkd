@@ -11,17 +11,21 @@ import { showToast } from './toast.js';
 import { resolveAttendanceLocation } from './attendance-geolocation.js';
 import {
     cameraErrorNotice,
+    geolocationErrorNotice,
     serverErrorNotice,
     shouldShowDelayedVerificationNotice,
     VERIFICATION_NOTICES,
 } from './attendance-verification-messages.js';
 import {
     createDetectorOptions,
+    detectFaces,
     ensureDetectionReady as loadDetectionModels,
     ensureRecognitionReady as loadRecognitionModel,
     isDetectionReady,
     preloadFaceModels,
+    warmUpInference,
 } from './face-api-runtime.js';
+import { isTimeoutError, loadImage, sleep, withTimeout } from './async-timeout.js';
 import {
     distanceToMatchPercent,
     formatMatchPercent,
@@ -39,9 +43,24 @@ import {
 
 const MIN_REPORT_LENGTH = 15;
 
+// Time limits so no step can leave the modal spinning (iPhone Safari stalls silently).
+const CAMERA_PERMISSION_TIMEOUT_MS = 60000;
+const VIDEO_PLAY_TIMEOUT_MS = 8000;
+const VIDEO_FRAMES_TIMEOUT_MS = 6000;
+const LOCATION_TIMEOUT_MS = 45000;
+const PROFILE_DESCRIPTOR_TIMEOUT_MS = 20000;
+const SUBMIT_TIMEOUT_MS = 60000;
+// Reload after success even if the spoken confirmation never finishes.
+const SUCCESS_RELOAD_FALLBACK_MS = 5000;
+// Larger frames only cost memory and upload time; detection works on 320 px.
+const MAX_CAPTURE_SIZE = 720;
+
 const FaceVerificationModal = {
     detectorOptions: null,
     stream: null,
+    cameraPromise: null,
+    runSeq: 0,
+    submitting: false,
     currentForm: null,
     profileDescriptor: null,
     verified: false,
@@ -295,18 +314,27 @@ const FaceVerificationModal = {
         }
 
         if (this.isCameraActive()) {
-            return this.attachStreamToVideo();
+            // Re-attach when the modal opens: iPhone Safari leaves a stream attached
+            // while the modal was hidden frozen or black.
+            const attached = await this.attachStreamToVideo({ force: !prewarm });
+            if (!attached && !prewarm) {
+                this.setNotice(VERIFICATION_NOTICES.cameraNotReady);
+            }
+            return attached;
         }
 
+        // Page warm-up and the modal can ask at the same time; share one request.
+        this.cameraPromise ??= this.openCameraStream().finally(() => {
+            this.cameraPromise = null;
+        });
+
         try {
-            this.stream = await navigator.mediaDevices.getUserMedia({
-                video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } },
-                audio: false,
-            });
-            const attached = await this.attachStreamToVideo();
+            this.stream = await this.cameraPromise;
+            this.watchCameraTracks(this.stream);
+            const attached = await this.attachStreamToVideo({ force: true });
             if (!attached) {
                 if (!prewarm) {
-                    this.setNotice(cameraErrorNotice());
+                    this.setNotice(VERIFICATION_NOTICES.cameraNotReady);
                 }
                 return false;
             }
@@ -318,32 +346,104 @@ const FaceVerificationModal = {
         } catch (error) {
             console.error('Gagal membuka kamera:', error);
             if (!prewarm) {
-                this.setNotice(cameraErrorNotice(error));
+                this.setNotice(isTimeoutError(error) ? VERIFICATION_NOTICES.cameraNotReady : cameraErrorNotice(error));
             }
             return false;
         }
+    },
+
+    async openCameraStream() {
+        const request = (constraints) => {
+            const pending = navigator.mediaDevices.getUserMedia(constraints);
+
+            // The permission prompt can be left unanswered; stop a stream that arrives too late.
+            return withTimeout(pending, CAMERA_PERMISSION_TIMEOUT_MS, 'Membuka kamera').catch((error) => {
+                if (isTimeoutError(error)) {
+                    pending.then((late) => late.getTracks().forEach((track) => track.stop())).catch(() => { });
+                }
+                throw error;
+            });
+        };
+
+        try {
+            return await request({
+                video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } },
+                audio: false,
+            });
+        } catch (error) {
+            if (!['OverconstrainedError', 'ConstraintNotSatisfiedError'].includes(error?.name)) {
+                throw error;
+            }
+            return request({ video: true, audio: false });
+        }
+    },
+
+    watchCameraTracks(stream) {
+        stream?.getVideoTracks().forEach((track) => {
+            // iOS ends the camera track when Safari goes to the background or a call comes in.
+            track.addEventListener('ended', () => {
+                if (this.stream === stream && this.isModalOpen() && !this.capturedPhotoDataUrl) {
+                    this.setPipelineStep('camera', false);
+                    this.setCaptureEnabled(false);
+                    this.setNotice(VERIFICATION_NOTICES.cameraNotReady);
+                }
+            });
+        });
+    },
+
+    isModalOpen() {
+        return Boolean(this.modal() && !this.modal().classList.contains('hidden'));
     },
 
     isCameraActive() {
         return Boolean(this.stream?.active && this.stream.getVideoTracks().some((track) => track.readyState === 'live'));
     },
 
-    async attachStreamToVideo() {
+    hasVideoFrames() {
+        const video = this.videoEl();
+        return Boolean(video && video.videoWidth > 0 && video.videoHeight > 0 && video.readyState >= 2);
+    },
+
+    async waitForVideoFrames(timeoutMs = VIDEO_FRAMES_TIMEOUT_MS) {
+        const deadline = Date.now() + timeoutMs;
+        while (Date.now() < deadline) {
+            if (this.hasVideoFrames()) {
+                return true;
+            }
+            await sleep(100);
+        }
+        return this.hasVideoFrames();
+    },
+
+    async attachStreamToVideo({ force = false } = {}) {
         const video = this.videoEl();
         if (!video || !this.stream) {
             return false;
         }
 
-        if (video.srcObject !== this.stream) {
+        // iOS only plays camera video inline and muted.
+        video.muted = true;
+        video.playsInline = true;
+        video.setAttribute('playsinline', '');
+        video.setAttribute('muted', '');
+
+        if (force || video.srcObject !== this.stream) {
+            video.srcObject = null;
             video.srcObject = this.stream;
         }
 
         try {
-            await video.play();
-            return true;
-        } catch {
-            return false;
+            await withTimeout(video.play(), VIDEO_PLAY_TIMEOUT_MS, 'Memutar kamera');
+        } catch (error) {
+            console.warn('Preview kamera belum berjalan:', error);
         }
+
+        // play() can resolve while the element still shows no picture; wait for real frames.
+        if (this.modal()?.classList.contains('hidden')) {
+            return !video.paused || this.hasVideoFrames();
+        }
+
+        return this.waitForVideoFrames();
     },
 
     stopCamera() {
@@ -360,11 +460,20 @@ const FaceVerificationModal = {
         this.setPipelineStep('camera', false);
     },
 
-    onVisibilityChange() {
-        if (document.visibilityState !== 'visible' || !this.isCameraActive()) {
+    async onVisibilityChange() {
+        if (document.visibilityState !== 'visible' || !this.isModalOpen() || this.capturedPhotoDataUrl) {
             return;
         }
-        this.attachStreamToVideo().catch(() => { });
+
+        // Coming back from another app: iOS may have paused the preview or ended the camera.
+        const ok = this.isCameraActive()
+            ? await this.resumePreview()
+            : await this.startCamera();
+
+        if (ok && this.currentForm && !this.verificationInFlight) {
+            this.setPipelineStep('camera', true);
+            this.setLoadingPhase('ready', 'Kamera aktif — siap ambil foto', 'ready');
+        }
     },
 
     canWarmUp() {
@@ -372,34 +481,35 @@ const FaceVerificationModal = {
         return Boolean(cfg.profilePhotoUrl || cfg.hasFaceRegistered);
     },
 
+    /**
+     * Descriptor of the profile photo, used only for the match % shown before submitting.
+     * The server makes the real decision, so failures here are ignored.
+     */
     async preloadProfileDescriptor(photoUrl) {
         if (this.profileDescriptor || !photoUrl) {
-            return;
+            return Boolean(this.profileDescriptor);
         }
 
         const recognitionOk = await this.ensureRecognitionReady();
         if (!recognitionOk || !this.detectorOptions) {
-            return;
+            return false;
         }
 
-        const img = await new Promise((resolve, reject) => {
-            const el = new Image();
-            el.crossOrigin = 'anonymous';
-            el.onload = () => resolve(el);
-            el.onerror = () => reject(new Error('Foto profil tidak dapat dimuat.'));
-            el.src = photoUrl;
-        });
+        const img = await loadImage(photoUrl, { crossOrigin: 'anonymous' });
+        const faces = await detectFaces(img, this.detectorOptions);
 
-        const detection = await faceapi
-            .detectSingleFace(img, this.detectorOptions)
-            .withFaceLandmarks()
-            .withFaceDescriptor();
-
-        if (detection) {
-            this.profileDescriptor = detection.descriptor;
+        if (faces.length === 1) {
+            this.profileDescriptor = faces[0].descriptor;
         }
+
+        return Boolean(this.profileDescriptor);
     },
 
+    /**
+     * Loads the models and compiles them in the background while the employee writes
+     * the report. Nothing awaits this: open() and verification load what they need
+     * themselves, each step with its own time limit.
+     */
     warmUp() {
         if (!this.canWarmUp()) {
             return Promise.resolve(false);
@@ -411,17 +521,23 @@ const FaceVerificationModal = {
 
         this.warmUpPromise = (async () => {
             preloadFaceModels();
-            await this.ensureDetectionReady();
-            await loadRecognitionModel();
+            if (!(await this.ensureDetectionReady())) {
+                return false;
+            }
+            await warmUpInference();
 
             const cfg = this.config();
-            if (cfg.profilePhotoUrl && cfg.hasFaceRegistered) {
-                await this.preloadProfileDescriptor(cfg.profilePhotoUrl);
+            if (cfg.profilePhotoUrl && cfg.hasFaceRegistered && !cfg.needsFaceDescriptorSync) {
+                await this.preloadProfileDescriptor(cfg.profilePhotoUrl).catch(() => false);
             }
 
-            await this.startCamera({ prewarm: true });
             return true;
-        })().catch(() => false);
+        })().catch(() => false).then((ok) => {
+            if (!ok) {
+                this.warmUpPromise = null;
+            }
+            return ok;
+        });
 
         return this.warmUpPromise;
     },
@@ -649,12 +765,12 @@ const FaceVerificationModal = {
         }
     },
 
-    async playVoice(text) {
-        try {
-            await speak(text);
-        } catch {
-            // ignore speech errors
-        }
+    /**
+     * Speaks without waiting. iPhone Safari often never finishes an utterance that was
+     * not started by a tap; awaiting it used to freeze verification on "Memverifikasi...".
+     */
+    playVoice(text) {
+        speak(text).catch(() => { });
     },
 
     playSuccessSound() {
@@ -711,7 +827,7 @@ const FaceVerificationModal = {
         this.playSuccessSound();
     },
 
-    async announce(key, text, cooldownMs = this.voiceCooldownMs) {
+    announce(key, text, cooldownMs = this.voiceCooldownMs) {
         if (!text) {
             return;
         }
@@ -721,33 +837,42 @@ const FaceVerificationModal = {
             return;
         }
         this.voiceEvents.set(key, now);
-        await this.playVoice(text);
+        this.playVoice(text);
     },
 
     scheduleConfirmAfterSuccess() {
         this.clearConfirmTimer();
+        const reload = () => {
+            this.confirmTimer = null;
+            if (this.verified) {
+                this.confirm();
+            }
+        };
+
+        // The attendance is saved; reload even if the spoken confirmation never ends.
+        this.confirmTimer = setTimeout(reload, SUCCESS_RELOAD_FALLBACK_MS);
         speakWithMinDuration(VOICE_MESSAGES.VERIFY_SUCCESS).then(() => {
-            this.confirmTimer = setTimeout(() => {
-                this.confirmTimer = null;
-                if (this.verified) {
-                    this.confirm();
-                }
-            }, SPEECH_END_BUFFER_MS);
+            if (!this.confirmTimer) {
+                return;
+            }
+            this.clearConfirmTimer();
+            this.confirmTimer = setTimeout(reload, SPEECH_END_BUFFER_MS);
         });
     },
 
+    /**
+     * Draws the current frame un-mirrored, like the registered face photo. The live
+     * preview is mirrored for comfort, but a mirrored face scores clearly lower
+     * against the registered one (about 0.28 extra distance in testing).
+     */
     captureFrame() {
         const video = this.videoEl();
         const canvas = this.canvasEl();
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
+        const scale = Math.min(1, MAX_CAPTURE_SIZE / Math.max(video.videoWidth, video.videoHeight));
+        canvas.width = Math.round(video.videoWidth * scale);
+        canvas.height = Math.round(video.videoHeight * scale);
 
-        const ctx = canvas.getContext('2d');
-        ctx.save();
-        ctx.translate(canvas.width, 0);
-        ctx.scale(-1, 1);
-        ctx.drawImage(video, 0, 0);
-        ctx.restore();
+        canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
 
         return canvas.toDataURL('image/jpeg', 0.85);
     },
@@ -765,12 +890,23 @@ const FaceVerificationModal = {
         const video = this.videoEl();
         const previewImg = this.previewImgEl();
         const canvas = this.canvasEl();
-        
+
         if (!video || !previewImg || !canvas) {
             return;
         }
 
-        // Capture frame using existing captureFrame method (preserves existing mirror behavior)
+        // Without decoded frames the photo would be empty (black on iPhone): re-attach instead.
+        if (!this.hasVideoFrames()) {
+            this.setCaptureEnabled(false);
+            this.setNotice(VERIFICATION_NOTICES.cameraNotReady);
+            this.attachStreamToVideo({ force: true }).then((ok) => {
+                if (ok && this.isModalOpen() && !this.capturedPhotoDataUrl) {
+                    this.setLoadingPhase('ready', 'Kamera aktif — siap ambil foto', 'ready');
+                }
+            });
+            return;
+        }
+
         this.capturedPhotoDataUrl = this.captureFrame();
         previewImg.src = this.capturedPhotoDataUrl;
 
@@ -810,17 +946,33 @@ const FaceVerificationModal = {
 
         if (this.isHardwareReady()) {
             this.setStatus('Kamera aktif — siap ambil foto', 'ready');
+            this.resumePreview().catch(() => { });
         } else {
             this.setStatus('Menyiapkan kamera dan lokasi GPS...', 'loading');
             this.setCaptureEnabled(false);
         }
     },
 
-    async detectFromVideo() {
-        return faceapi
-            .detectAllFaces(this.videoEl(), this.detectorOptions)
-            .withFaceLandmarks()
-            .withFaceDescriptors();
+    /**
+     * Safari pauses a hidden camera preview and may not restart it when shown again.
+     */
+    async resumePreview() {
+        const video = this.videoEl();
+        if (!video || !this.isCameraActive()) {
+            return false;
+        }
+
+        try {
+            await withTimeout(video.play(), VIDEO_PLAY_TIMEOUT_MS, 'Memutar kamera');
+        } catch {
+            // Falls through to a full re-attach below.
+        }
+
+        if (!video.paused && await this.waitForVideoFrames(1500)) {
+            return true;
+        }
+
+        return this.attachStreamToVideo({ force: true });
     },
 
     distance(a, b) {
@@ -840,10 +992,17 @@ const FaceVerificationModal = {
     },
 
     async fetchLocation(form) {
-        return resolveAttendanceLocation({
-            mapId: form.dataset.geofenceMapId || '',
-            requiresGeofence: form.dataset.requiresGeofence === '1',
-        });
+        try {
+            return await withTimeout(resolveAttendanceLocation({
+                mapId: form.dataset.geofenceMapId || '',
+                requiresGeofence: form.dataset.requiresGeofence === '1',
+            }), LOCATION_TIMEOUT_MS, 'Mengambil lokasi');
+        } catch (error) {
+            if (isTimeoutError(error)) {
+                error.verificationNotice = geolocationErrorNotice({ code: 3 });
+            }
+            throw error;
+        }
     },
 
     async preloadPageLocation() {
@@ -877,7 +1036,7 @@ const FaceVerificationModal = {
             if (!this.isLocationWithinGeofence(form, geo)) {
                 this.cachedLocation = null;
                 this.setNotice(VERIFICATION_NOTICES.gpsOutsideRadius);
-                await this.announce('gps-invalid', VOICE_MESSAGES.GPS_INVALID);
+                this.announce('gps-invalid', VOICE_MESSAGES.GPS_INVALID);
                 return false;
             }
 
@@ -899,7 +1058,7 @@ const FaceVerificationModal = {
             if (!this.isLocationWithinGeofence(form, this.cachedLocation)) {
                 this.cachedLocation = null;
                 this.setNotice(VERIFICATION_NOTICES.gpsOutsideRadius);
-                await this.announce('gps-invalid', VOICE_MESSAGES.GPS_INVALID);
+                this.announce('gps-invalid', VOICE_MESSAGES.GPS_INVALID);
                 return false;
             }
 
@@ -916,18 +1075,15 @@ const FaceVerificationModal = {
 
         this.setStatus('Menyiapkan data wajah dari foto profil...', 'loading');
 
-        const img = await new Promise((resolve, reject) => {
-            const el = new Image();
-            el.crossOrigin = 'anonymous';
-            el.onload = () => resolve(el);
-            el.onerror = () => reject(new Error('Foto profil tidak dapat dimuat.'));
-            el.src = form.dataset.profilePhotoUrl;
-        });
-
-        const detections = await faceapi
-            .detectAllFaces(img, this.detectorOptions)
-            .withFaceLandmarks()
-            .withFaceDescriptors();
+        let detections;
+        try {
+            const img = await loadImage(form.dataset.profilePhotoUrl, { crossOrigin: 'anonymous' });
+            detections = await detectFaces(img, this.detectorOptions);
+        } catch (error) {
+            console.error('Foto profil gagal diproses:', error);
+            this.setNotice(VERIFICATION_NOTICES.faceCheckFailed);
+            return false;
+        }
 
         if (detections.length !== 1) {
             this.setNotice({
@@ -942,22 +1098,23 @@ const FaceVerificationModal = {
 
         this.profileDescriptor = detections[0].descriptor;
 
-        const res = await csrfFetch(form.dataset.syncUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
+        let response;
+        try {
+            response = await this.postJson(form.dataset.syncUrl, {
                 face_descriptor: Array.from(detections[0].descriptor),
                 faces_detected: 1,
-            }),
-        });
-
-        if (!res) {
+            });
+        } catch (error) {
+            console.error('Sinkronisasi data wajah gagal:', error);
+            this.setNotice(error?.name === 'AbortError' ? VERIFICATION_NOTICES.submitTimeout : VERIFICATION_NOTICES.networkFailure);
             return false;
         }
 
-        const data = await res.json();
+        if (!response) {
+            return false;
+        }
+
+        const { res, data } = response;
         if (!res.ok || !data.success) {
             this.setNotice(serverErrorNotice(data.message || 'Data wajah dari foto profil gagal disiapkan.'));
             return false;
@@ -967,6 +1124,9 @@ const FaceVerificationModal = {
         return true;
     },
 
+    /**
+     * Best effort: the match % is only a hint, so give up quietly after a short wait.
+     */
     async ensureProfileDescriptor(form) {
         if (this.profileDescriptor) {
             return true;
@@ -975,35 +1135,70 @@ const FaceVerificationModal = {
             return false;
         }
 
-        const img = await new Promise((resolve, reject) => {
-            const el = new Image();
-            el.crossOrigin = 'anonymous';
-            el.onload = () => resolve(el);
-            el.onerror = () => reject(new Error('Foto profil tidak dapat dimuat.'));
-            el.src = form.dataset.profilePhotoUrl;
-        });
-
-        const detection = await faceapi
-            .detectSingleFace(img, this.detectorOptions)
-            .withFaceLandmarks()
-            .withFaceDescriptor();
-
-        if (!detection) {
+        try {
+            return await withTimeout(
+                this.preloadProfileDescriptor(form.dataset.profilePhotoUrl),
+                PROFILE_DESCRIPTOR_TIMEOUT_MS,
+                'Foto profil',
+            );
+        } catch (error) {
+            console.warn('Foto profil tidak dapat dibandingkan di perangkat:', error);
             return false;
         }
+    },
 
-        this.profileDescriptor = detection.descriptor;
-        return true;
+    /**
+     * POSTs JSON with a time limit. Resolves null when the CSRF token expired
+     * (the page reloads itself); throws AbortError on timeout.
+     */
+    async postJson(url, payload, timeoutMs = SUBMIT_TIMEOUT_MS) {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+        try {
+            const res = await csrfFetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload),
+                signal: controller.signal,
+            });
+
+            if (!res) {
+                return null;
+            }
+
+            // A proxy error page is HTML, not JSON.
+            const data = await res.json().catch(() => ({}));
+            return { res, data };
+        } finally {
+            clearTimeout(timer);
+        }
     },
 
     async runVerification(form) {
+        // Closing the modal bumps runSeq; a stale run stops at its next step.
+        const run = ++this.runSeq;
+        const cancelled = () => run !== this.runSeq || this.currentForm !== form;
+
         this.retryBtn()?.classList.add('hidden');
         this.verified = false;
         this.setPipelineStep('verify', false);
         this.setPipelineStep('match', false);
         this.setNotice(VERIFICATION_NOTICES.verificationProcessing);
 
+        const canvas = this.canvasEl();
+        if (!this.capturedPhotoDataUrl || !canvas?.width || !canvas?.height) {
+            this.setNotice(VERIFICATION_NOTICES.photoMissing);
+            this.retakePhoto();
+            return;
+        }
+
         const detectionOk = await this.ensureDetectionReady();
+        if (cancelled()) {
+            return;
+        }
         if (!detectionOk) {
             this.setNotice(VERIFICATION_NOTICES.aiUnavailable);
             return;
@@ -1014,6 +1209,9 @@ const FaceVerificationModal = {
         this.setPipelineStep('verify', true);
 
         const recognitionOk = await this.ensureRecognitionReady();
+        if (cancelled()) {
+            return;
+        }
         if (!recognitionOk) {
             this.setNotice(VERIFICATION_NOTICES.aiUnavailable);
             return;
@@ -1021,55 +1219,44 @@ const FaceVerificationModal = {
 
         if (form.dataset.needsSync === '1') {
             const synced = await this.syncProfileDescriptor(form);
-            if (!synced) {
+            if (cancelled() || !synced) {
                 return;
             }
-        } else {
-            await this.ensureProfileDescriptor(form);
         }
 
-        // Use captured photo for verification instead of live video
-        const previewImg = this.previewImgEl();
-        if (!previewImg || !this.capturedPhotoDataUrl) {
-            this.setNotice(VERIFICATION_NOTICES.photoMissing);
-            this.retakePhoto();
+        // The canvas still holds the captured frame; no JPEG round trip needed.
+        let faces;
+        try {
+            faces = await detectFaces(canvas, this.detectorOptions);
+        } catch (error) {
+            console.error('Pemeriksaan wajah gagal:', error);
+            if (!cancelled()) {
+                this.setNotice(VERIFICATION_NOTICES.faceCheckFailed);
+            }
+            return;
+        }
+        if (cancelled()) {
             return;
         }
 
-        // Load image for face detection
-        const img = await new Promise((resolve, reject) => {
-            const el = new Image();
-            el.crossOrigin = 'anonymous';
-            el.onload = () => resolve(el);
-            el.onerror = () => reject(new Error('Gagal memuat foto.'));
-            el.src = this.capturedPhotoDataUrl;
-        });
-
-        const faces = await faceapi
-            .detectAllFaces(img, this.detectorOptions)
-            .withFaceLandmarks()
-            .withFaceDescriptors();
-
-        if (faces.length === 0) {
+        if (faces.length === 0 || !faces[0]?.descriptor) {
             this.setNotice(VERIFICATION_NOTICES.faceNotDetected);
-            await this.playVoice(VOICE_MESSAGES.FACE_NOT_DETECTED);
+            this.announce('face-not-detected-verify', VOICE_MESSAGES.FACE_NOT_DETECTED);
             return;
         }
         if (faces.length > 1) {
             this.setNotice(VERIFICATION_NOTICES.multipleFaces);
-            await this.announce('multiple-face-verify', VOICE_MESSAGES.MULTIPLE_FACE);
+            this.announce('multiple-face-verify', VOICE_MESSAGES.MULTIPLE_FACE);
             return;
         }
 
-        const result = faces[0];
+        const liveDescriptor = faces[0].descriptor;
 
-        if (!result?.descriptor) {
-            this.setNotice(VERIFICATION_NOTICES.faceNotDetected);
-            await this.announce('face-not-detected-verify', VOICE_MESSAGES.FACE_NOT_DETECTED);
+        // Early hint only; the server compares against the registered face and decides.
+        await this.ensureProfileDescriptor(form);
+        if (cancelled()) {
             return;
         }
-
-        const liveDescriptor = result.descriptor;
 
         if (this.profileDescriptor) {
             const distance = faceapi.euclideanDistance(liveDescriptor, this.profileDescriptor);
@@ -1082,7 +1269,7 @@ const FaceVerificationModal = {
                     ...VERIFICATION_NOTICES.faceMismatch,
                     message: `Kecocokan wajah hanya ${percent ?? 0}%, sedangkan batas minimal adalah ${minPercent}%. Ikuti langkah perbaikan di bawah lalu ambil foto ulang. Absensi belum tercatat.`,
                 });
-                await this.playVoice(VOICE_MESSAGES.FACE_MATCH_TOO_LOW);
+                this.playVoice(VOICE_MESSAGES.FACE_MATCH_TOO_LOW);
                 return;
             }
         }
@@ -1101,7 +1288,7 @@ const FaceVerificationModal = {
         if (!this.isLocationWithinGeofence(form, geo)) {
             this.cachedLocation = null;
             this.setNotice(VERIFICATION_NOTICES.gpsOutsideRadius);
-            await this.announce('gps-invalid', VOICE_MESSAGES.GPS_INVALID);
+            this.announce('gps-invalid', VOICE_MESSAGES.GPS_INVALID);
             return;
         }
 
@@ -1118,26 +1305,37 @@ const FaceVerificationModal = {
             payload.attendance_location = geo.location;
         }
 
-        const res = await csrfFetch(form.dataset.action, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(payload),
-        });
+        let response;
+        this.submitting = true;
+        try {
+            response = await this.postJson(form.dataset.action, payload);
+        } catch (error) {
+            console.error('Gagal mengirim absensi:', error);
+            this.setNotice(error?.name === 'AbortError' ? VERIFICATION_NOTICES.submitTimeout : VERIFICATION_NOTICES.networkFailure);
+            return;
+        } finally {
+            this.submitting = false;
+        }
 
-        if (!res) {
+        if (!response) {
             return;
         }
 
-        const data = await res.json();
+        const { res, data } = response;
 
         if (!res.ok || !data.success) {
             if (isFaceMismatchMessage(data.message)) {
-                this.setNotice(VERIFICATION_NOTICES.faceMismatch);
-                await this.playVoice(VOICE_MESSAGES.FACE_NOT_MATCH);
+                this.setNotice({
+                    ...VERIFICATION_NOTICES.faceMismatch,
+                    message: serverErrorNotice(data.message).message,
+                });
+                this.playVoice(VOICE_MESSAGES.FACE_NOT_MATCH);
             } else {
-                this.setNotice(serverErrorNotice(data.message));
+                this.setNotice(serverErrorNotice(
+                    data.message || (res.status >= 500
+                        ? `Server sedang mengalami gangguan (kode ${res.status})`
+                        : `Permintaan ditolak server (kode ${res.status})`),
+                ));
             }
             return;
         }
@@ -1259,25 +1457,26 @@ const FaceVerificationModal = {
                 'loading',
             );
 
-            await this.warmUp();
+            // Keep compiling the models in the background; the photo can be taken meanwhile.
+            this.warmUp();
+            const aiPromise = this.ensureDetectionReady();
 
-            if (!this.isCameraActive()) {
-                const camOk = await this.startCamera();
-                if (!camOk) {
-                    this.setCaptureEnabled(false);
-                    return;
-                }
-            } else {
-                await this.attachStreamToVideo();
-                this.setPipelineStep('camera', true);
-                this.setLoadingPhase('ready', 'Kamera aktif — siap ambil foto', 'ready');
+            const camOk = await this.startCamera();
+            if (!camOk || this.currentForm !== form) {
+                this.setCaptureEnabled(false);
+                return;
             }
+            this.setPipelineStep('camera', true);
 
             if (!isDetectionReady()) {
                 this.setLoadingPhase('ai', 'Model AI sedang dimuat. Mohon tunggu...', 'loading');
             }
 
-            const aiOk = await this.ensureDetectionReady();
+            const aiOk = await aiPromise;
+            // The employee may have closed the modal or already taken the photo meanwhile.
+            if (this.currentForm !== form || this.capturedPhotoDataUrl) {
+                return;
+            }
             if (!aiOk) {
                 this.setNotice(VERIFICATION_NOTICES.aiUnavailable);
                 this.setCaptureEnabled(false);
@@ -1293,11 +1492,13 @@ const FaceVerificationModal = {
     },
 
     close() {
-        if (this.verificationInFlight) {
+        // Only the upload itself must not be abandoned; face checks can be cancelled.
+        if (this.submitting) {
             this.setNotice(VERIFICATION_NOTICES.verificationTakingLonger);
             return;
         }
 
+        this.runSeq += 1;
         stopSpeech();
         this.clearConfirmTimer();
         if (!this.keepCameraOnClose) {
@@ -1493,25 +1694,30 @@ const FaceVerificationModal = {
 
             const btn = this.usePhotoBtn();
             if (btn) {
+                const form = this.currentForm;
                 this.verificationInFlight = true;
                 this.startVerificationDelayNotice();
                 btn.disabled = true;
-                if (this.cancelBtn()) {
-                    this.cancelBtn().disabled = true;
+                // Retaking now would redraw the canvas that is being checked.
+                const retake = this.retakeBtn();
+                if (retake) {
+                    retake.disabled = true;
                 }
                 const originalText = btn.textContent;
                 btn.textContent = 'Memverifikasi...';
 
                 try {
-                    await this.runVerification(this.currentForm);
+                    await this.runVerification(form);
                 } catch (error) {
                     console.error('Gagal mengirim verifikasi absensi:', error);
-                    this.setNotice(VERIFICATION_NOTICES.networkFailure);
+                    if (this.currentForm === form) {
+                        this.setNotice(VERIFICATION_NOTICES.networkFailure);
+                    }
                 } finally {
                     this.clearVerificationDelayNotice();
                     this.verificationInFlight = false;
-                    if (this.cancelBtn()) {
-                        this.cancelBtn().disabled = false;
+                    if (retake) {
+                        retake.disabled = false;
                     }
                     if (!this.verified) {
                         btn.disabled = !this.isGpsReady();
@@ -1571,7 +1777,8 @@ const FaceVerificationModal = {
                 this.setLoadingPhase('ai', 'Model AI sedang dimuat. Mohon tunggu...', 'loading');
             }
             const aiPromise = this.ensureDetectionReady();
-            const ok = this.isCameraActive() ? true : await this.startCamera();
+            // Also re-attaches a live stream whose preview froze.
+            const ok = await this.startCamera();
             if (!ok) {
                 this.setCaptureEnabled(false);
                 return;
@@ -1641,9 +1848,15 @@ const FaceVerificationModal = {
         }
 
         this.preloadPageLocation().catch(() => { });
-        this.warmUp().catch(() => { });
+        if (this.canWarmUp()) {
+            this.warmUp();
+            // Asks for camera permission on page load, as the modal copy promises.
+            this.startCamera({ prewarm: true }).catch(() => { });
+        }
         window.addEventListener('pagehide', () => this.releaseCamera());
-        document.addEventListener('visibilitychange', () => this.onVisibilityChange());
+        document.addEventListener('visibilitychange', () => {
+            this.onVisibilityChange().catch(() => { });
+        });
     },
 };
 

@@ -2,12 +2,47 @@
  * Sign-up onboarding: face registration (camera + face-api.js) and a location check.
  */
 
+import { isTimeoutError, sleep, withTimeout } from './async-timeout.js';
 import { csrfFetch } from './csrf-fetch.js';
-import { loadRecognitionModel, waitForFaceApi } from './face-api-runtime.js';
+import { createDetectorOptions, detectFaces, loadRecognitionModel, waitForFaceApi } from './face-api-runtime.js';
 import { distanceMeters, formatDistance } from './geo-distance.js';
 
 // A face narrower than this share of the frame is too far away to make a reliable reference.
 const MIN_FACE_WIDTH_RATIO = 0.2;
+// Larger frames only cost memory and upload time on phones.
+const MAX_CAPTURE_SIZE = 720;
+const CAMERA_PERMISSION_TIMEOUT_MS = 60000;
+const VIDEO_PLAY_TIMEOUT_MS = 8000;
+const SAVE_TIMEOUT_MS = 60000;
+
+function hasFrames(video) {
+    return video.videoWidth > 0 && video.videoHeight > 0 && video.readyState >= 2;
+}
+
+/**
+ * Starts the preview and waits for real frames: on iPhone, play() can resolve
+ * while the element still shows nothing, which made every capture a black photo.
+ */
+async function playPreview(video, timeoutMs = 6000) {
+    video.muted = true;
+    video.playsInline = true;
+
+    try {
+        await withTimeout(video.play(), VIDEO_PLAY_TIMEOUT_MS, 'Memutar kamera');
+    } catch (error) {
+        console.warn('Preview kamera belum berjalan:', error);
+    }
+
+    const deadline = Date.now() + timeoutMs;
+    while (Date.now() < deadline) {
+        if (hasFrames(video)) {
+            return true;
+        }
+        await sleep(100);
+    }
+
+    return hasFrames(video);
+}
 
 function setStatus(element, message, tone = 'info') {
     const tones = {
@@ -85,32 +120,54 @@ export function initFaceRegistration(root) {
             return;
         }
 
+        // Start loading the recognizer while the camera permission prompt is open.
+        const modelsReady = waitForFaceApi().then((ready) => {
+            if (!ready) {
+                throw new Error('face-api.js tidak termuat');
+            }
+            return loadRecognitionModel();
+        });
+        modelsReady.catch(() => { });
+
+        stopCamera();
         try {
-            stream = await navigator.mediaDevices.getUserMedia({
+            const pending = navigator.mediaDevices.getUserMedia({
                 video: { facingMode: 'user', width: { ideal: 960 }, height: { ideal: 720 } },
                 audio: false,
             });
-            video.srcObject = stream;
-            await video.play();
+            stream = await withTimeout(pending, CAMERA_PERMISSION_TIMEOUT_MS, 'Membuka kamera').catch((error) => {
+                if (isTimeoutError(error)) {
+                    pending.then((late) => late.getTracks().forEach((track) => track.stop())).catch(() => { });
+                }
+                throw error;
+            });
         } catch (error) {
             console.error('Gagal membuka kamera:', error);
-            setStatus(status, cameraErrorMessage(error), 'error');
+            setStatus(status, isTimeoutError(error)
+                ? 'Kamera belum diizinkan. Tekan "Izinkan" saat browser meminta akses kamera, lalu coba lagi.'
+                : cameraErrorMessage(error), 'error');
             startButton.disabled = false;
             return;
         }
 
+        // The element must be visible before playing, or iPhone renders no frames.
         toggle(startButton, false);
         showLiveView();
         captureButton.disabled = true;
+        video.srcObject = stream;
+
+        if (!(await playPreview(video))) {
+            stopCamera();
+            toggle(startButton, true);
+            startButton.disabled = false;
+            setStatus(status, 'Gambar kamera belum muncul. Tekan "Aktifkan Kamera" lagi, atau muat ulang halaman.', 'error');
+            return;
+        }
+
         setStatus(status, 'Memuat pengenal wajah...');
 
-        const faceApiReady = await waitForFaceApi();
-
         try {
-            if (!faceApiReady) {
-                throw new Error('face-api.js tidak termuat');
-            }
-            await loadRecognitionModel();
+            await modelsReady;
         } catch (error) {
             console.error(error);
             setStatus(status, 'Pengenal wajah gagal dimuat. Periksa koneksi internet lalu muat ulang halaman.', 'error');
@@ -122,27 +179,31 @@ export function initFaceRegistration(root) {
     });
 
     captureButton.addEventListener('click', async () => {
-        if (!video.videoWidth) {
+        if (!stream?.active || !hasFrames(video)) {
             setStatus(status, 'Kamera belum siap. Tunggu sebentar lalu coba lagi.', 'error');
+            if (stream?.active) {
+                playPreview(video).catch(() => { });
+            }
             return;
         }
 
         captureButton.disabled = true;
-        setStatus(status, 'Memeriksa wajah...');
+        setStatus(status, 'Memeriksa wajah... (bisa beberapa detik)');
 
+        const scale = Math.min(1, MAX_CAPTURE_SIZE / Math.max(video.videoWidth, video.videoHeight));
         const canvas = document.createElement('canvas');
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
+        canvas.width = Math.round(video.videoWidth * scale);
+        canvas.height = Math.round(video.videoHeight * scale);
         canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
 
         let detections = [];
         try {
-            detections = await faceapi
-                .detectAllFaces(canvas, new faceapi.TinyFaceDetectorOptions({ inputSize: 320, scoreThreshold: 0.5 }))
-                .withFaceLandmarks()
-                .withFaceDescriptors();
+            detections = await detectFaces(canvas, createDetectorOptions());
         } catch (error) {
             console.error('Deteksi wajah gagal:', error);
+            captureButton.disabled = false;
+            setStatus(status, 'Pemeriksaan wajah terlalu lama. Tutup aplikasi lain, lalu tekan "Ambil Foto" lagi.', 'error');
+            return;
         }
 
         captureButton.disabled = false;
@@ -178,9 +239,15 @@ export function initFaceRegistration(root) {
         setStatus(status, 'Wajah terdeteksi. Periksa foto, lalu tekan "Simpan Wajah".', 'success');
     });
 
-    retakeButton.addEventListener('click', () => {
+    retakeButton.addEventListener('click', async () => {
         showLiveView();
-        setStatus(status, 'Posisikan wajah di dalam oval, lalu tekan "Ambil Foto".');
+        captureButton.disabled = true;
+        // Safari pauses a hidden preview; restart it before the next capture.
+        const ready = stream?.active && (await playPreview(video));
+        captureButton.disabled = false;
+        setStatus(status, ready
+            ? 'Posisikan wajah di dalam oval, lalu tekan "Ambil Foto".'
+            : 'Kamera berhenti. Muat ulang halaman lalu aktifkan kamera lagi.', ready ? 'info' : 'error');
     });
 
     saveButton.addEventListener('click', async () => {
@@ -195,6 +262,9 @@ export function initFaceRegistration(root) {
         let response = null;
         let body = {};
 
+        const controller = new AbortController();
+        const abortTimer = setTimeout(() => controller.abort(), SAVE_TIMEOUT_MS);
+
         try {
             response = await csrfFetch(root.dataset.storeUrl, {
                 method: 'POST',
@@ -204,6 +274,7 @@ export function initFaceRegistration(root) {
                     face_descriptor: captured.descriptor,
                     faces_detected: 1,
                 }),
+                signal: controller.signal,
             });
             if (response === null) {
                 return; // CSRF expired: the page reloads itself.
@@ -211,6 +282,8 @@ export function initFaceRegistration(root) {
             body = await response.json().catch(() => ({}));
         } catch (error) {
             console.error(error);
+        } finally {
+            clearTimeout(abortTimer);
         }
 
         if (response?.ok) {

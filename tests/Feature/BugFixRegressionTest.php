@@ -205,6 +205,16 @@ class BugFixRegressionTest extends TestCase
             ->assertJsonPath('data.present', false);
     }
 
+    #[Test]
+    public function employee_record_without_any_role_gets_forbidden_instead_of_a_redirect_loop(): void
+    {
+        $user = $this->makeEmployee('Tanpa Peran', 'tanpa-peran@example.com', roles: []);
+
+        $this->actingAs($user)->get(route('attendance.index'))->assertForbidden();
+        // Other pages still send the user to their home page.
+        $this->actingAs($user)->get(route('employees.index'))->assertRedirect(route('attendance.index'));
+    }
+
     /**
      * @param  list<string>  $roles
      */

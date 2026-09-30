@@ -1,31 +1,5 @@
-let employeeFaceModelsReady = false;
-let employeeFaceDetectorOptions = null;
-
-async function ensureEmployeeFaceModels() {
-    if (employeeFaceModelsReady || typeof faceapi === 'undefined') {
-        return employeeFaceModelsReady;
-    }
-
-    const modelPath = document.querySelector('meta[name="face-model-path"]')?.content;
-
-    if (!modelPath) {
-        return false;
-    }
-
-    await Promise.all([
-        faceapi.nets.tinyFaceDetector.loadFromUri(modelPath),
-        faceapi.nets.faceLandmark68Net.loadFromUri(modelPath),
-        faceapi.nets.faceRecognitionNet.loadFromUri(modelPath),
-    ]);
-
-    employeeFaceDetectorOptions = new faceapi.TinyFaceDetectorOptions({
-        inputSize: 224,
-        scoreThreshold: 0.5,
-    });
-
-    employeeFaceModelsReady = true;
-    return true;
-}
+import { loadImage } from './async-timeout.js';
+import { createDetectorOptions, detectFaces, ensureRecognitionReady } from './face-api-runtime.js';
 
 function descriptorFieldForMode(mode) {
     return document.getElementById(mode === 'edit' ? 'edit_face_descriptor_json' : 'face_descriptor_json');
@@ -62,26 +36,26 @@ export async function extractFaceDescriptorFromFile(file, mode) {
         return;
     }
 
-    const ready = await ensureEmployeeFaceModels();
+    const ready = await ensureRecognitionReady();
 
     if (!ready) {
         setDescriptorStatus(mode, 'Model AI belum siap. Simpan foto lalu coba lagi dari halaman absensi.', true);
         return;
     }
 
-    const image = await new Promise((resolve, reject) => {
-        const img = new Image();
-        img.onload = () => resolve(img);
-        img.onerror = () => reject(new Error('Gagal membaca gambar.'));
-        img.src = URL.createObjectURL(file);
-    });
+    const objectUrl = URL.createObjectURL(file);
+    let detections;
 
-    const detections = await faceapi
-        .detectAllFaces(image, employeeFaceDetectorOptions)
-        .withFaceLandmarks()
-        .withFaceDescriptors();
-
-    URL.revokeObjectURL(image.src);
+    try {
+        const image = await loadImage(objectUrl);
+        detections = await detectFaces(image, createDetectorOptions());
+    } catch (error) {
+        console.error('Foto karyawan gagal diproses:', error);
+        setDescriptorStatus(mode, 'Foto tidak dapat diproses. Gunakan foto JPG/PNG lain dengan wajah yang jelas.', true);
+        return;
+    } finally {
+        URL.revokeObjectURL(objectUrl);
+    }
 
     if (detections.length !== 1) {
         setDescriptorStatus(

@@ -1,14 +1,30 @@
 /**
  * Singleton loader for face-api.js (local script) and AI models.
  * The library and its models load only when face verification starts.
+ *
+ * Every step has a time limit, and inference falls back from WebGL to the CPU
+ * backend when WebGL fails or hangs (seen on some iPhones), so a caller always
+ * gets either a result or an error it can show.
  */
+
+import { withTimeout } from './async-timeout.js';
+
+const SCRIPT_TIMEOUT_MS = 45000;
+const BACKEND_TIMEOUT_MS = 15000;
+// The three models are about 7 MB; allow for a slow mobile connection.
+const MODEL_TIMEOUT_MS = 90000;
+const WEBGL_INFERENCE_TIMEOUT_MS = 30000;
+const CPU_INFERENCE_TIMEOUT_MS = 60000;
 
 const state = {
     detectionReady: false,
     recognitionReady: false,
     scriptPromise: null,
+    backendPromise: null,
     detectionPromise: null,
     recognitionPromise: null,
+    usingCpu: false,
+    warmUpPromise: null,
 };
 
 export function modelPath() {
@@ -16,8 +32,10 @@ export function modelPath() {
 }
 
 export function createDetectorOptions() {
+    // 320 finds smaller or off-centre faces far more reliably than 160, and matches
+    // the size used when the face was registered.
     return new faceapi.TinyFaceDetectorOptions({
-        inputSize: 160,
+        inputSize: 320,
         scoreThreshold: 0.5,
     });
 }
@@ -32,7 +50,7 @@ export function isRecognitionReady() {
 
 export function faceApiScriptUrl() {
     return document.querySelector('meta[name="face-api-script-url"]')?.content
-        || '/face-api/face-api.min.js';
+        || '/face-api/face-api-1.7.15.js';
 }
 
 export function waitForFaceApi() {
@@ -53,6 +71,7 @@ export function waitForFaceApi() {
                 return;
             }
             settled = true;
+            clearTimeout(timer);
             script?.removeEventListener('load', onLoad);
             script?.removeEventListener('error', onError);
             resolve(ok);
@@ -70,6 +89,9 @@ export function waitForFaceApi() {
             script?.remove();
             finish(false);
         };
+
+        // A retry re-attaches to the same element, and succeeds at once if it loaded late.
+        const timer = setTimeout(() => finish(typeof faceapi !== 'undefined'), SCRIPT_TIMEOUT_MS);
 
         const shouldAppend = !script;
         if (shouldAppend) {
@@ -97,6 +119,43 @@ export function waitForFaceApi() {
     return state.scriptPromise;
 }
 
+async function useCpuBackend(tf) {
+    await tf.setBackend('cpu');
+    await tf.ready();
+    state.usingCpu = true;
+}
+
+/**
+ * Picks WebGL when it initialises, otherwise the CPU backend (slower, but works everywhere).
+ */
+function prepareBackend() {
+    if (state.backendPromise) {
+        return state.backendPromise;
+    }
+
+    state.backendPromise = (async () => {
+        const tf = faceapi.tf;
+        if (!tf?.setBackend) {
+            return 'default';
+        }
+
+        try {
+            const ok = await withTimeout(tf.setBackend('webgl'), BACKEND_TIMEOUT_MS, 'WebGL');
+            if (!ok) {
+                throw new Error('WebGL tidak tersedia');
+            }
+            await withTimeout(tf.ready(), BACKEND_TIMEOUT_MS, 'WebGL');
+        } catch (error) {
+            console.warn('WebGL tidak tersedia, pengenal wajah memakai CPU:', error);
+            await useCpuBackend(tf);
+        }
+
+        return tf.getBackend();
+    })();
+
+    return state.backendPromise;
+}
+
 export async function loadDetectionModels() {
     if (state.detectionReady) {
         return true;
@@ -108,10 +167,11 @@ export async function loadDetectionModels() {
 
     const path = modelPath();
 
-    state.detectionPromise = Promise.all([
-        faceapi.nets.tinyFaceDetector.loadFromUri(path),
-        faceapi.nets.faceLandmark68Net.loadFromUri(path),
-    ])
+    state.detectionPromise = prepareBackend()
+        .then(() => withTimeout(Promise.all([
+            faceapi.nets.tinyFaceDetector.loadFromUri(path),
+            faceapi.nets.faceLandmark68Net.loadFromUri(path),
+        ]), MODEL_TIMEOUT_MS, 'Memuat model wajah'))
         .then(() => {
             state.detectionReady = true;
             return true;
@@ -138,8 +198,11 @@ export async function loadRecognitionModel() {
 
     const path = modelPath();
 
-    state.recognitionPromise = faceapi.nets.faceRecognitionNet
-        .loadFromUri(path)
+    state.recognitionPromise = withTimeout(
+        faceapi.nets.faceRecognitionNet.loadFromUri(path),
+        MODEL_TIMEOUT_MS,
+        'Memuat model pengenal wajah',
+    )
         .then(() => {
             state.recognitionReady = true;
             return true;
@@ -179,6 +242,107 @@ export async function ensureRecognitionReady() {
     } catch {
         return false;
     }
+}
+
+/**
+ * Moves inference to the CPU backend and reloads the models there.
+ * Returns false when already on the CPU (nothing left to fall back to).
+ */
+async function switchToCpuBackend() {
+    const tf = faceapi.tf;
+    if (!tf?.setBackend || state.usingCpu) {
+        return false;
+    }
+
+    [
+        faceapi.nets.tinyFaceDetector,
+        faceapi.nets.faceLandmark68Net,
+        faceapi.nets.faceRecognitionNet,
+    ].forEach((net) => {
+        try {
+            net.dispose();
+        } catch {
+            // The WebGL context may already be lost.
+        }
+    });
+
+    Object.assign(state, {
+        detectionReady: false,
+        recognitionReady: false,
+        detectionPromise: null,
+        recognitionPromise: null,
+    });
+
+    await useCpuBackend(tf);
+    state.backendPromise = Promise.resolve('cpu');
+    await loadRecognitionModel();
+
+    return true;
+}
+
+function inferenceTimeout() {
+    return state.usingCpu ? CPU_INFERENCE_TIMEOUT_MS : WEBGL_INFERENCE_TIMEOUT_MS;
+}
+
+/**
+ * Runs `task` with a time limit. On a WebGL error or hang it retries once on the CPU backend.
+ */
+async function withBackendFallback(task) {
+    try {
+        return await withTimeout(task(), inferenceTimeout(), 'Pemeriksaan wajah');
+    } catch (error) {
+        console.warn('Pemeriksaan wajah gagal, mencoba ulang dengan CPU:', error);
+        if (!(await switchToCpuBackend())) {
+            throw error;
+        }
+        return withTimeout(task(), inferenceTimeout(), 'Pemeriksaan wajah');
+    }
+}
+
+/**
+ * Detects every face with landmarks and descriptors. Requires the recognition model.
+ */
+export function detectFaces(input, options = createDetectorOptions()) {
+    return withBackendFallback(
+        () => faceapi.detectAllFaces(input, options).withFaceLandmarks().withFaceDescriptors(),
+    );
+}
+
+/**
+ * Runs each model once on a blank image so shaders compile (or the CPU fallback kicks in)
+ * before the employee takes a photo, instead of during verification.
+ */
+export function warmUpInference() {
+    if (state.warmUpPromise) {
+        return state.warmUpPromise;
+    }
+
+    state.warmUpPromise = ensureRecognitionReady()
+        .then(async (ready) => {
+            if (!ready) {
+                return false;
+            }
+            const canvas = document.createElement('canvas');
+            canvas.width = 150;
+            canvas.height = 150;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#808080';
+            ctx.fillRect(0, 0, 150, 150);
+            // A blank image has no face, so the landmark and descriptor nets are run directly.
+            await withBackendFallback(async () => {
+                await faceapi.detectAllFaces(canvas, createDetectorOptions());
+                await faceapi.detectFaceLandmarks(canvas);
+                await faceapi.computeFaceDescriptor(canvas);
+            });
+            return true;
+        })
+        .catch((error) => {
+            console.warn('Pemanasan pengenal wajah gagal:', error);
+            state.warmUpPromise = null;
+            return false;
+        });
+
+    return state.warmUpPromise;
 }
 
 export function preloadFaceModels() {

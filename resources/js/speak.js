@@ -20,6 +20,10 @@ export const SPEECH_SUCCESS_MIN_DISPLAY_MS = 1200;
 /** Buffer after speech ends before navigation (ms). */
 export const SPEECH_END_BUFFER_MS = 400;
 
+/** Upper bound on waiting for one utterance: voice lookup + reading time (ms). */
+const SPEECH_WAIT_BASE_MS = 4000;
+const SPEECH_WAIT_PER_CHAR_MS = 90;
+
 let speechGeneration = 0;
 let resumeKeepAliveId = null;
 let voicesReady = false;
@@ -125,12 +129,19 @@ export function speak(text) {
         synth.cancel();
         clearResumeKeepAlive();
 
+        let guardTimer = null;
         const settle = () => {
+            window.clearTimeout(guardTimer);
             if (generation === speechGeneration) {
                 clearResumeKeepAlive();
             }
             resolve();
         };
+
+        // iPhone Safari can drop an utterance without ever firing onend or onerror
+        // (e.g. when it was not started from a tap), so never wait longer than the
+        // text could plausibly take to read out.
+        guardTimer = window.setTimeout(settle, SPEECH_WAIT_BASE_MS + text.length * SPEECH_WAIT_PER_CHAR_MS);
 
         const play = () => {
             if (generation !== speechGeneration) {

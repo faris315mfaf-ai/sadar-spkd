@@ -23,6 +23,12 @@ class RoleMiddleware
             return $next($request);
         }
 
+        // An employee record without the employee role has this very page as home;
+        // redirecting would loop until the browser gives up.
+        if (rtrim($user->homeUrl(), '/') === rtrim($request->url(), '/')) {
+            abort(403, 'Anda tidak memiliki akses ke halaman tersebut.');
+        }
+
         return redirect()
             ->to($user->homeUrl())
             ->with('error', 'Anda tidak memiliki akses ke halaman tersebut.');

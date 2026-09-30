@@ -313,6 +313,6 @@
     @endpush
 
     @push('scripts')
-        <script src="{{ asset('face-api/face-api.min.js') }}"></script>
+        <script src="{{ asset('face-api/face-api-1.7.15.js') }}"></script>
     @endpush
 </x-app-layout>

@@ -153,6 +153,28 @@ export const VERIFICATION_NOTICES = {
         'Absensi gagal dikirim',
         `Terjadi gangguan koneksi atau server. Periksa koneksi internet lalu coba kembali. ${notRecorded}`,
     ),
+    faceCheckFailed: notice(
+        'Pemeriksaan wajah terhenti',
+        `Perangkat terlalu lama memproses foto atau pengenal wajah berhenti bekerja. ${notRecorded}`,
+        'retake',
+        'warning',
+        [
+            'Tekan Ambil Foto Ulang, lalu tekan Gunakan Foto sekali saja dan tunggu hasilnya.',
+            'Tutup aplikasi lain yang terbuka dan matikan Mode Daya Rendah (iPhone) atau penghemat baterai.',
+            'Jika masih gagal, muat ulang halaman absensi lalu ulangi dari awal.',
+        ],
+    ),
+    submitTimeout: notice(
+        'Server belum merespons',
+        'Pengiriman absensi melebihi batas waktu. Absensi mungkin sudah tercatat atau belum.',
+        'retry',
+        'warning',
+        [
+            'Jangan langsung mengulang absensi.',
+            'Muat ulang halaman absensi untuk melihat apakah jam masuk atau pulang sudah tercatat.',
+            'Jika belum tercatat, periksa koneksi internet lalu lakukan absensi kembali.',
+        ],
+    ),
     reportIncomplete: notice(
         'Laporan belum lengkap',
         `Tulis laporan minimal 15 karakter sebelum melanjutkan absensi. ${notRecorded}`,

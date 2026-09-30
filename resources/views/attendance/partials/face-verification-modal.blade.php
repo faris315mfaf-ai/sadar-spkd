@@ -46,7 +46,8 @@
                 class="relative mx-auto w-full max-w-xl scroll-m-4 overflow-hidden rounded-2xl border border-gray-200 bg-gray-900 outline-none dark:border-gray-600">
                 <video id="face-video" autoplay muted playsinline
                     class="aspect-square max-h-[min(42vh,24rem)] w-full scale-x-[-1] object-cover sm:max-h-[min(52vh,28rem)] md:max-h-[min(56vh,32rem)]"></video>
-                <img id="face-preview-image" class="hidden aspect-square max-h-[min(42vh,24rem)] w-full object-cover sm:max-h-[min(52vh,28rem)] md:max-h-[min(56vh,32rem)]">
+                {{-- The saved photo is not mirrored (it must match the registered face); only the preview is. --}}
+                <img id="face-preview-image" alt="Foto verifikasi" class="hidden aspect-square max-h-[min(42vh,24rem)] w-full scale-x-[-1] object-cover sm:max-h-[min(52vh,28rem)] md:max-h-[min(56vh,32rem)]">
                 <canvas id="face-canvas" class="hidden"></canvas>
                 <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent px-4 py-3">
                     <p id="face-status" class="text-sm font-medium text-white">Menyiapkan kamera...</p>
