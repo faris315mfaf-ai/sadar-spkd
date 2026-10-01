@@ -13,6 +13,7 @@ use App\Http\Controllers\MyPayrollController;
 use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\PayrollController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\UserAccountController;
 use App\Http\Controllers\Settings\WorkLocationController;
 use App\Http\Controllers\Settings\SecurityScheduleController;
 use App\Http\Controllers\Settings\WorkHourSettingController;
@@ -102,6 +103,13 @@ Route::middleware(['auth', 'verified', 'role:admin,hr'])->group(function () {
     Route::delete('/payroll-details/{detail}', [PayrollController::class, 'deletePayrollDetail'])->middleware('feature:payroll')->name('payroll-details.destroy');
     Route::post('/payrolls/{payroll}/undo', [PayrollController::class, 'undoLastChange'])->middleware('feature:payroll')->name('payrolls.undo');
     Route::post('/payrolls/{payroll}/reset-to-system', [PayrollController::class, 'resetToSystem'])->middleware('feature:payroll')->name('payrolls.reset-to-system');
+});
+
+// Superadmin only: HR could otherwise take over the admin account.
+Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin/accounts')->name('admin.accounts.')->group(function () {
+    Route::get('/', [UserAccountController::class, 'index'])->name('index');
+    Route::get('/{user}/password', [UserAccountController::class, 'editPassword'])->name('password.edit');
+    Route::put('/{user}/password', [UserAccountController::class, 'updatePassword'])->name('password.update');
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {

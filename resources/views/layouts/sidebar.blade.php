@@ -163,6 +163,20 @@
                 Sistem
             </p>
 
+            @if ($authUser->hasRole('admin'))
+                <a href="{{ route('admin.accounts.index') }}"
+                    class="mb-1 flex w-full items-center rounded-2xl px-3.5 py-2.5 text-sm font-semibold transition-all duration-200 {{ $adminLink(request()->routeIs('admin.accounts.*')) }}">
+                    <svg class="mr-3 h-5 w-5 flex-shrink-0 opacity-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                    </svg>
+                    Akun &amp; Password
+                    @if (request()->routeIs('admin.accounts.*'))
+                        <span class="ml-auto h-1.5 w-1.5 rounded-full bg-brand-500"></span>
+                    @endif
+                </a>
+            @endif
+
             <div
                 x-data="{
                     open: localStorage.getItem('settingsMenuOpen') === '1',

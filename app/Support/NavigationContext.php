@@ -12,6 +12,7 @@ class NavigationContext
             'employees.*',
             'admin.attendance.*',
             'admin.absence-threshold.*',
+            'admin.accounts.*',
             'leave-verification.*',
             'payrolls.*',
             'settings.*',

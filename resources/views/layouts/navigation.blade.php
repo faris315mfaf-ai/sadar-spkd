@@ -8,6 +8,7 @@
         request()->routeIs('dashboard') => 'Dashboard',
         request()->routeIs('employees.*') => 'Data Karyawan',
         request()->routeIs('admin.attendance.*') => 'Admin Absensi',
+        request()->routeIs('admin.accounts.*') => 'Akun & Password',
         request()->routeIs('leave-verification.*') => 'Verifikasi Pengajuan',
         request()->routeIs('payrolls.*') => 'Penggajian',
         request()->routeIs('activity-log.*') => 'Log Aktivitas',
